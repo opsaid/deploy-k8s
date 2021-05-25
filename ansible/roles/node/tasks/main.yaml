@@ -1,0 +1,15 @@
+---
+# 创建 k8s worker 相关目录
+- name: 创建 k8s worker 相关目录
+  file: path={{ item }} mode=0755 state=directory
+  with_items:
+    - "{{ data_dir }}/kubelet"
+    - "{{ etc_dir }}/manifests"
+    - "{{ install_dir }}/kubelet"
+    - "{{ install_dir }}/kube-proxy"
+
+- import_tasks: kubelet.yaml
+- import_tasks: kube-proxy.yaml
+- import_tasks: containerd.yaml
+- import_tasks: calicoctl.yaml
+- import_tasks: cri-tools.yaml

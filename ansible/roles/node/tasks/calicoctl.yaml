@@ -1,0 +1,30 @@
+---
+- name: 创建 calico 相关目录
+  file: path={{ item }} mode=0755 state=directory
+  with_items:
+    - /etc/calico
+
+- name: 创建 {{ role_name }} 相关配置
+  template:
+    src: calico/{{ item }}.j2
+    dest: /etc/calico/{{ item }}
+    owner: root
+    group: root
+    mode: 0644
+    backup: no
+  with_items:
+    - calicoctl.cfg
+
+# /usr/local/bin/calicoctl
+# 拷贝 calicoctl 二进制文件
+- stat:
+    path: /usr/local/bin/calicoctl
+  register: calicoctl
+- name: 拷贝 calicoctl 二进制文件
+  copy:
+    src: ../../binary/files/calico/calicoctl-linux-amd64
+    dest: /usr/local/bin/calicoctl
+    owner: root
+    group: root
+    mode: 0755
+  when: calicoctl.stat.exists == False

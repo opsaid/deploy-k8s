@@ -1,0 +1,34 @@
+---
+- name: 在本地预先生成证书
+  hosts: pki
+  remote_user: root
+  tags:
+    - pki
+  roles:
+    - pki
+
+- name: 通用配置
+  hosts: control,worker
+  remote_user: root
+  tags:
+    - common
+  roles:
+    - common
+
+- name: 创建k8s控制平面
+  hosts: control
+  remote_user: root
+  tags:
+    - control
+  roles:
+    - etcd
+    - control
+    - node
+
+- name: 创建k8s worker节点
+  hosts: worker
+  remote_user: root
+  tags:
+    - worker
+  roles:
+    - node

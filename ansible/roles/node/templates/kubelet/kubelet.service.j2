@@ -1,0 +1,20 @@
+[Unit]
+Description=The Kubernetes Node Agent
+Documentation={{ product_docs }}
+After=containerd.service
+Requires=containerd.service
+
+[Service]
+WorkingDirectory={{ data_dir }}/kubelet
+EnvironmentFile={{ install_dir }}/kubelet/environment
+ExecStart={{ install_dir }}/kubelet/kubelet \
+        $KUBE_FLAG_GENERIC \
+        $KUBE_FLAG_GLOBAL
+Type=simple
+RestartSec=10
+Restart=always
+LimitNOFILE=65536
+StartLimitInterval=0
+
+[Install]
+WantedBy=multi-user.target

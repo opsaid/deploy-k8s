@@ -1,0 +1,19 @@
+---
+
+- stat:
+    path: roles/pki/files/{{ item }}.crt
+  with_items:
+  - etcd/ca
+  - apiserver/ca
+  - front-proxy/ca
+  register: certs
+- name: 生成内置etcd集群相关证书
+  vars:
+    work_dir: "roles/pki/files"
+    cert_kind: "{{ outer_item.item | dirname }}"
+    cert_name: "{{ outer_item.item | basename }}"
+  include_tasks: "openssl.yaml"
+  with_items: "{{ certs.results }}"
+  loop_control:
+    loop_var: outer_item
+  when: outer_item.stat.exists == False

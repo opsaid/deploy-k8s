@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Config
+preferences: {}
+current-context: {{ tls_bootstrap_user }}@{{ cluster_name }}
+clusters:
+- cluster:
+    certificate-authority: {{ etc_dir }}/pki/apiserver.crt
+    server: {{ apiserver_addr }}
+  name: {{ cluster_name }}
+contexts:
+- context:
+    cluster: {{ cluster_name }}
+    user: {{ tls_bootstrap_user }}
+  name: {{ tls_bootstrap_user }}@{{ cluster_name }}
+users:
+- name: {{ tls_bootstrap_user }}
+  user:
+    token: {{ tls_bootstrap_token }}

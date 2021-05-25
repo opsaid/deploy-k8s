@@ -1,0 +1,8 @@
+---
+
+- import_tasks: certs.yaml
+- import_tasks: kubectl.yaml
+- import_tasks: kube-apiserver.yaml
+- import_tasks: kube-scheduler.yaml
+- import_tasks: kube-controller-manager.yaml
+- import_tasks: manifests.yaml

@@ -1,0 +1,27 @@
+# {{ product_docs }}
+
+KUBE_FLAG_GENERIC="\
+  --bootstrap-kubeconfig={{ etc_dir }}/bootstrap-kubelet.conf \
+  --cert-dir={{ etc_dir }}/pki/ \
+  --cni-bin-dir=/opt/cni/bin \
+  --cni-conf-dir=/etc/cni/net.d \
+  --config={{ install_dir }}/kubelet/config.yaml \
+  --enable-server=true \
+  --hostname-override={{ ansible_host }} \
+  --image-pull-progress-deadline=1m0s \
+  --kubeconfig={{ etc_dir }}/kubelet.conf \
+  --network-plugin=cni \
+  --node-ip={{ ansible_host }} \
+  --root-dir={{ data_dir }}/kubelet \
+  --container-runtime=remote \
+  --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock \
+  --runtime-cgroups=/systemd/system.slice"
+
+KUBE_FLAG_GLOBAL="\
+  --alsologtostderr=true \
+  --log-dir={{ log_dir }} \
+  --log-file={{ log_dir }}/kubelet.log \
+  --log-file-max-size=2048 \
+  --log-flush-frequency=5s \
+  --logtostderr=false \
+  --v=0"

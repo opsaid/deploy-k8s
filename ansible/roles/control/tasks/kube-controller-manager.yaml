@@ -1,0 +1,44 @@
+---
+# https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/
+- name: 创建 kube-controller-manager 配置文件
+  template:
+    src: kube-controller-manager/environment.j2
+    dest: "{{ install_dir }}/kube-controller-manager/environment"
+    owner: root
+    group: root
+    mode: 0644
+    backup: no
+
+- name: 创建 controller-manager.config 文件
+  template:
+    src: kube-controller-manager/controller-manager.conf.j2
+    dest: "{{ etc_dir }}/controller-manager.conf"
+    owner: root
+    group: root
+    mode: 0600
+    backup: no
+
+# 拷贝 kube-controller-manager 二进制文件
+- stat:
+    path: "{{ install_dir }}/kube-controller-manager/kube-controller-manager"
+  register: controller
+- name: 拷贝 kube-controller-manager 二进制文件
+  copy:
+    src: ../../binary/files/kubernetes/server/bin/kube-controller-manager
+    dest: "{{ install_dir }}/kube-controller-manager/kube-controller-manager"
+    owner: root
+    group: root
+    mode: 0755
+  when: controller.stat.exists == False
+
+- name: 创建 kube-controller-manager systemd 文件
+  template:
+    src: kube-controller-manager/kube-controller-manager.service.j2
+    dest: /usr/lib/systemd/system/kube-controller-manager.service
+    owner: root
+    group: root
+    mode: 0644
+    backup: no
+  notify:
+    - enabled kube-controller-manager
+    - restart kube-controller-manager

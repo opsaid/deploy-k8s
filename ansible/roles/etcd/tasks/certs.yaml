@@ -1,0 +1,10 @@
+---
+# 拷贝etcd证书
+- name: 拷贝外部etcd集群相关证书
+  copy: src=../../pki/files/{{ item }} dest={{ etc_dir }}/pki/{{ item }} owner=root group=root mode=0644
+  with_items:
+  - etcd/ca.crt
+  - etcd/peer.crt
+  - etcd/peer.key
+  - etcd/server.crt
+  - etcd/server.key

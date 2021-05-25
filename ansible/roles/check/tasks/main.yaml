@@ -1,0 +1,4 @@
+---
+
+- import_tasks: etcd.yaml
+- import_tasks: kubernetes.yaml

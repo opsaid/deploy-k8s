@@ -1,0 +1,59 @@
+---
+# 用于检测etcd的相关依赖是否完整
+
+- stat:
+    path: roles/pki/files/etcd/ca.crt
+  delegate_to: localhost
+  register: etcd_ca_crt
+- stat:
+    path: roles/pki/files/etcd/ca.key
+  delegate_to: localhost
+  register: etcd_ca_key
+- stat:
+    path: roles/pki/files/etcd/healthcheck-client.crt
+  delegate_to: localhost
+  register: etcd_healthcheck_crt
+- stat:
+    path: roles/pki/files/etcd/healthcheck-client.key
+  delegate_to: localhost
+  register: etcd_healthcheck_key
+- stat:
+    path: roles/pki/files/etcd/peer.crt
+  delegate_to: localhost
+  register: etcd_peer_crt
+- stat:
+    path: roles/pki/files/etcd/peer.key
+  delegate_to: localhost
+  register: etcd_peer_key
+- stat:
+    path: roles/pki/files/etcd/server.crt
+  delegate_to: localhost
+  register: etcd_server_crt
+- stat:
+    path: roles/pki/files/etcd/server.key
+  delegate_to: localhost
+  register: etcd_server_key
+
+- name: 检测etcd是否满足证书需求
+  assert:  
+    that:
+      - etcd_ca_crt.stat.exists == True
+      - etcd_ca_key.stat.exists == True
+      - etcd_healthcheck_crt.stat.exists == True
+      - etcd_healthcheck_key.stat.exists == True
+      - etcd_peer_crt.stat.exists == True
+      - etcd_peer_key.stat.exists == True
+      - etcd_server_crt.stat.exists == True
+      - etcd_server_key.stat.exists == True
+    fail_msg: "must exist external etcd certs pki/etcd/*.{crt,key}"
+    quiet: True
+  when: external_etcd == True
+
+- name: 检测etcd是否满足证书需求
+  assert:  
+    that:
+      - etcd_ca_crt.stat.exists == True
+      - etcd_ca_key.stat.exists == True
+    fail_msg: "must exist pki/etcd/ca.{crt,key}"
+    quiet: True
+  when: external_etcd == False

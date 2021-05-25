@@ -1,0 +1,55 @@
+---
+- name: 创建 kubelet 配置文件
+  template:
+    src: kubelet/{{ item }}.j2
+    dest: "{{ install_dir }}/kubelet/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+    backup: no
+  with_items:
+    - config.yaml
+    - environment
+
+- name: 创建 kubelet kubeconfig配置文件
+  template:
+    src: kubelet/{{ item }}
+    dest: "{{ etc_dir }}/bootstrap-kubelet.conf"
+    owner: root
+    group: root
+    mode: 0644
+    backup: no
+  with_items:
+    - bootstrap-kubelet.conf.j2
+
+# 拷贝证书
+- name: 拷贝证书
+  copy: src=../../pki/files/apiserver/{{ item }} dest={{ etc_dir }}/pki/{{ item }} owner=root group=root mode=0644
+  with_items:
+    - ca.crt
+    - apiserver.crt
+
+# 拷贝 kubelet 二进制文件
+- stat:
+    path: "{{ install_dir }}/kubelet/kubelet"
+  register: kubelet
+- name: 拷贝 kubelet 二进制文件
+  copy:
+    src: ../../binary/files/kubernetes/server/bin/kubelet
+    dest: "{{ install_dir }}/kubelet/kubelet"
+    owner: root
+    group: root
+    mode: 0755
+  when: kubelet.stat.exists == False
+
+- name: 创建 kubelet systemd 文件
+  template:
+    src: kubelet/kubelet.service.j2
+    dest: /usr/lib/systemd/system/kubelet.service
+    owner: root
+    group: root
+    mode: 0644
+    backup: no
+  notify:
+    - enabled kubelet
+    - restart kubelet

@@ -1,0 +1,15 @@
+---
+# 用于检测k8s的相关依赖是否完整
+
+- stat:
+    path: roles/pki/files/oidc/ca.crt
+  delegate_to: localhost
+  register: k8s_oidc_crt
+
+- name: 检测k8s是否满足证书需求
+  assert:  
+    that:
+      - k8s_oidc_crt.stat.exists == True
+    fail_msg: "must exist oidc ca cert pki/oidc/ca.crt"
+    quiet: True
+  when: oidc_ca_file is defined

@@ -1,0 +1,37 @@
+---
+
+- name: 拷贝{{ cert_name }}-csr.conf文件
+  template:
+    src: "{{ cert_kind }}/{{ cert_name }}-csr.conf.j2"
+    dest: "{{ work_dir }}/{{ cert_kind }}/{{ cert_name }}-csr.conf"
+
+- name: 生成 {{ cert_name }}.key 私钥
+  command: openssl genrsa -out {{ cert_name }}.key 2048
+  args:
+    chdir: "{{ work_dir }}/{{ cert_kind }}"
+
+- name: 生成 {{ cert_name }}.csr 证书
+  command: openssl req -new -key {{ cert_name }}.key -out {{ cert_name }}.csr -config {{ cert_name }}-csr.conf
+  args:
+    chdir: "{{ work_dir }}/{{ cert_kind }}"
+
+- name: 签名 {{ cert_name }}.crt 证书
+  command: openssl x509 -req -in {{ cert_name }}.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out {{ cert_name }}.crt -days 3650 -extensions v3_ext -extfile {{ cert_name }}-csr.conf
+  args:
+    chdir: "{{ work_dir }}/{{ cert_kind }}"
+  when: cert_name != "ca"
+
+- name: 签名 {{ cert_name }}.crt 证书
+  command: openssl x509 -req -in {{ cert_name }}.csr -signkey {{ cert_name }}.key -out {{ cert_name }}.crt -days 7300 -extensions v3_ext -extfile {{ cert_name }}-csr.conf
+  args:
+    chdir: "{{ work_dir }}/{{ cert_kind }}"
+  when: cert_name == "ca"
+
+- name: 清理临时生成的文件
+  file:
+    path: "{{ work_dir }}/{{ cert_kind }}/{{ item }}"
+    state: absent
+  with_items:
+  - ca.srl
+  - "{{ cert_name }}.csr"
+  - "{{ cert_name }}-csr.conf"

@@ -1,0 +1,26 @@
+---
+- name: 安装 etcd 软件包
+  yum: name=etcd.x86_64 state=latest
+
+- name: 设置 etcd 配置文件
+  template:
+    src: etcd.conf
+    dest: /etc/etcd/etcd.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart etcd
+    - enabled etcd
+
+- name: 创建 etcd 数据目录
+  file: path={{ item }} owner=etcd group=etcd mode=0755 state=directory
+  with_items:
+    - "{{ data_dir }}/etcd"
+
+- name: 启动 etcd 并设置默认启动
+  systemd:
+    name: etcd
+    state: started
+    enabled: yes
+    #daemon_reload: yes

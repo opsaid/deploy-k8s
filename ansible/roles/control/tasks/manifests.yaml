@@ -1,0 +1,21 @@
+---
+- stat:
+    path: /usr/local/src/manifests/rbac.yaml
+  register: manifests
+- name: 创建k8s基础组件部署清单
+  template:
+    src: manifests/{{ item }}.j2
+    dest: /usr/local/src/manifests/{{ item }}
+    owner: root
+    group: root
+    mode: 0644
+  with_items: 
+    - psp.yaml
+    - rbac.yaml
+    - calico.yaml
+    - coredns.yaml
+    - metrics-server.yaml
+  notify:
+    - kubectl label control
+    - kubectl apply manifests
+  when: manifests.stat.exists == False

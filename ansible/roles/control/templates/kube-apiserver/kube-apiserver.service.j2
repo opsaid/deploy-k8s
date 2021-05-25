@@ -1,0 +1,23 @@
+[Unit]
+Description=Kubernetes API Service
+Documentation={{ product_docs }}
+After=etcd.service
+Wants=etcd.service
+
+[Service]
+EnvironmentFile={{ install_dir }}/kube-apiserver/environment
+ExecStart={{ install_dir }}/kube-apiserver/kube-apiserver \
+        $KUBE_FLAG_GENERIC \
+        $KUBE_FLAG_ETCD \
+        $KUBE_FLAG_SECURE_SERVING \
+        $KUBE_FLAG_AUDITING \
+        $KUBE_FLAG_ADMISSION \
+        $KUBE_FLAG_GLOBAL
+Type=notify
+RestartSec=10
+Restart=always
+LimitNOFILE=65536
+StartLimitInterval=0
+
+[Install]
+WantedBy=multi-user.target

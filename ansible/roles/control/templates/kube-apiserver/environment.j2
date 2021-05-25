@@ -1,0 +1,79 @@
+# {{ product_docs }}
+
+KUBE_FLAG_GENERIC="\
+  --advertise-address={{ ansible_host }} \
+  --default-not-ready-toleration-seconds=60 \
+  --default-unreachable-toleration-seconds=60 \
+  --goaway-chance=0.001 \
+  --livez-grace-period=5m"
+
+KUBE_FLAG_ETCD="\
+  --storage-backend=etcd3 \
+  --watch-cache=true \
+  --default-watch-cache-size=100 \
+  --enable-garbage-collector=true \
+  --etcd-cafile={{ etc_dir }}/pki/etcd/ca.crt \
+  --etcd-certfile={{ etc_dir }}/pki/apiserver-etcd-client.crt \
+  --etcd-keyfile={{ etc_dir }}/pki/apiserver-etcd-client.key \
+  --etcd-prefix=/kubernetes/{{ cluster_domain }}/registry \
+  --etcd-compaction-interval=30m \
+  --etcd-servers={% for host in groups['etcd'] %}https://{{ hostvars[host]['server_name'] }}:2379{% if not loop.last %},{% endif %}{% endfor %}"
+
+KUBE_FLAG_SECURE_SERVING="\
+  --bind-address={{ ansible_host }} \
+  --secure-port=6443 \
+  --address=127.0.0.1 \
+  --port=8080 \
+  --tls-cert-file={{ etc_dir }}/pki/apiserver.crt \
+  --tls-private-key-file={{ etc_dir }}/pki/apiserver.key \
+  --anonymous-auth=true \
+  --client-ca-file={{ etc_dir }}/pki/ca.crt \
+  --enable-bootstrap-token-auth \
+{% if (oidc_issuer_url is defined) and (oidc_client_id is defined) %}
+  --oidc-issuer-url={{ oidc_issuer_url }} \
+  --oidc-client-id={{ oidc_client_id }} \
+{% if oidc_ca_file is defined %}
+  --oidc-ca-file={{ oidc_ca_file }} \
+{% endif %}
+  --oidc-username-claim={{ oidc_username_claim }} \
+  --oidc-groups-claim={{ oidc_groups_claim }} \
+{% endif %}
+  --requestheader-allowed-names=front-proxy-client \
+  --requestheader-client-ca-file={{ etc_dir }}/pki/front-proxy-ca.crt \
+  --requestheader-extra-headers-prefix=X-Remote-Extra- \
+  --requestheader-group-headers=X-Remote-Group \
+  --requestheader-username-headers=X-Remote-User \
+  --token-auth-file={{ etc_dir }}/known_tokens.csv \
+  --authorization-mode=RBAC,Node \
+  --proxy-client-cert-file={{ etc_dir }}/pki/front-proxy-client.crt \
+  --proxy-client-key-file={{ etc_dir }}/pki/front-proxy-client.key \
+  --allow-privileged=true \
+  --apiserver-count={{ groups['control'] | length }} \
+  --enable-aggregator-routing=false \
+  --endpoint-reconciler-type=lease \
+  --event-ttl=1h \
+  --kubelet-client-certificate={{ etc_dir }}/pki/apiserver-kubelet-client.crt \
+  --kubelet-client-key={{ etc_dir }}/pki/apiserver-kubelet-client.key \
+  --kubelet-https=true \
+  --service-account-key-file={{ etc_dir }}/pki/sa.key \
+  --service-cluster-ip-range={{ service_cluster_ip_range }} \
+  --service-node-port-range=30000-32767"
+
+KUBE_FLAG_AUDITING="\
+  --audit-log-path={{ log_dir }}/audit.log \
+  --audit-log-maxage=20 \
+  --audit-log-maxbackup=10 \
+  --audit-log-maxsize=1024 \
+  --audit-policy-file={{ install_dir }}/kube-apiserver/audit-policy.yaml"
+
+KUBE_FLAG_ADMISSION="\
+  --enable-admission-plugins=NamespaceLifecycle,LimitRanger,ServiceAccount,TaintNodesByCondition,Priority,DefaultTolerationSeconds,DefaultStorageClass,StorageObjectInUseProtection,PersistentVolumeClaimResize,RuntimeClass,CertificateApproval,CertificateSigning,CertificateSubjectRestriction,DefaultIngressClass,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,PodSecurityPolicy"
+
+KUBE_FLAG_GLOBAL="\
+  --alsologtostderr=true \
+  --log-dir={{ log_dir }} \
+  --log-file={{ log_dir }}/kube-apiserver.log \
+  --log-file-max-size=2048 \
+  --log-flush-frequency=5s \
+  --logtostderr=false \
+  --v=0"

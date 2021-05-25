@@ -1,0 +1,13 @@
+---
+# 拷贝 kubectl 二进制文件
+- stat:
+    path: /usr/bin/kubectl
+  register: kubectl
+- name: 拷贝 kubectl 二进制文件
+  copy:
+    src: ../../binary/files/kubernetes/client/bin/kubectl
+    dest: /usr/bin/kubectl
+    owner: root
+    group: root
+    mode: 0755
+  when: kubectl.stat.exists == False

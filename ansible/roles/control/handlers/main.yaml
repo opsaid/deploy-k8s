@@ -1,0 +1,38 @@
+---
+- name: enabled kube-apiserver
+  systemd: name=kube-apiserver enabled=yes
+- name: restart kube-apiserver
+  systemd: name=kube-apiserver state=restarted
+
+- name: enabled kube-scheduler
+  systemd: name=kube-scheduler enabled=yes
+- name: restart kube-scheduler
+  systemd: name=kube-scheduler state=restarted
+
+- name: enabled kube-controller-manager
+  systemd: name=kube-controller-manager enabled=yes
+- name: restart kube-controller-manager
+  systemd: name=kube-controller-manager state=restarted
+
+- name: kubectl apply manifests
+  shell: "kubectl apply -f /usr/local/src/manifests/{{ item }}"
+  run_once: true
+  ignore_errors: yes
+  with_items:
+    - psp.yaml
+    - rbac.yaml
+#    - calico.yaml
+#    - coredns.yaml
+#    - metrics-server.yaml
+
+- name: kubectl label control
+  shell: "kubectl label node {{ item }} node-role.kubernetes.io/master="
+  run_once: true
+  ignore_errors: yes
+  loop: "{{ groups['control'] }}"
+
+- name: kubectl label control
+  shell: "kubectl taint node {{ item }} node-role.kubernetes.io/master:NoSchedule"
+  run_once: true
+  ignore_errors: yes
+  loop: "{{ groups['control'] }}"

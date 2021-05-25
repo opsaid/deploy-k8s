@@ -1,0 +1,47 @@
+---
+# https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/
+- name: 创建 kube-scheduler 配置文件
+  template:
+    src: kube-scheduler/{{ item }}.j2
+    dest: "{{ install_dir }}/kube-scheduler/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+    backup: no
+  with_items:
+    - config.yaml
+    - environment
+
+- name: 创建 scheduler.config 文件
+  template:
+    src: kube-scheduler/scheduler.conf.j2
+    dest: "{{ etc_dir }}/scheduler.conf"
+    owner: root
+    group: root
+    mode: 0600
+    backup: no
+
+# 拷贝 kube-scheduler 二进制文件
+- stat:
+    path: "{{ install_dir }}/kube-scheduler/kube-scheduler"
+  register: scheduler
+- name: 拷贝 kube-scheduler 二进制文件
+  copy:
+    src: ../../binary/files/kubernetes/server/bin/kube-scheduler
+    dest: "{{ install_dir }}/kube-scheduler/kube-scheduler"
+    owner: root
+    group: root
+    mode: 0755
+  when: scheduler.stat.exists == False
+
+- name: 创建 kube-scheduler systemd 文件
+  template:
+    src: kube-scheduler/kube-scheduler.service.j2
+    dest: /usr/lib/systemd/system/kube-scheduler.service
+    owner: root
+    group: root
+    mode: 0644
+    backup: no
+  notify:
+    - enabled kube-scheduler
+    - restart kube-scheduler

@@ -1,0 +1,36 @@
+---
+- name: 创建 cri-tools 相关配置
+  template:
+    src: cri-tools/{{ item }}.j2
+    dest: /etc/crictl.yaml
+    owner: root
+    group: root
+    mode: 0644
+    backup: no
+  with_items:
+    - crictl.yaml
+
+# 拷贝 cri-tools 二进制文件
+- stat:
+    path: /usr/local/bin/crictl
+  register: crictl
+- name: 拷贝 crictl 二进制文件
+  copy:
+    src: ../../binary/files/cri-tools/crictl-linux-amd64
+    dest: /usr/local/bin/crictl
+    owner: root
+    group: root
+    mode: 0755
+  when: crictl.stat.exists == False
+
+- stat:
+    path: /usr/local/bin/critest
+  register: critest
+- name: 拷贝 critest 二进制文件
+  copy:
+    src: ../../binary/files/cri-tools/critest-linux-amd64
+    dest: /usr/local/bin/critest
+    owner: root
+    group: root
+    mode: 0755
+  when: critest.stat.exists == False

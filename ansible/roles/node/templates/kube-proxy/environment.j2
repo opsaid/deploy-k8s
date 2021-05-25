@@ -1,0 +1,14 @@
+# {{ product_docs }}
+
+KUBE_FLAG_GENERIC="\
+  --profiling=true \
+  --config={{ install_dir }}/kube-proxy/config.yaml"
+
+KUBE_FLAG_GLOBAL="\
+  --alsologtostderr=true \
+  --log-dir={{ log_dir }} \
+  --log-file={{ log_dir }}/kube-proxy.log \
+  --log-file-max-size=2048 \
+  --log-flush-frequency=5s \
+  --logtostderr=false \
+  --v=0"

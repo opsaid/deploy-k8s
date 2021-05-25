@@ -1,0 +1,17 @@
+---
+
+- name: 设置 /etc/hosts
+  block:
+    - name: 添加 ETCD集群至 /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ hostvars[item]['ansible_host'] }} {{ hostvars[item]['server_name'] }}"
+        regexp: "^{{ hostvars[item]['ansible_host'] }} {{ hostvars[item]['server_name'] }}"
+      with_items: "{{ groups['etcd'] }}"
+
+    - name: 添加 apiserver 地址 /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ apiserver_haip }} {{ apiserver_host }}"
+        regexp: "^{{ apiserver_haip }} {{ apiserver_host }}"
+  when: resolv_use_hosts

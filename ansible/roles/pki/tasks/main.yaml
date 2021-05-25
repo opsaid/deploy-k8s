@@ -1,0 +1,16 @@
+---
+
+# 创建 kubernetes 安装目录
+- name: 创建 kubernetes 安装目录
+  file: path={{ item }} mode=0755 state=directory
+  with_items:
+    - "roles/pki/files/oidc"
+    - "roles/pki/files/etcd"
+    - "roles/pki/files/apiserver"
+    - "roles/pki/files/front-proxy"
+
+# 生成各服务依赖的证书文件
+- import_tasks: generate_ca.yaml
+- import_tasks: generate_etcd.yaml
+- import_tasks: generate_proxy.yaml
+- import_tasks: generate_apiserver.yaml

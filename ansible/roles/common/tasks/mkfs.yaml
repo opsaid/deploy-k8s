@@ -1,0 +1,24 @@
+---
+
+- name: 判断是否使用独立数据盘
+  block:
+  - stat:
+      path: "{{ data_device_path }}"
+    register: data
+  - name: 格式化 {{ data_device_path }} 并挂载至 {{ data_dir }}
+    block:
+    - name: 格式化 {{ data_device_path }} 为 xfs 分区
+      filesystem:
+        fstype: xfs
+        dev: "{{ data_device_path }}"
+        force: no
+        opts: -n ftype=1
+    - name: 挂载 {{ data_device_path }} 至 {{ data_dir }}
+      mount:
+        path: "{{ data_dir }}"
+        src: "{{ data_device_path }}"
+        fstype: xfs
+        #opts: noatime
+        state: mounted
+    when: data.stat.exists
+  when: data_device_path is defined

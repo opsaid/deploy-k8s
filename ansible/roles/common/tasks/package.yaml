@@ -1,0 +1,73 @@
+---
+
+# selinux带来安全保障，同时也加大复杂度，目前没有能力控制好，所以先禁用
+- name: 禁用 selinux
+  selinux:
+    state: disabled
+
+# 禁用 swap
+- name: 是否关闭swap
+  block:
+  - name: 关闭swap，执行 swapoff -a
+    command: "swapoff -a"
+    when: ansible_swaptotal_mb > 0
+  - name: 关闭swap，取消 /etc/fstab 中 swap 挂载
+    lineinfile:
+      path: "/etc/fstab"
+      line: '#\1 swap \2'
+      regexp: "(?!#)(.*) swap (.*)"
+      #backup: yes
+      state: present
+      backrefs: yes
+  when: disable_swap == True
+
+# centos7默认使用firewalld管理iptable，卸载以防冲突
+- name: 卸载 firewalld 相关安装包
+  yum: 
+    name: ['firewalld', 'python-firewall', 'firewalld-filesystem']
+    state: absent
+
+# 关闭非必要服务
+#- name: stop unused service
+#  systemd:
+#    name: "{{ item }}"
+#    enabled:  no
+#    state: stopped
+#  with_items:
+#   - rpcbind.socket
+
+# socat 在work节点端口转发时候会用到
+- name: 安装基础软件包
+  yum: 
+    name: ['vim', 'net-tools', 'libseccomp', 'iproute', 'chrony', 'conntrack-tools']
+    state: latest
+
+# 时间同步
+- name: chrony
+  copy:
+    src: chrony.conf
+    dest: /etc/chrony.conf
+- name: enabled chronyd
+  systemd: 
+    name: chronyd
+    enabled: yes 
+    state: restarted 
+    daemon_reload: yes
+
+# 设置时区
+- name: Set timezone to {{ timezone }}
+  timezone:
+    name: "{{ timezone }}"
+
+# 创建 kubernetes 安装目录
+- name: 创建 kubernetes 安装目录
+  file: path={{ item }} mode=0755 state=directory
+  with_items:
+    - "{{ data_dir }}"
+    - "{{ etc_dir }}"
+    - "{{ etc_dir }}/pki"
+    - "{{ etc_dir }}/pki/etcd"
+    - "{{ etc_dir }}/pki/oidc"
+    - "{{ etc_dir }}/manifests"
+    - "{{ log_dir }}"
+    - "{{ install_dir }}"

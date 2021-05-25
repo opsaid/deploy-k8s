@@ -1,0 +1,42 @@
+---
+
+# 检查是否存在sa.pub/sa.key文件
+- stat:
+    path: roles/pki/files/sa.key
+  delegate_to: localhost
+  register: sa
+- name: 生成私钥
+  block:
+  - name: 生成sa.key
+    command: openssl genrsa -out sa.key 2048
+    args:
+      chdir: roles/pki/files/
+  - name: 生成sa.pub
+    command: openssl rsa -in sa.key -pubout -out sa.pub
+    args:
+      chdir: roles/pki/files/
+  delegate_to: localhost
+  when: sa.stat.exists == False
+
+# 由于apiserver.crt几个节点必须相同, kube-proxy-client几个节点均需要
+# 统一本地生成后在同步过去
+- stat:
+    path: roles/pki/files/{{ item }}.crt
+  with_items:
+  - apiserver/apiserver
+  - apiserver/cluster-admin
+  - apiserver/kube-proxy-client
+  - apiserver/scheduler-client
+  - apiserver/apiserver-kubelet-client
+  - apiserver/controller-manager-client
+  register: certs
+- name: 预先生成k8s apiserver相关本地证书
+  vars:
+    work_dir: "roles/pki/files"
+    cert_kind: "{{ outer_item.item | dirname }}"
+    cert_name: "{{ outer_item.item | basename }}"
+  include_tasks: "openssl.yaml"
+  with_items: "{{ certs.results }}"
+  loop_control:
+    loop_var: outer_item
+  when: outer_item.stat.exists == False
