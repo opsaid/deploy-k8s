@@ -86,6 +86,9 @@ container_registry:
     insecure_skip_verify: true
 - mirror: 'registry.cn-hangzhou.aliyuncs.com/kube-image-repo'
   endpoints: [ "https://registry.cn-hangzhou.aliyuncs.com/kube-image-repo" ]
+  #auth:
+  #  username: ""
+  #  password: ""
   tls:
     insecure_skip_verify: true
     

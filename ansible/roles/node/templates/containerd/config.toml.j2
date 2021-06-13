@@ -98,16 +98,19 @@ imports = ["/etc/containerd/config.toml"]
 
     [plugins."io.containerd.grpc.v1.cri".registry]
       [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
-
 {% for registry in container_registry %}
         [plugins."io.containerd.grpc.v1.cri".registry.mirrors."{{ registry.mirror }}"]
           endpoint = {{ registry.endpoints | to_json }}
 {% endfor %}
-
       [plugins."io.containerd.grpc.v1.cri".registry.configs]
-
 {% for registry in container_registry %}
         [plugins."io.containerd.grpc.v1.cri".registry.configs."{{ registry.mirror }}"]
+{% if registry.auth is defined %}
+          [plugins."io.containerd.grpc.v1.cri".registry.configs."{{ registry.mirror }}".auth]
+            username = "{{ registry.auth.username }}"
+            password = "{{ registry.auth.password }}"
+{% endif %}
+{% if registry.tls is defined %}
           [plugins."io.containerd.grpc.v1.cri".registry.configs."{{ registry.mirror }}".tls]
 {% if registry.tls.insecure_skip_verify is defined %}
             insecure_skip_verify = {{ registry.tls.insecure_skip_verify | to_json }}
@@ -120,6 +123,7 @@ imports = ["/etc/containerd/config.toml"]
 {% endif %}
 {% if registry.tls.key_file is defined %}
             key_file = "{{ registry.tls.key_file }}"
+{% endif %}
 {% endif %}
 {% endfor %}
 
