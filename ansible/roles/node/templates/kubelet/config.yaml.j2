@@ -1,7 +1,7 @@
 kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1
 staticPodPath: {{ etc_dir }}/manifests
-address: {{ ansible_host }}
+address: {{ ansible_facts[listen_device_name]['ipv4']['address'] }}
 port: 10250
 readOnlyPort: 10255
 authentication:
@@ -18,7 +18,7 @@ authorization:
     cacheAuthorizedTTL: 5m0s
     cacheUnauthorizedTTL: 30s
 healthzPort: 10248
-healthzBindAddress: {{ ansible_host }}
+healthzBindAddress: {{ ansible_facts[listen_device_name]['ipv4']['address'] }}
 oomScoreAdj: -999
 clusterDomain: {{ cluster_domain }}
 clusterDNS:

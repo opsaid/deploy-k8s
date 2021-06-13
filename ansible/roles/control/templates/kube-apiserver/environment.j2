@@ -1,7 +1,7 @@
 # {{ product_docs }}
 
 KUBE_FLAG_GENERIC="\
-  --advertise-address={{ ansible_host }} \
+  --advertise-address={{ ansible_facts[listen_device_name]['ipv4']['address'] }} \
   --default-not-ready-toleration-seconds=60 \
   --default-unreachable-toleration-seconds=60 \
   --goaway-chance=0.001 \
@@ -20,7 +20,7 @@ KUBE_FLAG_ETCD="\
   --etcd-servers={% for host in groups['etcd'] %}https://{{ hostvars[host]['server_name'] }}:2379{% if not loop.last %},{% endif %}{% endfor %}"
 
 KUBE_FLAG_SECURE_SERVING="\
-  --bind-address={{ ansible_host }} \
+  --bind-address={{ ansible_facts[listen_device_name]['ipv4']['address'] }} \
   --secure-port=6443 \
   --address=127.0.0.1 \
   --port=8080 \
