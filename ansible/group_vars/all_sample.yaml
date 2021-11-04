@@ -41,7 +41,7 @@ cluster_domain: "{{ cluster_name }}.k8s.opsaid.cn"
 node_cidr_mask: 28
 
 # worker 节点支持的最大 pod 数量
-node_max_pods: 16
+node_max_pods: 32
 
 # 集群pod使用的网络地址范围
 cluster_cidr: 192.168.201.0/24
@@ -68,6 +68,12 @@ apiserver_addr: https://{{ apiserver_host }}:6443
 # 生成方式：head -c 16 /dev/urandom | od -An -t x | tr -d ' '
 tls_bootstrap_user: kubelet-bootstrap
 tls_bootstrap_token: 53fb9ee737936db263ebd937ab1829cd
+
+# 在系统级禁用ipv6
+disable_ipv6: true
+
+# 系统服务是否必须在控制节点
+system_service_in_control_node: false
 
 # oidc设置
 #oidc_issuer_url: https://opsaid.com/oauth2

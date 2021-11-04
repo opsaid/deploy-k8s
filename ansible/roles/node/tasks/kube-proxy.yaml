@@ -2,8 +2,8 @@
 # socat 用于 worker 节点端口转发使用(helm)
 # ipvsadm 用于 ProxyMode=lvs 下，管理查看条目方便
 - name: 安装基础软件包
-  yum: 
-    name: ['socat', 'ipvsadm'] 
+  package: 
+    name: ['socat', 'ipvsadm', 'iptables'] 
     state: latest
 
 - name: 创建 kube-proxy 配置文件

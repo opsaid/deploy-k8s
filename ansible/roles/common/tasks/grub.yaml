@@ -1,0 +1,45 @@
+---
+
+- name: 修改cgroup使用v1版本
+  block:
+  - name: 检查cgroup版本是否使用v1
+    lineinfile:
+      path: /etc/default/grub
+      regexp: '^GRUB_CMDLINE_LINUX=(.*)systemd.unified_cgroup_hierarchy=0(.*)'
+      state: absent
+    check_mode: true
+    register: grub_cmdline_check
+  - name: 设置cgroup版本为v1
+    lineinfile: 
+      path: /etc/default/grub
+      backrefs: true
+      regexp: '^GRUB_CMDLINE_LINUX="(.*)"$'
+      line: 'GRUB_CMDLINE_LINUX="\1 systemd.unified_cgroup_hierarchy=0"'
+      state: present
+    when: grub_cmdline_check.found == 0
+    notify: debian update grub config
+  when: ansible_distribution == 'Debian' and ansible_distribution_major_version | int == 11
+
+- name: 系统级禁止ipv6
+  block:
+  - name: 是否已经配置禁止ipv6
+    lineinfile:
+      path: /etc/default/grub
+      regexp: 'GRUB_CMDLINE_LINUX=(.*)ipv6.disable=1(.*)'
+      state: absent
+    check_mode: true
+    register: grub_cmdline_check
+    changed_when: false
+
+  - name: 配置应用禁止ipv6规则
+    lineinfile:
+      path: /etc/default/grub
+      backrefs: yes
+      regexp: '^GRUB_CMDLINE_LINUX="(.*)"$'
+      line: 'GRUB_CMDLINE_LINUX="\1 ipv6.disable=1"'
+      state: present
+    when: grub_cmdline_check.found == 0
+    notify: 
+    - debian update grub config
+    - centos update grub config
+  when: disable_ipv6 == True

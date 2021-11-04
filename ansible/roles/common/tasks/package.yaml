@@ -1,9 +1,22 @@
 ---
+# 安装包源且更新apt cache
+- name: 设置 apt 源
+  block:
+  - name: 更新 sources.list 配置文件
+    template:
+      src: sources.list
+      dest: /etc/apt/sources.list
+  - name: 更新 apt cache
+    apt:
+      update_cache: yes
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 # selinux带来安全保障，同时也加大复杂度，目前没有能力控制好，所以先禁用
 - name: 禁用 selinux
   selinux:
     state: disabled
+  register: result
+  failed_when: result.msg | default('ok', True) is not search('(^ok$|libselinux-python|(SELinux state changed))')
 
 # 禁用 swap
 - name: 是否关闭swap
@@ -23,7 +36,7 @@
 
 # centos7默认使用firewalld管理iptable，卸载以防冲突
 - name: 卸载 firewalld 相关安装包
-  yum: 
+  package: 
     name: ['firewalld', 'python-firewall', 'firewalld-filesystem']
     state: absent
 
@@ -37,10 +50,17 @@
 #   - rpcbind.socket
 
 # socat 在work节点端口转发时候会用到
-- name: 安装基础软件包
-  yum: 
+# debian不存在 libseccomp
+- name: 安装基础软件包（centos/redhat）
+  package: 
     name: ['vim', 'net-tools', 'libseccomp', 'iproute', 'chrony', 'conntrack-tools']
     state: latest
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+- name: 安装基础软件包（debian/ubuntu）
+  package: 
+    name: ['vim', 'net-tools', 'libseccomp-dev', 'iproute2', 'chrony', 'conntrack']
+    state: latest
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 # 时间同步
 - name: chrony
