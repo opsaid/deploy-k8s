@@ -111,3 +111,18 @@ kubectl apply -f /usr/local/src/manifests/calico.yaml
 ```
 for i in $(kubectl get csr | grep -v NAME | awk '{ print $1 }'); do kubectl certificate approve $i; done
 ```
+
+## Others
+
+debian11默认使用cgroup v2，会导致kubelet启动不了，这里降级使用cgroup v1版本
+
+```
+/etc/default/grub
+
+GRUB_CMDLINE_LINUX="systemd.unified_cgroup_hierarchy=0"
+```
+
+```
+grub-mkconfig -o /boot/grub/grub.cfg
+```
+

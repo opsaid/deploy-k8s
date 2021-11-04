@@ -6,6 +6,16 @@
 
 ### Added
 
+- 进程以普通用户运行代替root
+
+## v0.1.1 - [2021-11-02]
+
+### Added
+
+- 新增系统级别是否禁用ipv6选项
+- 可控制关键进程coredns、calico controller是否必须部署在管理节点
+- debian11默认使用cgroup v2，kubelet当前依赖v1，在grub配置使用v1版本
+
 ## v0.1.0 - [2021-03-26]
 
 ### Added
