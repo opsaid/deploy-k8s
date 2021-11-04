@@ -1,0 +1,8 @@
+---
+- name: debian update grub config
+  shell: grub-mkconfig -o /boot/grub/grub.cfg
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+
+- name: centos update grub config
+  shell: grub2-mkconfig -o /boot/grub2/grub.cfg
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"

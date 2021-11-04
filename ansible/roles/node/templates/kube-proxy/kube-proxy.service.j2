@@ -2,7 +2,7 @@
 Description=Kubernetes Kube-Proxy Server
 Documentation={{ product_docs }}
 After=network.target
-Requires=network.service
+#Requires=network.service
 
 [Service]
 EnvironmentFile={{ install_dir }}/kube-proxy/environment
