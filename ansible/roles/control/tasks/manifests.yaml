@@ -14,7 +14,9 @@
     - rbac.yaml
     - calico.yaml
     - coredns.yaml
+    - calico-crd.yaml
     - metrics-server.yaml
+    - kustomization.yaml
   notify:
     - kubectl label control
     - kubectl apply manifests

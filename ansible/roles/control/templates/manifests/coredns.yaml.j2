@@ -149,8 +149,10 @@ spec:
             drop:
             - all
           readOnlyRootFilesystem: true
+{% if system_service_in_control_node %}
       nodeSelector:
         node-role.kubernetes.io/master: ""
+{% endif %}
       dnsPolicy: Default
       volumes:
         - name: config-volume

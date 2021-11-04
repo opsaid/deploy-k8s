@@ -15,15 +15,9 @@
   systemd: name=kube-controller-manager state=restarted
 
 - name: kubectl apply manifests
-  shell: "kubectl apply -f /usr/local/src/manifests/{{ item }}"
+  shell: "kubectl apply -k /usr/local/src/manifests"
   run_once: true
   ignore_errors: yes
-  with_items:
-    - psp.yaml
-    - rbac.yaml
-#    - calico.yaml
-#    - coredns.yaml
-#    - metrics-server.yaml
 
 - name: kubectl label control
   shell: "kubectl label node {{ item }} node-role.kubernetes.io/master="
