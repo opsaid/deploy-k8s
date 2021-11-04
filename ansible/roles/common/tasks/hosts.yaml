@@ -5,8 +5,8 @@
     - name: 添加 ETCD集群至 /etc/hosts
       lineinfile:
         path: /etc/hosts
-        line: "{{ ansible_facts[listen_device_name]['ipv4']['address'] }} {{ hostvars[item]['server_name'] }}"
-        regexp: "^{{ ansible_facts[listen_device_name]['ipv4']['address'] }} {{ hostvars[item]['server_name'] }}"
+        line: "{{ hostvars[item]['server_addr'] }} {{ hostvars[item]['server_name'] }}"
+        regexp: "^{{ hostvars[item]['server_addr'] }} {{ hostvars[item]['server_name'] }}"
       with_items: "{{ groups['etcd'] }}"
 
     - name: 添加 apiserver 地址 /etc/hosts
