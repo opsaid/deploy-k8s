@@ -429,9 +429,9 @@ spec:
           value: "info"
         - name: CALICO_DISABLE_FILE_LOGGING
           value: "true"
-        # 关闭http健康检测服务
+        # 开启http健康检测服务，calico-node -felix-live探测依赖
         - name: FELIX_HEALTHENABLED
-          value: "false"
+          value: "true"
         - name: FELIX_PROMETHEUSPROCESSMETRICSENABLED
           value: "true"
         - name: FELIX_PROMETHEUSMETRICSHOST
