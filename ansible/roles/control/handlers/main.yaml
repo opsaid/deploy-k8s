@@ -20,13 +20,13 @@
   ignore_errors: yes
 
 - name: kubectl label control
-  shell: "kubectl label node {{ item }} node-role.kubernetes.io/master="
+  shell: "kubectl label node {{ hostvars[item]['ansible_host'] }} node-role.kubernetes.io/master="
   run_once: true
   ignore_errors: yes
   loop: "{{ groups['control'] }}"
 
 - name: kubectl label control
-  shell: "kubectl taint node {{ item }} node-role.kubernetes.io/master:NoSchedule"
+  shell: "kubectl taint node {{ hostvars[item]['ansible_host'] }} node-role.kubernetes.io/master:NoSchedule"
   run_once: true
   ignore_errors: yes
   loop: "{{ groups['control'] }}"
