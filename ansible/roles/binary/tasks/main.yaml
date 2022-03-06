@@ -1,1 +1,6 @@
 ---
+
+- import_tasks: calico.yaml
+  when: network_plugin == "calico"
+- import_tasks: containerd.yaml
+- import_tasks: kubernetes.yaml

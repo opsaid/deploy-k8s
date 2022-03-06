@@ -1,15 +1,14 @@
 [Unit]
-Description=The Kubernetes Node Agent
+Description=kubelet: The Kubernetes Node Agent
 Documentation={{ product_docs }}
-After=containerd.service
-Requires=containerd.service
+Wants=network-online.target
+After=network-online.target
 
 [Service]
 WorkingDirectory={{ data_dir }}/kubelet
-EnvironmentFile={{ install_dir }}/kubelet/environment
-ExecStart={{ install_dir }}/kubelet/kubelet \
-        $KUBE_FLAG_GENERIC \
-        $KUBE_FLAG_GLOBAL
+EnvironmentFile=-/etc/default/kubelet
+EnvironmentFile=-{{ data_dir }}/kubelet/kubeadm-flags.env
+ExecStart={{ install_dir }}/kubelet $KUBELET_KUBECONFIG_ARGS $KUBELET_CONFIG_ARGS $KUBELET_KUBEADM_ARGS $KUBELET_EXTRA_ARGS
 Type=simple
 RestartSec=10
 Restart=always

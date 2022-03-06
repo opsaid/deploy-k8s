@@ -14,3 +14,4 @@
 - import_tasks: generate_etcd.yaml
 - import_tasks: generate_proxy.yaml
 - import_tasks: generate_apiserver.yaml
+- import_tasks: generate_kubelet.yaml

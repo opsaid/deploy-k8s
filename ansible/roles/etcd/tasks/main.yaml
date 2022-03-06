@@ -1,7 +1,0 @@
----
-
-- include_tasks: certs.yaml
-
-- name: 部署etcd服务
-  include_tasks: "etcd.yaml"
-  when: external_etcd == False

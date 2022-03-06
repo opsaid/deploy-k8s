@@ -21,3 +21,4 @@ ansible/roles/binary/files/kubernetes/client/bin/kubectl filter=lfs diff=lfs mer
 ansible/roles/binary/files/kubernetes/server/bin/apiextensions-apiserver filter=lfs diff=lfs merge=lfs -text
 ansible/roles/binary/files/kubernetes/server/bin/kube-apiserver filter=lfs diff=lfs merge=lfs -text
 ansible/roles/binary/files filter=lfs diff=lfs merge=lfs -text
+*.tar.gz filter=lfs diff=lfs merge=lfs -text

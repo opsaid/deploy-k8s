@@ -1,0 +1,55 @@
+---
+
+# 部署脚本版本
+deploy_version: 2.1.0
+
+# apiserver的端口，一般不做变更
+apiserver_port: 6443
+
+# 域名地址对应高可用ip，其他外部服务如有依赖均使用该域名
+apiserver_host: "{{ cluster_domain }}"
+
+# 提供给各个客户端连接kube-apiserver且使用tls认证的地址
+apiserver_addr: https://{{ apiserver_host }}:{{ apiserver_port }}
+
+# 设置节点时区
+# /usr/share/zoneinfo/Asia/Shanghai
+timezone: Asia/Shanghai
+
+# 在系统级禁用ipv6
+disable_ipv6: true
+
+# k8s组件二进制安装目录
+install_dir: /usr/bin
+
+# k8s配置文件目录
+etc_dir: /etc/kubernetes
+
+# k8s组件日志目录
+log_dir: /var/log/kubernetes
+
+# 存放数据目录
+data_dir: /data
+
+# 临时文件存放目录
+temp_dir: /tmp
+
+# 系统服务是否必须在控制节点
+system_service_in_control_node: false
+
+# 是否允许开启swap
+disable_swap: true
+
+# worker 节点支持的最大 pod 数量
+node_max_pods: 64
+
+# k8s apiserver的cluster ip
+# 在 {{ service_cluster_ip_range }} 网段范围内，一般取第一个
+master_cluster_ip: "{{ service_cluster_ip_range.split('.')[0:3] | join('.') }}.1"
+
+# 集群内coredns service地址
+# 在 {{ service_cluster_ip_range }} 网段范围内，一般取第十个
+cluster_dns: "{{ service_cluster_ip_range.split('.')[0:3] | join('.') }}.10"
+
+# 帮助文档地址
+product_docs: https://opsaid.cn/docs

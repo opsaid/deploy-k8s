@@ -1,2 +1,0 @@
-# 开启的控制器列表
-kube_enable_controllers: attachdetach,bootstrapsigner,clusterrole-aggregation,cronjob,csrapproving,csrcleaner,csrsigning,daemonset,deployment,disruption,endpoint,endpointslice,garbagecollector,horizontalpodautoscaling,job,namespace,nodeipam,nodelifecycle,persistentvolume-binder,persistentvolume-expander,podgc,pvc-protection,pv-protection,replicaset,replicationcontroller,resourcequota,root-ca-cert-publisher,route,service,serviceaccount,serviceaccount-token,statefulset,tokencleaner,ttl,ttl-after-finished

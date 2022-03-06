@@ -1,15 +1,25 @@
 ---
+
 - name: 创建 kubelet 配置文件
   template:
     src: kubelet/{{ item }}.j2
-    dest: "{{ install_dir }}/kubelet/{{ item }}"
+    dest: "{{ data_dir }}/kubelet/{{ item }}"
     owner: root
     group: root
     mode: 0644
     backup: no
   with_items:
     - config.yaml
-    - environment
+    - kubeadm-flags.env
+
+- name: 创建 kubelet 环境变量
+  template:
+    src: kubelet/environment.j2
+    dest: /etc/default/kubelet
+    owner: root
+    group: root
+    mode: 0644
+    backup: no
 
 - name: 创建 kubelet kubeconfig配置文件
   template:
@@ -22,30 +32,50 @@
   with_items:
     - bootstrap-kubelet.conf.j2
 
+# 如果工作目录非/var/lib/kubelet，则需创建软链，kubeadm下设置为常量，不能变更
+- name: 创建 /var/lib/kubelet 软链接
+  file:
+    src: "{{ data_dir }}/kubelet"
+    dest: /var/lib/kubelet
+    owner: root
+    group: root
+    state: link
+  when: data_dir != "/var/lib"
+
 # 拷贝证书
-- name: 拷贝证书
-  copy: src=../../pki/files/apiserver/{{ item }} dest={{ etc_dir }}/pki/{{ item }} owner=root group=root mode=0644
-  with_items:
-    - ca.crt
-    - apiserver.crt
+#- name: 拷贝证书
+#  copy: src=../../pki/files/apiserver/{{ item }} dest={{ etc_dir }}/pki/{{ item }} owner=root group=root mode=0644
+#  with_items:
+#    - ca.crt
+#    - apiserver.crt
 
 # 拷贝 kubelet 二进制文件
 - stat:
-    path: "{{ install_dir }}/kubelet/kubelet"
+    path: "{{ install_dir }}/kubelet"
   register: kubelet
-- name: 拷贝 kubelet 二进制文件
-  copy:
-    src: ../../binary/files/kubernetes/server/bin/kubelet
-    dest: "{{ install_dir }}/kubelet/kubelet"
-    owner: root
-    group: root
-    mode: 0755
+- name: 设置 kubelet
+  block:
+  - name: 拷贝 kubelet 二进制文件
+    copy:
+      src: ../../binary/files/kubernetes/server/bin/kubelet
+      dest: "{{ install_dir }}/kubelet"
+      owner: root
+      group: root
+      mode: 0755
+  - name: 创建 kubelet 二进制软链
+    file:
+      src: "{{ install_dir }}/kubelet"
+      dest: /usr/bin/kubelet
+      owner: root
+      group: root
+      state: link
+    when: install_dir != "/usr/bin"
   when: kubelet.stat.exists == False
 
 - name: 创建 kubelet systemd 文件
   template:
     src: kubelet/kubelet.service.j2
-    dest: /usr/lib/systemd/system/kubelet.service
+    dest: /etc/systemd/system/kubelet.service
     owner: root
     group: root
     mode: 0644

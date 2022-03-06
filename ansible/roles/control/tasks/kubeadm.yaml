@@ -1,0 +1,97 @@
+---
+
+# 创建 kubeadm 相关目录
+- name: 创建 kubeadm 相关目录
+  file: path={{ item }} mode=0755 state=directory
+  with_items:
+    - /usr/local/src/kubeadm
+    - /usr/local/src/kubeadm/patches
+
+- name: 创建 kubeadm config.yaml
+  template:
+    src: kubeadm/config.yaml.j2
+    dest: /usr/local/src/kubeadm/config.yaml
+    owner: root
+    group: root
+    mode: 0644
+
+- name: 创建 kubeadm control patches
+  template:
+    src: "kubeadm/patches/{{ item }}.j2"
+    dest: /usr/local/src/kubeadm/patches/{{ item }}
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - kube-apiserver+merge.yaml
+
+# https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/
+- name: 创建 kube-scheduler 配置文件
+  template:
+    src: kube-scheduler/config-v{{ k8s_version.split('.')[:2] | join('.') }}.yaml.j2
+    dest: "{{ etc_dir }}/scheduler-config.yaml"
+    owner: root
+    group: root
+    mode: 0644
+    backup: no
+
+# 创建静态token文件（用于kubelet-bootstrap）格式：token,user,uid,"group1,group2,group3"
+# 拥有token，既可使用user或group1、group2、group3的权限
+- name: 创建 known_tokens.csv 文件
+  template:
+    src=kube-apiserver/known_tokens.csv.j2 dest={{ etc_dir }}/known_tokens.csv owner=root group=root mode=0644
+
+- name: 创建审计规则文件
+  template:
+    src: kube-apiserver/audit-policy.yaml.j2
+    dest: "{{ etc_dir }}/audit-policy.yaml"
+    owner: root
+    group: root
+    mode: 0644
+    backup: no
+
+# 同步静态pod文件
+- name: 创建静态POD文件
+  template:
+    src: "manifests/{{ item }}.j2"
+    dest: /etc/kubernetes/manifests/{{ item }}
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - etcd.yaml
+    - kube-apiserver.yaml
+    - kube-controller-manager.yaml
+    - kube-scheduler.yaml
+
+- name: 创建kubeconfig文件
+  template:
+    src: "kubeconfig/{{ item }}.j2"
+    dest: /etc/kubernetes/{{ item }}
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - admin.conf
+    - kubelet.conf
+    - scheduler.conf
+    - controller-manager.conf
+
+#- name: 创建 kubelet-client 证书
+#  template:
+#    src: "kubeconfig/{{ item }}.j2"
+#    dest: /etc/kubernetes/{{ item }}
+#    owner: root
+#    group: root
+#    mode: 0644
+#  with_items:
+#    - 
+
+- name: 创建kubectl授权文件
+  template:
+    src: kubeconfig/admin.conf.j2
+    dest: "/root/.kube/config"
+    owner: root
+    group: root
+    mode: 0644
+    backup: no

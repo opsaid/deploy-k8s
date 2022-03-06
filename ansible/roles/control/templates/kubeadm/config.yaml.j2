@@ -1,0 +1,249 @@
+---
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: InitConfiguration
+bootstrapTokens:
+- groups:
+  - system:bootstrappers:kubeadm:default-node-token
+  token: abcdef.0123456789abcdef
+  ttl: 24h0m0s
+  usages:
+  - signing
+  - authentication
+localAPIEndpoint:
+  advertiseAddress: {{ apiserver_haip }}
+  bindPort: {{ apiserver_port }}
+nodeRegistration:
+  criSocket: /var/run/containerd/containerd.sock
+  imagePullPolicy: IfNotPresent
+  name: {{ ansible_facts[listen_device_name]['ipv4']['address'] }}
+  taints: null
+patches:
+  directory: /usr/local/src/kubeadm/patches/
+
+---
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: ClusterConfiguration
+apiServer:
+  extraArgs:
+{% for key, value in api_server_args.items() %}
+    {{ key | replace('_','-') }}: "{{ value }}"
+{% endfor %}
+{% if (oidc_issuer_url is defined) and (oidc_client_id is defined) %}
+    oidc-issuer-url: "{{ oidc_issuer_url }}"
+    oidc-client-id: "{{ oidc_client_id }}"
+{% if oidc_ca_file is defined %}
+    oidc-ca-file: "{{ oidc_ca_file }}"
+{% endif %}
+    oidc-username-claim: "{{ oidc_username_claim }}"
+    oidc-groups-claim: "{{ oidc_groups_claim }}"
+{% endif %}
+
+  extraVolumes:
+  - name: k8s-logs
+    hostPath: "{{ log_dir }}"
+    mountPath: "{{ log_dir }}"
+    readOnly: false
+    pathType: "DirectoryOrCreate"
+  - name: tokenconfig
+    hostPath: "{{ etc_dir }}/known_tokens.csv"
+    mountPath: "{{ etc_dir }}/known_tokens.csv"
+    readOnly: true
+    pathType: "File"
+  - name: auditconfig
+    hostPath: "{{ etc_dir }}/audit-policy.yaml"
+    mountPath: "{{ etc_dir }}/audit-policy.yaml"
+    readOnly: true
+    pathType: "File"
+
+  timeoutForControlPlane: 4m0s
+certificatesDir: /etc/kubernetes/pki
+clusterName: {{ cluster_name }}
+
+controllerManager:
+  extraArgs:
+{% for key, value in controller_manager_args.items() %}
+    {{ key | replace('_','-') }}: "{{ value }}"
+{% endfor %}
+{% if (groups['control'] | length) > 1 %}
+    leader-elect: "true"
+    leader-elect-lease-duration: "60s"
+    leader-elect-renew-deadline: "30s"
+    leader-elect-resource-lock: "endpointsleases"
+    leader-elect-resource-name: "kube-controller-manager"
+    leader-elect-resource-namespace: "kube-system"
+    leader-elect-retry-period: "10s"
+{% else %}
+    leader-elect: "false"
+{% endif %}
+  extraVolumes:
+  - name: k8s-logs
+    hostPath: "{{ log_dir }}"
+    mountPath: "{{ log_dir }}"
+    readOnly: false
+    pathType: "DirectoryOrCreate"
+
+dns: {}
+
+etcd:
+{% if external_etcd %}
+  external:
+    endpoints:
+{% for host in groups['etcd'] %}
+    - https://{{ hostvars[host]['server_name'] }}:2379
+{% endfor %}
+    caFile: {{ etc_dir }}/pki/etcd/ca.crt
+    certFile: {{ etc_dir }}/pki/etcd/server.crt
+    keyFile: {{ etc_dir }}/pki/etcd/server.key
+{% else %}
+  local:
+    dataDir: "{{ data_dir }}/etcd/"
+    extraArgs:
+{% for key, value in etcd_args.items() %}
+      {{ key | replace('_','-') }}: "{{ value }}"
+{% endfor %}
+    serverCertSANs:
+    - 127.0.0.1
+{% for host in groups['etcd'] %}
+    - {{ hostvars[host]['server_addr'] }}
+{% endfor %}
+{% for host in groups['etcd'] %}
+    - {{ hostvars[host]['server_name'] }}
+{% endfor %}
+    peerCertSANs:
+    - 127.0.0.1
+{% for host in groups['etcd'] %}
+    - {{ hostvars[host]['server_addr'] }}
+{% endfor %}
+{% for host in groups['etcd'] %}
+    - {{ hostvars[host]['server_name'] }}
+{% endfor %}
+{% endif %}
+
+imageRepository: {{ internal_images.namespace }}
+kubernetesVersion: {{ k8s_version }}
+networking:
+  dnsDomain: {{ cluster_domain }}
+  serviceSubnet: {{ service_cluster_ip_range }}
+
+scheduler:
+  extraArgs:
+{% for key, value in scheduler_args.items() %}
+    {{ key | replace('_','-') }}: "{{ value }}"
+{% endfor %}
+{% if (groups['control'] | length) > 1 %}
+    leader-elect: "true"
+    leader-elect-lease-duration: "60s"
+    leader-elect-renew-deadline: "30s"
+    leader-elect-resource-lock: "endpointsleases"
+    leader-elect-resource-name: "kube-scheduler"
+    leader-elect-resource-namespace: "kube-system"
+    leader-elect-retry-period: "10s"
+{% else %}
+    leader-elect: "false"
+{% endif %}
+  extraVolumes:
+  - name: k8s-certs
+    hostPath: "/etc/kubernetes/pki"
+    mountPath: "/etc/kubernetes/pki"
+    readOnly: true
+    pathType: "DirectoryOrCreate"
+  - name: schedulerconfig
+    hostPath: "{{ etc_dir }}/scheduler-config.yaml"
+    mountPath: "{{ etc_dir }}/scheduler-config.yaml"
+    readOnly: true
+    pathType: "File"
+  - name: k8s-logs
+    hostPath: "{{ log_dir }}"
+    mountPath: "{{ log_dir }}"
+    readOnly: false
+    pathType: "DirectoryOrCreate"
+
+---
+kind: KubeletConfiguration
+apiVersion: kubelet.config.k8s.io/v1beta1
+staticPodPath: {{ etc_dir }}/manifests
+address: {{ ansible_facts[listen_device_name]['ipv4']['address'] }}
+port: 10250
+readOnlyPort: 0
+authentication:
+  anonymous:
+    enabled: false
+  webhook:
+    enabled: true
+    cacheTTL: 2m0s
+  x509:
+    clientCAFile: {{ etc_dir }}/pki/ca.crt
+authorization:
+  mode: Webhook
+  webhook:
+    cacheAuthorizedTTL: 5m0s
+    cacheUnauthorizedTTL: 30s
+healthzPort: 10248
+healthzBindAddress: 127.0.0.1
+oomScoreAdj: -999
+clusterDomain: {{ cluster_domain }}
+clusterDNS:
+  - {{ cluster_dns }}
+nodeStatusUpdateFrequency: 10s
+nodeStatusReportFrequency: 5m
+nodeLeaseDurationSeconds: 40
+imageMinimumGCAge: 2m
+imageGCHighThresholdPercent: 85
+imageGCLowThresholdPercent: 80
+kubeletCgroups: /systemd/system.slice
+cgroupDriver: systemd
+hairpinMode: promiscuous-bridge
+maxPods: {{ node_max_pods }}
+serializeImagePulls: true
+failSwapOn: {{ disable_swap | to_json }}
+containerLogMaxSize: 100Mi
+containerLogMaxFiles: 5
+systemReserved:
+  cpu: {{ resource_reserve.system.cpu }}
+  memory: {{ resource_reserve.system.memory }}
+kubeReserved:
+  cpu: {{ resource_reserve.kube.cpu }}
+  memory: {{ resource_reserve.kube.memory }}
+
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+bindAddress: 0.0.0.0
+bindAddressHardFail: false
+clientConnection:
+  acceptContentTypes: ""
+  burst: 10
+  contentType: application/vnd.kubernetes.protobuf
+  kubeconfig: "/var/lib/kube-proxy/kubeconfig.conf"
+  qps: 5
+clusterCIDR: {{ cluster_cidr }}
+configSyncPeriod: 15m0s
+conntrack:
+  maxPerCore: 32768
+  min: 131072
+  tcpCloseWaitTimeout: 1h0m0s
+  tcpEstablishedTimeout: 24h0m0s
+detectLocalMode: ""
+enableProfiling: false
+healthzBindAddress: 127.0.0.1:10256
+iptables:
+  masqueradeAll: false
+  masqueradeBit: 14
+  minSyncPeriod: 0s
+  syncPeriod: 30s
+ipvs:
+  excludeCIDRs: null
+  minSyncPeriod: 0s
+  scheduler: rr
+  strictARP: false
+  syncPeriod: 30s
+  tcpFinTimeout: 0s
+  tcpTimeout: 0s
+  udpTimeout: 0s
+metricsBindAddress: 127.0.0.1:10249
+mode: "ipvs"
+nodePortAddresses:
+- {{ cluster_cidr }}
+oomScoreAdj: -999
+portRange: ""
+udpIdleTimeout: 250ms

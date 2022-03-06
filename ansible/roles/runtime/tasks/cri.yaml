@@ -1,0 +1,12 @@
+---
+
+- name: 创建 crictl 相关配置
+  template:
+    src: cri/{{ item }}.j2
+    dest: /etc/crictl.yaml
+    owner: root
+    group: root
+    mode: 0644
+    backup: no
+  with_items:
+    - crictl.yaml

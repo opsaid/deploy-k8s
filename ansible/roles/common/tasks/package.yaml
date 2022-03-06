@@ -40,6 +40,12 @@
     name: ['firewalld', 'python-firewall', 'firewalld-filesystem']
     state: absent
 
+- name: 卸载基础软件包（centos/redhat）
+  package: 
+    name: ['postfix']
+    state: absent
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
 # 关闭非必要服务
 #- name: stop unused service
 #  systemd:
@@ -53,7 +59,7 @@
 # debian不存在 libseccomp
 - name: 安装基础软件包（centos/redhat）
   package: 
-    name: ['vim', 'net-tools', 'libseccomp', 'iproute', 'chrony', 'conntrack-tools']
+    name: ['vim', 'net-tools', 'libseccomp', 'iproute', 'chrony', 'conntrack-tools', 'socat']
     state: latest
   when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 - name: 安装基础软件包（debian/ubuntu）
@@ -61,6 +67,13 @@
     name: ['vim', 'net-tools', 'libseccomp-dev', 'iproute2', 'chrony', 'conntrack']
     state: latest
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+# socat 用于 worker 节点端口转发使用(helm)
+# ipvsadm 用于 ProxyMode=lvs 下，管理查看条目方便
+- name: 安装基础软件包
+  package:
+    name: ['socat', 'ipvsadm', 'iptables']
+    state: latest
 
 # 时间同步
 - name: chrony
@@ -91,3 +104,21 @@
     - "{{ etc_dir }}/manifests"
     - "{{ log_dir }}"
     - "{{ install_dir }}"
+
+# 创建cni相关目录
+- name: 创建cni相关目录
+  file: path={{ item }} mode=0755 state=directory
+  with_items:
+    - /opt/cni/bin
+    - /etc/cni/net.d
+
+# 创建 containerd 相关目录
+- name: 创建 containerd 相关目录
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ data_dir }}/containerd"
+    - /opt/containerd
+    - /etc/containerd
+    - /data/containerd

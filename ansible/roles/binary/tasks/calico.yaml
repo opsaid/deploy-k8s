@@ -1,0 +1,75 @@
+---
+
+- stat:
+    path: roles/binary/files/calico/bin/calicoctl-linux-amd64
+  register: binary_calicoctl
+
+- name: 获取官方relases安装包
+  block:
+  - name: 创建 calico 二进制存放目录
+    file: path={{ item }} mode=0755 state=directory
+    with_items:
+      - "roles/binary/files/calico/bin"
+
+  - name: 下载 calico release-v{{ calico_version }}.tgz
+    get_url:
+      url: https://github.com/projectcalico/calico/releases/download/v{{ calico_version }}/release-v{{ calico_version }}.tgz
+      dest: "{{ temp_dir }}/release-v{{ calico_version }}.tgz"
+      #checksum: sha256:{{ calico_version_sha256 }}
+
+  - name: 解压 release-v{{ calico_version }}.tgz 至 {{ temp_dir }}
+    unarchive:
+      src: "{{ temp_dir }}/release-v{{ calico_version }}.tgz"
+      dest: "{{ temp_dir }}"
+
+  - name: 拷贝 kubeadm 二进制文件
+    copy:
+      src: "{{ temp_dir }}/release-v{{ calico_version }}/bin/calicoctl"
+      dest: roles/binary/files/calico/bin/calicoctl-linux-amd64
+      mode: 0755
+
+  - name: 导入官方镜像
+    command: docker load -i {{ item }}
+    args:
+      chdir: "{{ temp_dir }}/release-v{{ calico_version }}/images"
+    with_items:
+      - calico-cni.tar
+      - calico-node.tar
+      - calico-kube-controllers.tar
+
+  - name: 获取 calico/cni 镜像ID
+    shell: docker images | grep calico/cni | grep {{ calico_version }} | awk '{ print $3 }'
+    register: imgid_calico_cni
+  - name: 获取 calico/node 镜像ID
+    shell: docker images | grep calico/node | grep {{ calico_version }} | awk '{ print $3 }'
+    register: imgid_calico_node
+  - name: 获取 calico/kube-controllers 镜像ID
+    shell: docker images | grep calico/kube-controllers | grep {{ calico_version }} | awk '{ print $3 }'
+    register: imgid_calico_kube_controllers
+
+  - name: 更改 calico/cni 镜像名
+    command: docker tag {{ imgid_calico_cni.stdout }} {{ internal_images.namespace }}/calico-cni:{{ internal_images.system.calico_cni }}
+  - name: 更改 calico/node 镜像名
+    command: docker tag {{ imgid_calico_node.stdout }} {{ internal_images.namespace }}/calico-node:{{ internal_images.system.calico_node }}
+  - name: 更改 calico/kube-controllers 镜像名
+    command: docker tag {{ imgid_calico_kube_controllers.stdout }} {{ internal_images.namespace }}/calico-kube-controllers:{{ internal_images.system.calico_kube_controllers }}
+
+  # TODO; 前提需要有docker repos的权限
+  - name: 上传镜像：{{ internal_images.namespace }}/calico-cni:{{ internal_images.system.calico_cni }}
+    command: docker push {{ internal_images.namespace }}/calico-cni:{{ internal_images.system.calico_cni }}
+  - name: 上传镜像：{{ internal_images.namespace }}/calico-node:{{ internal_images.system.calico_node }}
+    command: docker push {{ internal_images.namespace }}/calico-node:{{ internal_images.system.calico_node }}
+  - name: 上传镜像：{{ internal_images.namespace }}/calico-kube-controllers:{{ internal_images.system.calico_kube_controllers }}
+    command: docker push {{ internal_images.namespace }}/calico-kube-controllers:{{ internal_images.system.calico_kube_controllers }}
+
+  when: (network_plugin == "calico") and (binary_calicoctl.stat.exists == False)
+
+- name: 清理缓存文件
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ temp_dir }}/release-v{{ calico_version }}"
+    - "{{ temp_dir }}/release-v{{ calico_version }}.tgz"
+
+  when: (network_plugin == "calico") and (binary_calicoctl.stat.exists == False)

@@ -1,12 +1,4 @@
 ---
-# 创建 k8s master 相关目录
-- name: 创建 k8s master 相关目录
-  file: path={{ item }} mode=0755 state=directory
-  with_items:
-    - /usr/local/src/manifests
-    - "{{ install_dir }}/kube-apiserver"
-    - "{{ install_dir }}/kube-scheduler"
-    - "{{ install_dir }}/kube-controller-manager"
 
 # 拷贝必须的几个证书文件
 - name: 拷贝 k8s-{{ cluster_name }}-apiserver-ca 关联证书
@@ -43,14 +35,31 @@
   copy: src=../../pki/files/oidc/ca.crt dest={{ etc_dir }}/pki/oidc/ca.crt owner=root group=root mode=0644
   when: oidc_ca_file is defined
 
-# 拷贝etcd证书
+# 拷贝etcd证书, etcd ca.key在集群上使用不到
 - name: 拷贝外部etcd集群相关证书
   copy: src=../../pki/files/{{ item }} dest={{ etc_dir }}/pki/{{ item }} owner=root group=root mode=0644
   with_items:
   - etcd/ca.crt
+  - etcd/ca.key
   - etcd/peer.crt
   - etcd/peer.key
   - etcd/healthcheck-client.crt
   - etcd/healthcheck-client.key
   - etcd/server.crt
   - etcd/server.key
+
+# 拷贝 kubelet-client 证书文件
+- name: 拷贝 kubelet-client-{{ ansible_facts[listen_device_name]['ipv4']['address']  }}.crt 关联证书
+  copy: 
+    src: ../../pki/files/apiserver/kubelet-client-{{ ansible_facts[listen_device_name]['ipv4']['address'] }}.crt
+    dest: "{{ etc_dir }}/pki/kubelet-client-current.crt"
+    owner: root 
+    group: root 
+    mode: 0644
+- name: 拷贝 kubelet-client-{{ ansible_facts[listen_device_name]['ipv4']['address']  }}.crt 关联证书
+  copy: 
+    src: ../../pki/files/apiserver/kubelet-client-{{ ansible_facts[listen_device_name]['ipv4']['address'] }}.key
+    dest: "{{ etc_dir }}/pki/kubelet-client-current.key"
+    owner: root 
+    group: root 
+    mode: 0644

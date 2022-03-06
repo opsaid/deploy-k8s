@@ -3,15 +3,3 @@
   systemd: name=kubelet enabled=yes
 - name: restart kubelet
   systemd: name=kubelet state=restarted
-
-- name: enabled kube-proxy
-  systemd: name=kube-proxy enabled=yes
-- name: restart kube-proxy
-  systemd: name=kube-proxy state=restarted
-
-- name: reload systemd
-  systemd: daemon_reload=yes
-- name: enabled containerd
-  systemd: name=containerd enabled=yes state=started
-- name: restart containerd
-  systemd: name=containerd state=restarted daemon_reload=yes

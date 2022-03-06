@@ -4,9 +4,25 @@
 
 ## Unreleased
 
+## v2.1.0 - [2022-03-06]
+
+### Added
+
+- 重构部署，控制平面基于静态POD方案
+
+## v0.1.3 - [2021-12-07]
+
+### Fixed
+
+- 开启calico felix http健康检测服务
+
 ### Added
 
 - 进程以普通用户运行代替root
+- 禁用calico的bird6
+- calico滚动更新更改为OnDelete
+- 支持管理与业务网段的配置
+- 调整kubelet安装目录以符合kubeadm规范
 
 ## v0.1.1 - [2021-11-02]
 

@@ -1,0 +1,4 @@
+---
+
+- import_tasks: cri.yaml
+- import_tasks: containerd.yaml

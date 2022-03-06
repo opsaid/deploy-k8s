@@ -1,6 +1,0 @@
----
-- name: enabled etcd
-  systemd: name=etcd enabled=yes
-
-- name: restart etcd
-  systemd: name=etcd state=restarted

@@ -1,0 +1,23 @@
+---
+
+- stat:
+    path: /usr/local/src/addons/rbac.yaml
+  register: addons
+- name: 创建k8s基础组件部署清单
+  template:
+    src: addons/{{ item }}.j2
+    dest: /usr/local/src/addons/{{ item }}
+    owner: root
+    group: root
+    mode: 0644
+  with_items: 
+    - psp.yaml
+    - rbac.yaml
+    - coredns.yaml
+    - kube-proxy.yaml
+    - metrics-server.yaml
+    - kustomization.yaml
+    - "{{ network_plugin }}.yaml"
+  #notify:
+  #  - kubectl label control
+  when: addons.stat.exists == False

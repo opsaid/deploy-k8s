@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Config
+preferences: {}
+current-context: system:node:{{ ansible_facts[listen_device_name]['ipv4']['address'] }}@{{ cluster_name }}
+clusters:
+- cluster:
+    certificate-authority: /etc/kubernetes/pki/apiserver.crt
+    server: {{ apiserver_addr }}
+  name: {{ cluster_name }}
+contexts:
+- context:
+    cluster: {{ cluster_name }}
+    user: system:node:{{ ansible_facts[listen_device_name]['ipv4']['address'] }}
+  name: system:node:{{ ansible_facts[listen_device_name]['ipv4']['address'] }}@{{ cluster_name }}
+users:
+- name: system:node:{{ ansible_facts[listen_device_name]['ipv4']['address'] }}
+  user:
+    client-certificate: /etc/kubernetes/pki/kubelet-client-current.crt
+    client-key: /etc/kubernetes/pki/kubelet-client-current.key

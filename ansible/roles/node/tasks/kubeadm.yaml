@@ -1,0 +1,14 @@
+---
+
+# 拷贝 kubeadm 二进制文件
+- stat:
+    path: /usr/bin/kubeadm
+  register: kubeadm
+- name: 拷贝 kubeadm 二进制文件
+  copy:
+    src: ../../binary/files/kubernetes/server/bin/kubeadm
+    dest: /usr/bin/kubeadm
+    owner: root
+    group: root
+    mode: 0755
+  when: kubeadm.stat.exists == False

@@ -1,8 +1,12 @@
 ---
 
+# 创建 k8s control plane 相关目录
+- name: 创建k8s控制平面相关目录
+  file: path={{ item }} mode=0755 state=directory
+  with_items:
+    - /root/.kube
+    - /usr/local/src/addons
+
 - import_tasks: certs.yaml
-- import_tasks: kubectl.yaml
-- import_tasks: kube-apiserver.yaml
-- import_tasks: kube-scheduler.yaml
-- import_tasks: kube-controller-manager.yaml
-- import_tasks: manifests.yaml
+- import_tasks: addons.yaml
+- import_tasks: kubeadm.yaml

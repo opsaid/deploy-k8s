@@ -1,34 +1,56 @@
 ---
-- name: 在本地预先生成证书
+
+- name: 生成集群依赖的证书至部署仓库
   hosts: pki
   remote_user: root
   tags:
-    - pki
+  - pki
   roles:
-    - pki
+  - pki
+  vars_files:
+  - group_vars/default.yaml
 
-- name: 通用配置
+- name: 下载依赖的二进制文件至部署仓库
+  hosts: binary
+  remote_user: root
+  tags:
+  - binary
+  roles:
+  - binary
+  vars_files:
+  - group_vars/component-v{{ k8s_version.split('.')[:2] | join('.') }}.yaml
+
+- name: 针对所有节点实现公共基础配置
   hosts: control,worker
   remote_user: root
   tags:
-    - common
+  - common
   roles:
-    - common
+  - common
+  vars_files:
+  - group_vars/default.yaml
 
-- name: 创建k8s控制平面
+- name: 部署K8S控制平面节点
   hosts: control
   remote_user: root
   tags:
-    - control
+  - control
   roles:
-    - etcd
-    - control
-    - node
+  - control
+  - runtime
+  - node
+  vars_files:
+  - group_vars/default.yaml
+  - group_vars/component-v{{ k8s_version.split('.')[:2] | join('.') }}.yaml
 
-- name: 创建k8s worker节点
+- name: 部署K8S工作负载节点
   hosts: worker
   remote_user: root
   tags:
-    - worker
+  - worker
   roles:
-    - node
+  - runtime
+  - node
+  vars_files:
+  - group_vars/default.yaml
+  - group_vars/component-v{{ k8s_version.split('.')[:2] | join('.') }}.yaml

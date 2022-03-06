@@ -1,0 +1,71 @@
+---
+# 创建 containerd 相关目录
+- name: 创建 containerd 相关目录
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - /etc/containerd  
+    - /opt/containerd
+    - "{{ data_dir }}/containerd"
+
+# 安装部署containerd
+- stat:
+    path: /usr/local/bin/containerd
+  register: containerd
+- name: Copy And Unpackage containerd
+  unarchive:
+    src: ../../binary/files/containerd/cri-containerd-cni-{{ containerd_version }}-linux-amd64.tar.gz
+    dest: /
+  when: containerd.stat.exists == False
+
+# 模块开机加载
+- name: /etc/modules-load.d/containerd.conf
+  template:
+    src: containerd/module
+    dest: /etc/modules-load.d/containerd.conf
+
+# 模块在线加载
+- name: 加载模块
+  modprobe:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - overlay
+    - br_netfilter
+
+- name: 设置内核参数
+  sysctl: 
+    name: "{{ item }}" 
+    value: "1"
+    state: present 
+    sysctl_set: yes
+    reload: yes
+    sysctl_file: /etc/sysctl.d/99-kubernetes-cri.conf
+  with_items:
+    - net.ipv4.ip_forward
+    - net.bridge.bridge-nf-call-iptables
+    - net.bridge.bridge-nf-call-ip6tables
+
+- name: 创建 containerd 配置文件
+  template:
+    src: containerd/config.toml.j2
+    dest: /etc/containerd/config.toml
+    owner: root
+    group: root
+    mode: 0644
+
+- name: 创建 containerd.service
+  template:
+    src: containerd/containerd.service.j2
+    dest: /etc/systemd/system/containerd.service
+    owner: root
+    group: root
+    mode: 0644
+
+- name: enabled containerd
+  systemd:
+    name: containerd
+    enabled: yes
+    state: started
+    daemon_reload: yes

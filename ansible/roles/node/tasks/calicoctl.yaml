@@ -1,4 +1,5 @@
 ---
+
 - name: 创建 calico 相关目录
   file: path={{ item }} mode=0755 state=directory
   with_items:
@@ -22,7 +23,7 @@
   register: calicoctl
 - name: 拷贝 calicoctl 二进制文件
   copy:
-    src: ../../binary/files/calico/calicoctl-linux-amd64
+    src: ../../binary/files/calico/bin/calicoctl-linux-amd64
     dest: /usr/local/bin/calicoctl
     owner: root
     group: root

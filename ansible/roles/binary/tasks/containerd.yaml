@@ -1,0 +1,16 @@
+---
+
+- name: 创建 calico 二进制存放目录
+  file: path={{ item }} mode=0755 state=directory
+  with_items:
+    - "roles/binary/files/containerd"
+
+- stat:
+    path: roles/binary/files/containerd/cri-containerd-cni-{{ containerd_version }}-linux-amd64.tar.gz
+  register: cri_containerd_cni
+- name: 下载 cri-containerd-cni-{{ containerd_version }}-linux-amd64.tar.gz
+  get_url:
+    url: https://github.com/containerd/containerd/releases/download/v{{ containerd_version }}/cri-containerd-cni-{{ containerd_version }}-linux-amd64.tar.gz
+    dest: roles/binary/files/containerd/cri-containerd-cni-{{ containerd_version }}-linux-amd64.tar.gz
+    checksum: sha256:https://github.com/containerd/containerd/releases/download/v{{ containerd_version }}/cri-containerd-cni-{{ containerd_version }}-linux-amd64.tar.gz.sha256sum
+  when: cri_containerd_cni.stat.exists == False
