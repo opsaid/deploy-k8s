@@ -1,0 +1,85 @@
+---
+
+# DANGER! 
+# 部署的k8s版本，支持的主版本：
+# 1.18.x 1.22.x
+k8s_version: 1.22.6
+#k8s_version_sha256: 4c1bc8f68594158b47243376c0f3f4cac11643ef8a17461545d61cf141fc4eb8
+
+# DANGER! 
+# 集群编号与名称
+cluster_name: fake
+
+# DANGER! 
+# 集群域名后缀
+cluster_domain: "{{ cluster_name }}.k8s.a-demo-web.site"
+
+# 对节点通过/etc/hosts做dns条目绑定
+resolv_use_hosts: true
+
+# 使用外部的etcd服务，不会实际部署etcd
+# 在hosts中配置的etcd地址仅用于设置kube-apiserver的连接
+external_etcd: false
+
+# DANGER! 
+# 使用的k8s网络插件，支持: calico
+network_plugin: calico
+
+# 集群南北流量高可用的ip地址
+# 一般为vip，没有则设置为控制平面任意一个实际的ip地址
+apiserver_haip: 192.168.31.200
+
+# 集群对外的业务网段，用于监听端口对外提供服务
+# 管理网段与业务网段分开时配置业务网段，如没有则按需设置为管理网段
+node_port_addresses:
+- 192.168.30.0/24
+- 192.168.31.0/24
+
+# worker 节点使用的子网掩码
+node_cidr_mask: 28
+
+# 集群pod使用的网络地址范围
+cluster_cidr: 192.168.201.0/24
+
+# 集群service使用的网络地址范围
+# 可取范围：10.0.0.0/16-24，172.16-31.0.0/16-24，192.168.0.0/16-24
+service_cluster_ip_range: 10.233.0.0/16
+
+# DANGER! 
+# tls bootstrapping, 首次部署生成下token之后无需变更
+# 生成方式：head -c 16 /dev/urandom | od -An -t x | tr -d ' '
+tls_bootstrap_user: kubelet-bootstrap
+tls_bootstrap_token: 53fb9ee737936db263ebd937ab1829cd
+
+# oidc设置
+#oidc_issuer_url: https://a-demo-web.site/oauth2
+#oidc_client_id: kubernetes
+#oidc_username_claim: email
+#oidc_groups_claim: groups
+# 如果是自签ca，则需要把ca文件存放至pki/files/oidc/ca.crt下
+#oidc_ca_file: /etc/kubernetes/pki/oidc/ca.crt
+
+# 容器镜像中心，集群只允许以下登记的地址
+# 设置 insecure_skip_verify=true 跳过https的ca认证
+container_registry:
+- mirror: 'docker.io'
+  endpoints: [ "https://docker.mirrors.ustc.edu.cn" ]
+  tls:
+    insecure_skip_verify: true
+- mirror: 'registry.cn-hangzhou.aliyuncs.com/kube-image-repo'
+  endpoints: [ "https://registry.cn-hangzhou.aliyuncs.com/kube-image-repo" ]
+  #auth:
+  #  username: ""
+  #  password: ""
+  tls:
+    insecure_skip_verify: true
+
+# 预留系统资源，防止节点内存不足导致离线
+# 由于swap被关闭，如果可用内存不足，节点会进入不可用状态
+resource_reserve:
+  kube:
+    cpu: 100m
+    memory: 100Mi
+  system:
+    cpu: 50m
+    memory: 50Mi
