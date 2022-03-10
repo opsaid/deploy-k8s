@@ -37,6 +37,37 @@ internal_images:
     # coredns/coredns:1.8.7
     coredns: 1.8.7-amd64
 
+# etcd
+etcd_args:
+  advertise_client_urls: "https://{{ ansible_facts[listen_device_name]['ipv4']['address'] }}:2379"
+  auto_tls: "false"
+  cert_file: "{{ etc_dir }}/pki/etcd/server.crt"
+  client_cert_auth: "true"
+  data_dir: "{{ data_dir }}/etcd/"
+  election_timeout: "1000"
+  enable_v2: "false"
+  heartbeat_interval: "100"
+  initial_advertise_peer_urls: "https://{{ server_name }}:2380"
+  initial_cluster: "{% for host in groups['etcd'] %}{{ hostvars[host]['server_name'] }}=https://{{ hostvars[host]['server_name'] }}:2380{% if not loop.last %},{% endif %}{% endfor %}"
+  initial_cluster_state: "new"
+  initial_cluster_token: "{{ cluster_name }}"
+  key_file: "{{ etc_dir }}/pki/etcd/server.key"
+  listen_client_urls: "https://127.0.0.1:2379,https://{{ ansible_facts[listen_device_name]['ipv4']['address'] }}:2379"
+  listen_metrics_urls: "http://127.0.0.1:2381"
+  listen_peer_urls: "https://{{ ansible_facts[listen_device_name]['ipv4']['address'] }}:2380"
+  max_request_bytes: "1048576"
+  max_snapshots: "5"
+  max_wals: "5"
+  name: "{{ server_name }}"
+  peer_auto_tls: "false"
+  peer_cert_file: "{{ etc_dir }}/pki/etcd/peer.crt"
+  peer_client_cert_auth: "true"
+  peer_key_file: "{{ etc_dir }}/pki/etcd/peer.key"
+  peer_trusted_ca_file: "{{ etc_dir }}/pki/etcd/ca.crt"
+  quota_backend_bytes: "4294967296"
+  snapshot_count: "10000"
+  trusted_ca_file: "{{ etc_dir }}/pki/etcd/ca.crt"
+
 # 对应k8s cli，变量由下划线转中划线
 api_server_args:
   advertise_address: "{{ ansible_facts[listen_device_name]['ipv4']['address'] }}"
@@ -101,6 +132,7 @@ api_server_args:
 
 # kube-controller-manager
 controller_manager_args:
+  address: "127.0.0.1"
   allocate_node_cidrs: "true"
   alsologtostderr: "true"
   authentication_kubeconfig: "{{ etc_dir }}/controller-manager.conf"
@@ -113,7 +145,7 @@ controller_manager_args:
   cluster_cidr: "{{ cluster_cidr }}"
   cluster_name: "{{ cluster_name }}"
   cluster_signing_cert_file: "{{ etc_dir }}/pki/ca.crt"
-  cluster_signing_duration: "43800h0m0s"
+  experimental_cluster_signing_duration: "43800h0m0s"
   cluster_signing_key_file: "{{ etc_dir }}/pki/ca.key"
   concurrent_deployment_syncs: "5"
   concurrent_endpoint_syncs: "5"
@@ -144,7 +176,7 @@ controller_manager_args:
   node_monitor_period: "5s"
   node_startup_grace_period: "1m0s"
   pod_eviction_timeout: "5m0s"
-  port: "0"
+  port: "10252"
   requestheader_allowed_names: "front-proxy-client"
   requestheader_client_ca_file: "{{ etc_dir }}/pki/front-proxy-ca.crt"
   requestheader_extra_headers_prefix: "X-Remote-Extra-"
