@@ -15,21 +15,24 @@
 - stat:
     path: roles/binary/files/kubernetes/server/bin/kubeadm
   register: binary_kubeadm
+- stat:
+    path: "{{ temp_dir }}/kubernetes.tar.gz"
+  register: kubernetes_src
 
 - name: 获取官方relases安装包
   block:
-  - name: 下载 kubernetes.tar.gz
+  - name: 下载 kubernetes.tar.gz（不验证sha256值）
     get_url:
       url: https://github.com/kubernetes/kubernetes/releases/download/v{{ k8s_version }}/kubernetes.tar.gz
       dest: "{{ temp_dir }}/kubernetes.tar.gz"
-    when: k8s_version_sha256 is not defined
+    when: (k8s_version_sha256 is not defined) and (kubernetes_src.stat.exists == False)
 
-  - name: 下载 kubernetes.tar.gz
+  - name: 下载 kubernetes.tar.gz（需要验证sha256值）
     get_url:
       url: https://github.com/kubernetes/kubernetes/releases/download/v{{ k8s_version }}/kubernetes.tar.gz
       dest: "{{ temp_dir }}/kubernetes.tar.gz"
       checksum: sha256:{{ k8s_version_sha256 }}
-    when: k8s_version_sha256 is defined
+    when: (k8s_version_sha256 is defined) and (kubernetes_src.stat.exists == False)
 
   - name: 解压 {{ temp_dir }}/kubernetes.tar.gz 至 {{ temp_dir }}
     unarchive:
@@ -40,6 +43,10 @@
     command: ./cluster/get-kube-binaries.sh
     args:
       chdir: "{{ temp_dir }}/kubernetes"
+    environment:
+      KUBERNETES_SKIP_CONFIRM: true
+      KUBERNETES_CLIENT_OS: linux
+      KUBERNETES_SERVER_ARCH: amd64
 
   - name: 解压 kubernetes-server-linux-amd64.tar.gz
     unarchive:
