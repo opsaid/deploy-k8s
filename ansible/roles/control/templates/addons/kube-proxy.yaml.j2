@@ -123,10 +123,10 @@ spec:
           type: ""
         name: lib-modules
   updateStrategy:
-    rollingUpdate:
-      maxSurge: 0
-      maxUnavailable: 1
-    type: RollingUpdate
+    #rollingUpdate:
+    #  maxSurge: 0
+    #  maxUnavailable: 1
+    type: OnDelete
 
 ---
 apiVersion: v1
