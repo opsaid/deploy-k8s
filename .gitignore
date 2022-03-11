@@ -1,3 +1,4 @@
 temp/
 *-dev.*
+ansible/roles/pki/files/
 ansible/roles/binary/files/
