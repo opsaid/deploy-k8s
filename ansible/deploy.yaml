@@ -18,6 +18,7 @@
   roles:
   - binary
   vars_files:
+  - group_vars/default.yaml
   - group_vars/component-v{{ k8s_version.split('.')[:2] | join('.') }}.yaml
 
 - name: 针对所有节点实现公共基础配置
