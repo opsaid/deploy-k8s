@@ -25,13 +25,10 @@
     command: "swapoff -a"
     when: ansible_swaptotal_mb > 0
   - name: 关闭swap，取消 /etc/fstab 中 swap 挂载
-    lineinfile:
+    replace:
       path: "/etc/fstab"
-      line: '#\1 swap \2'
-      regexp: "(?!#)(.*) swap (.*)"
-      #backup: yes
-      state: present
-      backrefs: yes
+      regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+      replace: '# \1'
   when: disable_swap == True
 
 # centos7默认使用firewalld管理iptable，卸载以防冲突
