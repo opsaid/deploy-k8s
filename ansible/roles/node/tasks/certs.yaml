@@ -2,7 +2,12 @@
 
 # 拷贝证书
 - name: 拷贝证书
-  copy: src=../../pki/files/apiserver/{{ item }} dest={{ etc_dir }}/pki/{{ item }} owner=root group=root mode=0644
+  copy: 
+    src: ../../pki/files/apiserver/{{ item }} 
+    dest: "{{ etc_dir }}/pki/{{ item }}"
+    mode: 0644
+    owner: kube 
+    group: root 
   with_items:
     - ca.crt
     - apiserver.crt

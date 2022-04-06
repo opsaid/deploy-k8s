@@ -7,7 +7,7 @@
   template:
     src: addons/{{ item }}.j2
     dest: /usr/local/src/addons/{{ item }}
-    owner: root
+    owner: kube
     group: root
     mode: 0644
   with_items: 

@@ -11,7 +11,7 @@
   template:
     src: kubeadm/config.yaml.j2
     dest: /usr/local/src/kubeadm/config.yaml
-    owner: root
+    owner: kube
     group: root
     mode: 0644
 
@@ -19,7 +19,7 @@
   template:
     src: "kubeadm/patches/{{ item }}.j2"
     dest: /usr/local/src/kubeadm/patches/{{ item }}
-    owner: root
+    owner: kube
     group: root
     mode: 0644
   with_items:
@@ -30,7 +30,7 @@
   template:
     src: kube-scheduler/config-v{{ k8s_version.split('.')[:2] | join('.') }}.yaml.j2
     dest: "{{ etc_dir }}/scheduler-config.yaml"
-    owner: root
+    owner: kube
     group: root
     mode: 0644
     backup: no
@@ -39,13 +39,13 @@
 # 拥有token，既可使用user或group1、group2、group3的权限
 - name: 创建 known_tokens.csv 文件
   template:
-    src=kube-apiserver/known_tokens.csv.j2 dest={{ etc_dir }}/known_tokens.csv owner=root group=root mode=0644
+    src=kube-apiserver/known_tokens.csv.j2 dest={{ etc_dir }}/known_tokens.csv owner=kube group=root mode=0644
 
 - name: 创建审计规则文件
   template:
     src: kube-apiserver/audit-policy.yaml.j2
     dest: "{{ etc_dir }}/audit-policy.yaml"
-    owner: root
+    owner: kube
     group: root
     mode: 0644
     backup: no
@@ -55,7 +55,7 @@
   template:
     src: "manifests/{{ item }}.j2"
     dest: /etc/kubernetes/manifests/{{ item }}
-    owner: root
+    owner: kube
     group: root
     mode: 0644
   with_items:
@@ -68,7 +68,7 @@
   template:
     src: "kubeconfig/{{ item }}.j2"
     dest: /etc/kubernetes/{{ item }}
-    owner: root
+    owner: kube
     group: root
     mode: 0644
   with_items:

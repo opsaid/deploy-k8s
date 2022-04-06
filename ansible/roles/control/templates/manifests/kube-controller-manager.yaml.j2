@@ -60,17 +60,19 @@ spec:
       readOnly: true
     - mountPath: /usr/libexec/kubernetes/kubelet-plugins/volume/exec
       name: flexvolume-dir
-    - mountPath: /etc/kubernetes/pki
+    - mountPath: {{ etc_dir }}/pki
       name: k8s-certs
       readOnly: true
-    - mountPath: /var/log/kubernetes
+    - mountPath: {{ log_dir }}
       name: k8s-logs
-    - mountPath: /etc/kubernetes/controller-manager.conf
+    - mountPath: {{ etc_dir }}/controller-manager.conf
       name: kubeconfig
       readOnly: true
   hostNetwork: true
   priorityClassName: system-node-critical
   securityContext:
+    runAsNonRoot: true
+    runAsUser: 997
     seccompProfile:
       type: RuntimeDefault
   volumes:
@@ -87,15 +89,15 @@ spec:
       type: DirectoryOrCreate
     name: flexvolume-dir
   - hostPath:
-      path: /etc/kubernetes/pki
+      path: {{ etc_dir }}/pki
       type: DirectoryOrCreate
     name: k8s-certs
   - hostPath:
-      path: /var/log/kubernetes
-      type: DirectoryOrCreate
+      path: {{ log_dir }}
+      type: Directory
     name: k8s-logs
   - hostPath:
-      path: /etc/kubernetes/controller-manager.conf
+      path: {{ etc_dir }}/controller-manager.conf
       type: FileOrCreate
     name: kubeconfig
 status: {}

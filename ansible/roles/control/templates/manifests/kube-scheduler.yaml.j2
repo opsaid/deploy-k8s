@@ -52,37 +52,39 @@ spec:
       periodSeconds: 10
       timeoutSeconds: 15
     volumeMounts:
-    - mountPath: /etc/kubernetes/pki
+    - mountPath: {{ etc_dir }}/pki
       name: k8s-certs
       readOnly: true
-    - mountPath: /var/log/kubernetes
+    - mountPath: {{ log_dir }}
       name: k8s-logs
-    - mountPath: /etc/kubernetes/scheduler.conf
+    - mountPath: {{ etc_dir }}/scheduler.conf
       name: kubeconfig
       readOnly: true
-    - mountPath: /etc/kubernetes/scheduler-config.yaml
+    - mountPath: {{ etc_dir }}/scheduler-config.yaml
       name: schedulerconfig
       readOnly: true
   hostNetwork: true
   priorityClassName: system-node-critical
   securityContext:
+    runAsNonRoot: true
+    runAsUser: 997
     seccompProfile:
       type: RuntimeDefault
   volumes:
   - hostPath:
-      path: /etc/kubernetes/pki
-      type: DirectoryOrCreate
+      path: {{ etc_dir }}/pki
+      type: Directory
     name: k8s-certs
   - hostPath:
-      path: /var/log/kubernetes
-      type: DirectoryOrCreate
+      path: {{ log_dir }}
+      type: Directory
     name: k8s-logs
   - hostPath:
-      path: /etc/kubernetes/scheduler.conf
+      path: {{ etc_dir }}/scheduler.conf
       type: FileOrCreate
     name: kubeconfig
   - hostPath:
-      path: /etc/kubernetes/scheduler-config.yaml
+      path: {{ etc_dir }}/scheduler-config.yaml
       type: File
     name: schedulerconfig
 status: {}

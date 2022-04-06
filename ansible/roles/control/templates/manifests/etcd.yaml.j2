@@ -44,22 +44,24 @@ spec:
       periodSeconds: 10
       timeoutSeconds: 15
     volumeMounts:
-    - mountPath: /data/etcd/
+    - mountPath: {{ data_dir }}/etcd
       name: etcd-data
-    - mountPath: /etc/kubernetes/pki/etcd
+    - mountPath: {{ etc_dir }}/pki/etcd
       name: etcd-certs
   hostNetwork: true
   priorityClassName: system-node-critical
   securityContext:
+    runAsNonRoot: true
+    runAsUser: 996
     seccompProfile:
       type: RuntimeDefault
   volumes:
   - hostPath:
-      path: /etc/kubernetes/pki/etcd
-      type: DirectoryOrCreate
+      path: {{ etc_dir }}/pki/etcd
+      type: Directory
     name: etcd-certs
   - hostPath:
-      path: /data/etcd/
-      type: DirectoryOrCreate
+      path: {{ data_dir }}/etcd
+      type: Directory
     name: etcd-data
 status: {}

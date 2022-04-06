@@ -1,0 +1,31 @@
+---
+
+- name: User | Create etcd Group
+  group:
+    name: etcd
+    gid: 996
+    system: yes
+- name: User | Create etcd User
+  user:
+    uid: 996
+    comment: "Etcd user"
+    createhome: no
+    group: etcd
+    shell: /sbin/nologin
+    name: etcd
+    system: yes
+
+- name: User | Create kube Group
+  group:
+    name: kube
+    gid: 997
+    system: yes
+- name: User | Create kube User
+  user:
+    uid: 997
+    comment: "Kubernetes user"
+    createhome: no
+    group: kube
+    shell: /sbin/nologin
+    name: kube
+    system: yes

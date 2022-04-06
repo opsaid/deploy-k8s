@@ -25,7 +25,7 @@
   template:
     src: kubelet/{{ item }}
     dest: "{{ etc_dir }}/bootstrap-kubelet.conf"
-    owner: root
+    owner: kube
     group: root
     mode: 0644
     backup: no
@@ -41,13 +41,6 @@
     group: root
     state: link
   when: data_dir != "/var/lib"
-
-# 拷贝证书
-#- name: 拷贝证书
-#  copy: src=../../pki/files/apiserver/{{ item }} dest={{ etc_dir }}/pki/{{ item }} owner=root group=root mode=0644
-#  with_items:
-#    - ca.crt
-#    - apiserver.crt
 
 # 拷贝 kubelet 二进制文件
 - stat:

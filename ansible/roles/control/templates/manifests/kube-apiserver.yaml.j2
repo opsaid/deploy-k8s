@@ -61,7 +61,7 @@ spec:
       periodSeconds: 10
       timeoutSeconds: 15
     volumeMounts:
-    - mountPath: /etc/kubernetes/audit-policy.yaml
+    - mountPath: {{ etc_dir }}/audit-policy.yaml
       name: auditconfig
       readOnly: true
     - mountPath: /etc/ssl/certs
@@ -70,22 +70,24 @@ spec:
     - mountPath: /etc/pki
       name: etc-pki
       readOnly: true
-    - mountPath: /etc/kubernetes/pki
+    - mountPath: {{ etc_dir }}/pki
       name: k8s-certs
       readOnly: true
-    - mountPath: /var/log/kubernetes
+    - mountPath: {{ log_dir }}
       name: k8s-logs
-    - mountPath: /etc/kubernetes/known_tokens.csv
+    - mountPath: {{ etc_dir }}/known_tokens.csv
       name: tokenconfig
       readOnly: true
   hostNetwork: true
   priorityClassName: system-node-critical
   securityContext:
+    runAsNonRoot: true
+    runAsUser: 997
     seccompProfile:
       type: RuntimeDefault
   volumes:
   - hostPath:
-      path: /etc/kubernetes/audit-policy.yaml
+      path: {{ etc_dir }}/audit-policy.yaml
       type: File
     name: auditconfig
   - hostPath:
@@ -97,15 +99,15 @@ spec:
       type: DirectoryOrCreate
     name: etc-pki
   - hostPath:
-      path: /etc/kubernetes/pki
-      type: DirectoryOrCreate
+      path: {{ etc_dir }}/pki
+      type: Directory
     name: k8s-certs
   - hostPath:
-      path: /var/log/kubernetes
-      type: DirectoryOrCreate
+      path: {{ log_dir }}
+      type: Directory
     name: k8s-logs
   - hostPath:
-      path: /etc/kubernetes/known_tokens.csv
+      path: {{ etc_dir }}/known_tokens.csv
       type: File
     name: tokenconfig
 status: {}

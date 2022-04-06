@@ -65,6 +65,18 @@
     state: latest
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
+# 关闭默认启动服务
+- name: 关闭默认启动服务
+  systemd:
+    name: "{{ item }}"
+    enabled: no
+    state: stopped
+  with_items:
+   - snapd.socket
+   - multipathd.service
+   - multipathd.socket
+  when: ansible_distribution == 'Ubuntu'
+
 # socat 用于 worker 节点端口转发使用(helm)
 # ipvsadm 用于 ProxyMode=lvs 下，管理查看条目方便
 - name: 安装基础软件包
@@ -88,34 +100,3 @@
 - name: Set timezone to {{ timezone }}
   timezone:
     name: "{{ timezone }}"
-
-# 创建 kubernetes 安装目录
-- name: 创建 kubernetes 安装目录
-  file: path={{ item }} mode=0755 state=directory
-  with_items:
-    - "{{ data_dir }}"
-    - "{{ etc_dir }}"
-    - "{{ etc_dir }}/pki"
-    - "{{ etc_dir }}/pki/etcd"
-    - "{{ etc_dir }}/pki/oidc"
-    - "{{ etc_dir }}/manifests"
-    - "{{ log_dir }}"
-    - "{{ install_dir }}"
-
-# 创建cni相关目录
-- name: 创建cni相关目录
-  file: path={{ item }} mode=0755 state=directory
-  with_items:
-    - /opt/cni/bin
-    - /etc/cni/net.d
-
-# 创建 containerd 相关目录
-- name: 创建 containerd 相关目录
-  file:
-    path: "{{ item }}"
-    state: directory
-  with_items:
-    - "{{ data_dir }}/containerd"
-    - /opt/containerd
-    - /etc/containerd
-    - /data/containerd
