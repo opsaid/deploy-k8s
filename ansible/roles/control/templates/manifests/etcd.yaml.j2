@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   annotations:
-    kubeadm.kubernetes.io/etcd.advertise-client-urls: https://192.168.30.188:2379
+    kubeadm.kubernetes.io/etcd.advertise-client-urls: https://{{ ansible_facts[listen_device_name]['ipv4']['address'] }}:2379
   creationTimestamp: null
   labels:
     component: etcd

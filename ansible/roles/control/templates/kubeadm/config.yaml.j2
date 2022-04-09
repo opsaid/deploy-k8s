@@ -89,7 +89,7 @@ etcd:
   external:
     endpoints:
 {% for host in groups['etcd'] %}
-    - https://{{ hostvars[host]['server_name'] }}:2379
+    - https://{{ host }}.{{ cluster_domain }}:2379
 {% endfor %}
     caFile: {{ etc_dir }}/pki/etcd/ca.crt
     certFile: {{ etc_dir }}/pki/etcd/server.crt
@@ -104,18 +104,18 @@ etcd:
     serverCertSANs:
     - 127.0.0.1
 {% for host in groups['etcd'] %}
-    - {{ hostvars[host]['server_addr'] }}
+    - {{ hostvars[host]['ansible_host'] }}
 {% endfor %}
 {% for host in groups['etcd'] %}
-    - {{ hostvars[host]['server_name'] }}
+    - {{ host }}.{{ cluster_domain }}
 {% endfor %}
     peerCertSANs:
     - 127.0.0.1
 {% for host in groups['etcd'] %}
-    - {{ hostvars[host]['server_addr'] }}
+    - {{ hostvars[host]['ansible_host'] }}
 {% endfor %}
 {% for host in groups['etcd'] %}
-    - {{ hostvars[host]['server_name'] }}
+    - {{ host }}.{{ cluster_domain }}
 {% endfor %}
 {% endif %}
 
