@@ -14,7 +14,7 @@ cluster_name: fake
 # 集群域名后缀
 cluster_domain: "{{ cluster_name }}.k8s.a-demo-web.site"
 
-# 对节点通过/etc/hosts做dns条目绑定
+# 如果kube apiserver接口域名未通过dns解析，则通过本地hosts绑定
 resolv_use_hosts: true
 
 # 使用外部的etcd服务，不会实际部署etcd
