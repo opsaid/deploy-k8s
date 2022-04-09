@@ -24,7 +24,7 @@
     path: "{{ item }}" 
     owner: etcd
     group: etcd
-    mode: 0755 
+    mode: 0700
     state: directory
   with_items:
     - "{{ data_dir }}/etcd"
