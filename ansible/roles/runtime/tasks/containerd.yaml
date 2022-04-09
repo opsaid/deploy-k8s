@@ -13,10 +13,16 @@
 - stat:
     path: /usr/local/bin/containerd
   register: containerd
-- name: Copy And Unpackage containerd
-  unarchive:
-    src: ../../binary/files/containerd/cri-containerd-cni-{{ containerd_version }}-linux-amd64.tar.gz
-    dest: /
+- name: 安装部署 containerd
+  block:
+  - name: 拷贝与解压 containerd
+    unarchive:
+      src: ../../binary/files/containerd/cri-containerd-cni-{{ containerd_version }}-linux-amd64.tar.gz
+      dest: /
+  - name: 移除默认配置 10-containerd-net.conflist
+    file:
+      path: /etc/cni/net.d/10-containerd-net.conflist
+      state: absent
   when: containerd.stat.exists == False
 
 # 模块开机加载
