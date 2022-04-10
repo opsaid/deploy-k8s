@@ -5,6 +5,14 @@
   - stat:
       path: "{{ data_device_path }}"
     register: data
+
+  # 确认 data_device_path 是否已包含分区
+  - shell: file -s {{ data_device_path }}
+    register: fs
+  - set_fact:
+      format_fs: true
+    when: '"XFS filesystem" in fs.stdout'
+
   - name: 格式化 {{ data_device_path }} 并挂载至 {{ data_dir }}
     block:
     - name: 格式化 {{ data_device_path }} 为 xfs 分区
@@ -20,5 +28,5 @@
         fstype: xfs
         #opts: noatime
         state: mounted
-    when: data.stat.exists
+    when: data.stat.exists and format_fs is not defined
   when: data_device_path is defined
