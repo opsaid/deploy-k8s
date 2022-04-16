@@ -1,0 +1,44 @@
+---
+
+- name: 停止 containerd kubelet
+  systemd:
+    name: "{{ item }}"
+    state: stopped
+    enabled: no
+    daemon_reexec: yes
+  with_items:
+    - kubelet
+    - containerd 
+  ignore_errors: true
+
+- name: 清理 containerd kubelet 缓存文件
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /usr/bin/kubelet
+    - /etc/default/kubelet
+    - /etc/systemd/system/kubelet.service
+    - "{{ data_dir }}/kubelet/pods"
+    - "{{ data_dir }}/kubelet/plugins_registry"
+    - "{{ etc_dir }}/bootstrap-kubelet.conf"
+    - "{{ install_dir }}/kubelet"
+    - /etc/calico/
+    - /usr/local/bin/calicoctl
+    - /etc/kubernetes/
+    - /usr/bin/kubeadm
+    - /usr/bin/kubectl
+    # TODO
+    - /root/.kube/config
+    - /usr/local/src/kubeadm/
+    - /usr/local/src/addons/
+    - /etc/crictl.yaml
+    - /etc/containerd
+    - /opt/containerd
+    - /usr/local/bin/containerd
+    - /etc/modules-load.d/containerd.conf
+    - /etc/sysctl.d/99-kubernetes-cri.conf
+    - /etc/containerd/config.toml
+    - /etc/systemd/system/containerd.service
+    - /usr/local/bin/crictl
+  ignore_errors: true
