@@ -74,7 +74,7 @@ api_server_args:
   allow_privileged: "true"
   alsologtostderr: "true"
   anonymous_auth: "true"
-  apiserver_count: "{{ groups['control'] | length }}"
+  apiserver_count: "{{ groups['kube_control_plane'] | length }}"
   audit_log_maxage: "20"
   audit_log_maxbackup: "10"
   audit_log_maxsize: "1024"

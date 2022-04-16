@@ -64,7 +64,7 @@ controllerManager:
 {% for key, value in controller_manager_args.items() %}
     {{ key | replace('_','-') }}: "{{ value }}"
 {% endfor %}
-{% if (groups['control'] | length) > 1 %}
+{% if (groups['kube_control_plane'] | length) > 1 %}
     leader-elect: "true"
     leader-elect-lease-duration: "60s"
     leader-elect-renew-deadline: "30s"
@@ -130,7 +130,7 @@ scheduler:
 {% for key, value in scheduler_args.items() %}
     {{ key | replace('_','-') }}: "{{ value }}"
 {% endfor %}
-{% if (groups['control'] | length) > 1 %}
+{% if (groups['kube_control_plane'] | length) > 1 %}
     leader-elect: "true"
     leader-elect-lease-duration: "60s"
     leader-elect-renew-deadline: "30s"

@@ -2,7 +2,7 @@
 
 - stat:
     path: roles/pki/files/apiserver/kubelet-client-{{ hostvars[item]['ansible_host'] }}.crt
-  with_items: "{{ groups['control'] }} "
+  with_items: "{{ groups['kube_control_plane'] }} "
   register: certs
 
 - name: 生成kubelet client证书

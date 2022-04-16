@@ -22,7 +22,7 @@
   - group_vars/component-v{{ k8s_version.split('.')[:2] | join('.') }}.yaml
 
 - name: 针对所有节点实现公共基础配置
-  hosts: control,worker
+  hosts: kube_control_plane,kube_node
   remote_user: root
   tags:
   - common
@@ -32,7 +32,7 @@
   - group_vars/default.yaml
 
 - name: 部署K8S控制平面节点
-  hosts: control
+  hosts: kube_control_plane
   remote_user: root
   tags:
   - control
@@ -45,7 +45,7 @@
   - group_vars/component-v{{ k8s_version.split('.')[:2] | join('.') }}.yaml
 
 - name: 部署K8S工作负载节点
-  hosts: worker
+  hosts: kube_node
   remote_user: root
   tags:
   - worker
@@ -55,3 +55,13 @@
   vars_files:
   - group_vars/default.yaml
   - group_vars/component-v{{ k8s_version.split('.')[:2] | join('.') }}.yaml
+
+- name: 卸载节点
+  hosts: uninstall
+  remote_user: root
+  tags:
+  - uninstall
+  roles:
+  - uninstall
+  vars_files:
+  - group_vars/default.yaml
