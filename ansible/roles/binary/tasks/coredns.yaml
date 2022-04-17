@@ -1,0 +1,49 @@
+---
+
+# 创建 coredns 二进制存放目录
+- name: 创建 coredns 二进制存放目录
+  file: path={{ item }} mode=0755 state=directory
+  with_items:
+    - "{{ temp_dir }}/coredns/"
+    - "{{ temp_dir }}/coredns/bin"
+
+- name: 构建 coredns 官方镜像
+  block:
+  - name: 下载 coredns_{{ internal_images.system.coredns }}_linux_amd64.tgz
+    get_url:
+      url: https://github.com/coredns/coredns/releases/download/v{{ internal_images.system.coredns }}/coredns_{{ internal_images.system.coredns }}_linux_amd64.tgz
+      dest: "{{ temp_dir }}/coredns_{{ internal_images.system.coredns }}_linux_amd64.tgz"
+      checksum: sha256:https://github.com/coredns/coredns/releases/download/v{{ internal_images.system.coredns }}/coredns_{{ internal_images.system.coredns }}_linux_amd64.tgz.sha256
+
+  - name: 解压 coredns_{{ internal_images.system.coredns }}_linux_amd64.tgz
+    unarchive:
+      src: "{{ temp_dir }}/coredns_{{ internal_images.system.coredns }}_linux_amd64.tgz"
+      #dest:  "roles/binary/files/coredns/bin"
+      dest:  "{{ temp_dir }}/coredns/bin/"
+
+  - name: 生存 coredns Dockerfile
+    template:
+      src: coredns/Dockerfile.j2
+      dest: "{{ temp_dir }}/coredns/Dockerfile"
+      group: root
+      mode: 0644
+
+  - name: 制作 {{ internal_images.namespace }}/coredns:{{ internal_images.system.coredns }} 镜像
+    command: docker build -f Dockerfile ./ -t {{ internal_images.namespace }}/coredns:{{ internal_images.system.coredns }}
+    args:
+      chdir: "{{ temp_dir }}/coredns/"
+
+  # TODO; 前提需要有docker repos的权限
+  - name: 上传 {{ internal_images.namespace }}/coredns:{{ internal_images.system.coredns }} 镜像
+    command: docker push {{ internal_images.namespace }}/coredns:{{ internal_images.system.coredns }}
+  when: (binary_kubelet.stat.exists == False) and (binary_kubectl.stat.exists == False) and (binary_kubeadm.stat.exists == False)
+
+- name: 清理缓存文件
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ temp_dir }}/coredns/"
+    - "{{ temp_dir }}/coredns/bin"
+  # kubelet kubectl kubeadm是拷贝文件前检测，所以这里做不存在判断
+  when: (binary_kubelet.stat.exists == False) and (binary_kubectl.stat.exists == False) and (binary_kubeadm.stat.exists == False)
