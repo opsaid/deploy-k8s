@@ -1,0 +1,31 @@
+---
+
+# 创建 pause 二进制存放目录
+- name: 创建 pause 二进制存放目录
+  file: path={{ item }} mode=0755 state=directory
+  with_items:
+    - "roles/binary/files/pause"
+    - "roles/binary/files/pause/bin"
+
+- name: 构建 pause 官方镜像
+  block:
+  - name: 安装 gcc 编译软件（centos/redhat）
+    package:
+      name: ['gcc', 'glibc-static']
+      state: latest
+
+  - name: 制作 {{ internal_images.namespace }}/pause:{{ internal_images.system.pause }} 镜像
+    command: gcc -Os -Wall -Werror -static -DVERSION=v{{ internal_images.system.pause }} -o bin/pause-linux-amd64 pause.c
+    args:
+      chdir: "roles/binary/files/pause"
+
+  - name: 制作 {{ internal_images.namespace }}/pause:{{ internal_images.system.pause }} 镜像
+    command: docker build -f Dockerfile ./ -t {{ internal_images.namespace }}/pause:{{ internal_images.system.pause }}
+    args:
+      chdir: "roles/binary/files/pause"
+
+  # TODO; 前提需要有docker repos的权限
+  - name: 上传 {{ internal_images.namespace }}/pause:{{ internal_images.system.pause }} 镜像
+    command: docker push {{ internal_images.namespace }}/pause:{{ internal_images.system.pause }}
+
+  when: (binary_kubelet.stat.exists == False) and (binary_kubectl.stat.exists == False) and (binary_kubeadm.stat.exists == False)
