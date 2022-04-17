@@ -4,7 +4,7 @@
 - name: 创建 etcd 二进制存放目录
   file: path={{ item }} mode=0755 state=directory
   with_items:
-    - "roles/binary/files/etcd"
+    - "{{ temp_dir }}/etcd"
 
 - stat:
     path: roles/binary/files/etcd/etcd
@@ -26,25 +26,31 @@
     unarchive:
       src: "{{ temp_dir }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64.tar.gz"
       dest: "{{ temp_dir }}"
-  - name: 拷贝 etcd 二进制文件
-    copy:
-      src: "{{ temp_dir }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64/{{ item }}"
-      dest: roles/binary/files/etcd/{{ item }}
-      mode: 0755
-    with_items:
-      - etcd
-      - etcdctl
-      - etcdutl
+  #- name: 拷贝 etcd 二进制文件
+  #  copy:
+  #    src: "{{ temp_dir }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64/{{ item }}"
+  #    dest: roles/binary/files/etcd/{{ item }}
+  #    mode: 0755
+  #  with_items:
+  #    - etcd
+  #    - etcdctl
+  #    - etcdutl
+
+  - name: 生成 etcd Dockerfile
+    template:
+      src: etcd/Dockerfile.j2
+      dest: "{{ temp_dir }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64/Dockerfile"
+      group: root
+      mode: 0644
   
   - name: 制作 {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }} 镜像
     command: docker build -f Dockerfile ./ -t {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }}
     args:
-      chdir: "roles/binary/files/etcd"
+      chdir: "{{ temp_dir }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64/"
 
   # TODO; 前提需要有docker repos的权限
   - name: 上传 {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }} 镜像
     command: docker push {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }}
-
   when: (binary_etcd.stat.exists == False) and (binary_etcdctl.stat.exists == False) and (binary_etcdutl.stat.exists == False)
 
 - name: 清理缓存文件

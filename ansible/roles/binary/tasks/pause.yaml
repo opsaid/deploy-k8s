@@ -4,8 +4,8 @@
 - name: 创建 pause 二进制存放目录
   file: path={{ item }} mode=0755 state=directory
   with_items:
-    - "roles/binary/files/pause"
-    - "roles/binary/files/pause/bin"
+    - "{{ temp_dir }}/pause"
+    - "{{ temp_dir }}/pause/bin"
 
 - name: 构建 pause 官方镜像
   block:
@@ -14,18 +14,41 @@
       name: ['gcc', 'glibc-static']
       state: latest
 
+  - name: 生成 pause.c
+    template:
+      src: pause/pause.c
+      dest: "{{ temp_dir }}/pause/pause.c"
+      group: root
+      mode: 0644
+
+  - name: 生成 pause Dockerfile
+    template:
+      src: pause/Dockerfile.j2
+      dest: "{{ temp_dir }}/pause/Dockerfile"
+      group: root
+      mode: 0644
+
   - name: 制作 {{ internal_images.namespace }}/pause:{{ internal_images.system.pause }} 镜像
     command: gcc -Os -Wall -Werror -static -DVERSION=v{{ internal_images.system.pause }} -o bin/pause-linux-amd64 pause.c
     args:
-      chdir: "roles/binary/files/pause"
+      chdir: "{{ temp_dir }}/pause"
 
   - name: 制作 {{ internal_images.namespace }}/pause:{{ internal_images.system.pause }} 镜像
     command: docker build -f Dockerfile ./ -t {{ internal_images.namespace }}/pause:{{ internal_images.system.pause }}
     args:
-      chdir: "roles/binary/files/pause"
+      chdir: "{{ temp_dir }}/pause"
 
   # TODO; 前提需要有docker repos的权限
   - name: 上传 {{ internal_images.namespace }}/pause:{{ internal_images.system.pause }} 镜像
     command: docker push {{ internal_images.namespace }}/pause:{{ internal_images.system.pause }}
+#  when: (binary_kubelet.stat.exists == False) and (binary_kubectl.stat.exists == False) and (binary_kubeadm.stat.exists == False)
 
+- name: 清理缓存文件
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ temp_dir }}/pause"
+    - "{{ temp_dir }}/pause/bin"
+  # kubelet kubectl kubeadm是拷贝文件前检测，所以这里做不存在判断
   when: (binary_kubelet.stat.exists == False) and (binary_kubectl.stat.exists == False) and (binary_kubeadm.stat.exists == False)
