@@ -1,5 +1,6 @@
 ---
 
+- import_tasks: etcd.yaml
 - import_tasks: calico.yaml
   when: network_plugin == "calico"
 - import_tasks: containerd.yaml

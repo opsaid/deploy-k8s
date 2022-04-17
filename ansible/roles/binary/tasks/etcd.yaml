@@ -1,0 +1,58 @@
+---
+
+# 创建 etcd 二进制存放目录
+- name: 创建 etcd 二进制存放目录
+  file: path={{ item }} mode=0755 state=directory
+  with_items:
+    - "roles/binary/files/etcd"
+
+- stat:
+    path: roles/binary/files/etcd/etcd
+  register: binary_etcd
+- stat:
+    path: roles/binary/files/etcd/etcdctl
+  register: binary_etcdctl
+- stat:
+    path: roles/binary/files/etcd/etcdutl
+  register: binary_etcdutl
+
+- name: 获取官方relases安装包
+  block:
+  - name: 下载 etcd-v{{ internal_images.system.etcd }}-linux-amd64.tar.gz（不验证sha256值）
+    get_url:
+      url: https://github.com/etcd-io/etcd/releases/download/v{{ internal_images.system.etcd }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64.tar.gz
+      dest: "{{ temp_dir }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64.tar.gz"
+  - name: 解压 {{ temp_dir }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64.tar.gz 至 {{ temp_dir }}
+    unarchive:
+      src: "{{ temp_dir }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64.tar.gz"
+      dest: "{{ temp_dir }}"
+  - name: 拷贝 etcd 二进制文件
+    copy:
+      src: "{{ temp_dir }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64/{{ item }}"
+      dest: roles/binary/files/etcd/{{ item }}
+      mode: 0755
+    with_items:
+      - etcd
+      - etcdctl
+      - etcdutl
+  
+  - name: 制作 {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }} 镜像
+    command: docker build -f Dockerfile ./ -t {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }}
+    args:
+      chdir: "roles/binary/files/etcd"
+
+  # TODO; 前提需要有docker repos的权限
+  - name: 上传 {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }} 镜像
+    command: docker push {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }}
+
+  when: (binary_etcd.stat.exists == False) and (binary_etcdctl.stat.exists == False) and (binary_etcdutl.stat.exists == False)
+
+- name: 清理缓存文件
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ temp_dir }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64"
+    - "{{ temp_dir }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64.tar.gz"
+  # etcd etcdctl etcdutl是拷贝文件前检测，所以这里做不存在判断
+  when: (binary_etcd.stat.exists == False) and (binary_etcdctl.stat.exists == False) and (binary_etcdutl.stat.exists == False)
