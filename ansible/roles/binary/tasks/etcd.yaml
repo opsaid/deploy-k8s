@@ -43,14 +43,14 @@
       group: root
       mode: 0644
   
-  - name: 制作 {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }} 镜像
-    command: docker build -f Dockerfile ./ -t {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }}
+  - name: 制作 {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }}-{{ server_arch }} 镜像
+    command: docker build -f Dockerfile ./ -t {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }}-{{ server_arch }}
     args:
       chdir: "{{ temp_dir }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64/"
 
   # TODO; 前提需要有docker repos的权限
-  - name: 上传 {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }} 镜像
-    command: docker push {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }}
+  - name: 上传 {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }}-{{ server_arch }} 镜像
+    command: docker push {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }}-{{ server_arch }}
   when: (binary_etcd.stat.exists == False) and (binary_etcdctl.stat.exists == False) and (binary_etcdutl.stat.exists == False)
 
 - name: 清理缓存文件

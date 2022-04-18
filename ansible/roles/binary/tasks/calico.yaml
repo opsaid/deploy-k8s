@@ -48,19 +48,19 @@
     register: imgid_calico_kube_controllers
 
   - name: 更改 calico/cni 镜像名
-    command: docker tag {{ imgid_calico_cni.stdout }} {{ internal_images.namespace }}/calico-cni:{{ internal_images.system.calico_cni }}
+    command: docker tag {{ imgid_calico_cni.stdout }} {{ internal_images.namespace }}/calico-cni:{{ internal_images.system.calico_cni }}-{{ server_arch }}
   - name: 更改 calico/node 镜像名
-    command: docker tag {{ imgid_calico_node.stdout }} {{ internal_images.namespace }}/calico-node:{{ internal_images.system.calico_node }}
+    command: docker tag {{ imgid_calico_node.stdout }} {{ internal_images.namespace }}/calico-node:{{ internal_images.system.calico_node }}-{{ server_arch }}
   - name: 更改 calico/kube-controllers 镜像名
-    command: docker tag {{ imgid_calico_kube_controllers.stdout }} {{ internal_images.namespace }}/calico-kube-controllers:{{ internal_images.system.calico_kube_controllers }}
+    command: docker tag {{ imgid_calico_kube_controllers.stdout }} {{ internal_images.namespace }}/calico-kube-controllers:{{ internal_images.system.calico_kube_controllers }}-{{ server_arch }}
 
   # TODO; 前提需要有docker repos的权限
-  - name: 上传镜像：{{ internal_images.namespace }}/calico-cni:{{ internal_images.system.calico_cni }}
-    command: docker push {{ internal_images.namespace }}/calico-cni:{{ internal_images.system.calico_cni }}
-  - name: 上传镜像：{{ internal_images.namespace }}/calico-node:{{ internal_images.system.calico_node }}
-    command: docker push {{ internal_images.namespace }}/calico-node:{{ internal_images.system.calico_node }}
-  - name: 上传镜像：{{ internal_images.namespace }}/calico-kube-controllers:{{ internal_images.system.calico_kube_controllers }}
-    command: docker push {{ internal_images.namespace }}/calico-kube-controllers:{{ internal_images.system.calico_kube_controllers }}
+  - name: 上传镜像：{{ internal_images.namespace }}/calico-cni:{{ internal_images.system.calico_cni }}-{{ server_arch }}
+    command: docker push {{ internal_images.namespace }}/calico-cni:{{ internal_images.system.calico_cni }}-{{ server_arch }}
+  - name: 上传镜像：{{ internal_images.namespace }}/calico-node:{{ internal_images.system.calico_node }}-{{ server_arch }}
+    command: docker push {{ internal_images.namespace }}/calico-node:{{ internal_images.system.calico_node }}-{{ server_arch }}
+  - name: 上传镜像：{{ internal_images.namespace }}/calico-kube-controllers:{{ internal_images.system.calico_kube_controllers }}-{{ server_arch }}
+    command: docker push {{ internal_images.namespace }}/calico-kube-controllers:{{ internal_images.system.calico_kube_controllers }}-{{ server_arch }}
 
   when: (network_plugin == "calico") and (binary_calicoctl.stat.exists == False)
 

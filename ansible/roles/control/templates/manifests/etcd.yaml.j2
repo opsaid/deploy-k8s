@@ -16,7 +16,7 @@ spec:
 {% for key, value in etcd_args.items() %}
     - --{{ key | replace('_','-') }}={{ value }}
 {% endfor %}
-    image: {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }}
+    image: {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }}-{{ server_arch }}
     imagePullPolicy: IfNotPresent
     livenessProbe:
       failureThreshold: 8

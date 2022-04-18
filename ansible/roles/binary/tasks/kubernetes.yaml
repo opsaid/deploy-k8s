@@ -100,23 +100,23 @@
   #    msg: "{{ imgid_apiserver.stdout }}"
 
   - name: 更改 kube-apiserver 镜像名
-    command: docker tag {{ imgid_apiserver.stdout }} {{ internal_images.namespace }}/kube-apiserver:{{ internal_images.system.kube_apiserver }}
+    command: docker tag {{ imgid_apiserver.stdout }} {{ internal_images.namespace }}/kube-apiserver:{{ internal_images.system.kube_apiserver }}-{{ server_arch }}
   - name: 更改 kube-controller-manager 镜像名
-    command: docker tag {{ imgid_controller.stdout }} {{ internal_images.namespace }}/kube-controller-manager:{{ internal_images.system.kube_apiserver }}
+    command: docker tag {{ imgid_controller.stdout }} {{ internal_images.namespace }}/kube-controller-manager:{{ internal_images.system.kube_apiserver }}-{{ server_arch }}
   - name: 更改 kube-proxy 镜像名
-    command: docker tag {{ imgid_proxy.stdout }} {{ internal_images.namespace }}/kube-proxy:{{ internal_images.system.kube_apiserver }}
+    command: docker tag {{ imgid_proxy.stdout }} {{ internal_images.namespace }}/kube-proxy:{{ internal_images.system.kube_apiserver }}-{{ server_arch }}
   - name: 更改 kube-scheduler 镜像名
-    command: docker tag {{ imgid_scheduler.stdout }} {{ internal_images.namespace }}/kube-scheduler:{{ internal_images.system.kube_apiserver }}
+    command: docker tag {{ imgid_scheduler.stdout }} {{ internal_images.namespace }}/kube-scheduler:{{ internal_images.system.kube_apiserver }}-{{ server_arch }}
 
   # TODO; 前提需要有docker repos的权限
-  - name: 上传镜像：{{ internal_images.namespace }}/kube-apiserver:{{ internal_images.system.kube_apiserver }}
-    command: docker push {{ internal_images.namespace }}/kube-apiserver:{{ internal_images.system.kube_apiserver }}
-  - name: 上传镜像：{{ internal_images.namespace }}/kube-controller-manager:{{ internal_images.system.kube_apiserver }}
-    command: docker push {{ internal_images.namespace }}/kube-controller-manager:{{ internal_images.system.kube_apiserver }}
-  - name: 上传镜像：{{ internal_images.namespace }}/kube-proxy:{{ internal_images.system.kube_apiserver }}
-    command: docker push {{ internal_images.namespace }}/kube-proxy:{{ internal_images.system.kube_apiserver }}
-  - name: 上传镜像：{{ internal_images.namespace }}/kube-scheduler:{{ internal_images.system.kube_apiserver }}
-    command: docker push {{ internal_images.namespace }}/kube-scheduler:{{ internal_images.system.kube_apiserver }}
+  - name: 上传镜像：{{ internal_images.namespace }}/kube-apiserver:{{ internal_images.system.kube_apiserver }}-{{ server_arch }}
+    command: docker push {{ internal_images.namespace }}/kube-apiserver:{{ internal_images.system.kube_apiserver }}-{{ server_arch }}
+  - name: 上传镜像：{{ internal_images.namespace }}/kube-controller-manager:{{ internal_images.system.kube_apiserver }}-{{ server_arch }}
+    command: docker push {{ internal_images.namespace }}/kube-controller-manager:{{ internal_images.system.kube_apiserver }}-{{ server_arch }}
+  - name: 上传镜像：{{ internal_images.namespace }}/kube-proxy:{{ internal_images.system.kube_apiserver }}-{{ server_arch }}
+    command: docker push {{ internal_images.namespace }}/kube-proxy:{{ internal_images.system.kube_apiserver }}-{{ server_arch }}
+  - name: 上传镜像：{{ internal_images.namespace }}/kube-scheduler:{{ internal_images.system.kube_apiserver }}-{{ server_arch }}
+    command: docker push {{ internal_images.namespace }}/kube-scheduler:{{ internal_images.system.kube_apiserver }}-{{ server_arch }}
   when: (binary_kubelet.stat.exists == False) and (binary_kubectl.stat.exists == False) and (binary_kubeadm.stat.exists == False)
 
 - name: 清理缓存文件

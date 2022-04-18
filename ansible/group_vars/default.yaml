@@ -51,5 +51,9 @@ master_cluster_ip: "{{ service_cluster_ip_range.split('.')[0:3] | join('.') }}.1
 # 在 {{ service_cluster_ip_range }} 网段范围内，一般取第十个
 cluster_dns: "{{ service_cluster_ip_range.split('.')[0:3] | join('.') }}.10"
 
+# TODO
+# 服务端cpu架构，当前仅支持amd64
+server_arch: amd64
+
 # 帮助文档地址
 product_docs: https://opsaid.cn/docs
