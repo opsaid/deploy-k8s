@@ -29,7 +29,7 @@ internal_images:
     calico_kube_controllers: "{{ calico_version }}"
 
     # gcr.io/k8s-staging-metrics-server/metrics-server:master 
-    metrics_server: 0.5.2
+    metrics_server: 0.6.1
 
     # k8s.gcr.io/pause:3.2
     #pause: 3.5-amd64
