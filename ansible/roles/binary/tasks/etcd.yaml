@@ -6,16 +6,6 @@
   with_items:
     - "{{ temp_dir }}/etcd"
 
-- stat:
-    path: roles/binary/files/etcd/etcd
-  register: binary_etcd
-- stat:
-    path: roles/binary/files/etcd/etcdctl
-  register: binary_etcdctl
-- stat:
-    path: roles/binary/files/etcd/etcdutl
-  register: binary_etcdutl
-
 - name: 获取官方relases安装包
   block:
   - name: 下载 etcd-v{{ internal_images.system.etcd }}-linux-amd64.tar.gz（不验证sha256值）
@@ -26,15 +16,6 @@
     unarchive:
       src: "{{ temp_dir }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64.tar.gz"
       dest: "{{ temp_dir }}"
-  #- name: 拷贝 etcd 二进制文件
-  #  copy:
-  #    src: "{{ temp_dir }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64/{{ item }}"
-  #    dest: roles/binary/files/etcd/{{ item }}
-  #    mode: 0755
-  #  with_items:
-  #    - etcd
-  #    - etcdctl
-  #    - etcdutl
 
   - name: 生成 etcd Dockerfile
     template:
@@ -51,7 +32,7 @@
   # TODO; 前提需要有docker repos的权限
   - name: 上传 {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }}-{{ server_arch }} 镜像
     command: docker push {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }}-{{ server_arch }}
-  when: (binary_etcd.stat.exists == False) and (binary_etcdctl.stat.exists == False) and (binary_etcdutl.stat.exists == False)
+  when: (binary_kubelet.stat.exists == False) and (binary_kubectl.stat.exists == False) and (binary_kubeadm.stat.exists == False)
 
 - name: 清理缓存文件
   file:
@@ -61,4 +42,4 @@
     - "{{ temp_dir }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64"
     - "{{ temp_dir }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64.tar.gz"
   # etcd etcdctl etcdutl是拷贝文件前检测，所以这里做不存在判断
-  when: (binary_etcd.stat.exists == False) and (binary_etcdctl.stat.exists == False) and (binary_etcdutl.stat.exists == False)
+  when: (binary_kubelet.stat.exists == False) and (binary_kubectl.stat.exists == False) and (binary_kubeadm.stat.exists == False)

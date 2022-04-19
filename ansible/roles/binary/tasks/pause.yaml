@@ -41,7 +41,7 @@
   # TODO; 前提需要有docker repos的权限
   - name: 上传 {{ internal_images.namespace }}/pause:{{ internal_images.system.pause }}-{{ server_arch }} 镜像
     command: docker push {{ internal_images.namespace }}/pause:{{ internal_images.system.pause }}-{{ server_arch }}
-#  when: (binary_kubelet.stat.exists == False) and (binary_kubectl.stat.exists == False) and (binary_kubeadm.stat.exists == False)
+  when: (binary_kubelet.stat.exists == False) and (binary_kubectl.stat.exists == False) and (binary_kubeadm.stat.exists == False)
 
 - name: 清理缓存文件
   file:
