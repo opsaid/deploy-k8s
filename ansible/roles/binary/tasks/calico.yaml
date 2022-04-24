@@ -22,9 +22,9 @@
       src: "{{ temp_dir }}/release-v{{ calico_version }}.tgz"
       dest: "{{ temp_dir }}"
 
-  - name: 拷贝 kubeadm 二进制文件
+  - name: 拷贝 calicoctl 二进制文件
     copy:
-      src: "{{ temp_dir }}/release-v{{ calico_version }}/bin/calicoctl"
+      src: "{{ temp_dir }}/release-v{{ calico_version }}/bin/calicoctl/calicoctl-linux-amd64"
       dest: roles/binary/files/calico/bin/calicoctl-linux-amd64
       mode: 0755
 
