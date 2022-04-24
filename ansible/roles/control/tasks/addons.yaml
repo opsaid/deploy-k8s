@@ -1,23 +1,137 @@
 ---
 
-- stat:
-    path: /usr/local/src/addons/rbac.yaml
-  register: addons
-- name: 创建k8s基础组件部署清单
+# kube-system
+- name: 创建 k8s system 部署相关目录
+  vars:
+    component: kube-system
+  file: path={{ item }} mode=0755 state=directory
+  with_items:
+    - /usr/local/src/addons/{{ component }}
+    - /usr/local/src/addons/{{ component }}/cluster
+- name: 创建 system 部署清单
+  vars:
+    component: kube-system
+    version: v{{ k8s_version.split('.')[:2] | join('.') }}
   template:
-    src: addons/{{ item }}.j2
-    dest: /usr/local/src/addons/{{ item }}
+    src: addons/{{ version }}/{{ component }}/{{ item }}.j2
+    dest: /usr/local/src/addons/{{ component }}/{{ item }}
     owner: kube
     group: root
     mode: 0644
   with_items: 
-    - psp.yaml
-    - rbac.yaml
-    - coredns.yaml
-    - kube-proxy.yaml
-    - metrics-server.yaml
     - kustomization.yaml
-    - "{{ network_plugin }}.yaml"
-  #notify:
-  #  - kubectl label control
-  when: addons.stat.exists == False
+    - cluster/roles.yaml
+
+# calico
+- name: 创建 k8s calico 部署相关目录
+  file: path={{ item }} mode=0755 state=directory
+  with_items:
+    - /usr/local/src/addons/calico
+    - /usr/local/src/addons/calico/cluster
+    - /usr/local/src/addons/calico/cluster
+    - /usr/local/src/addons/calico/config/configmap
+    - /usr/local/src/addons/calico/crds
+    - /usr/local/src/addons/calico/workloads
+- name: 创建 calico 部署清单
+  vars:
+    version: v{{ k8s_version.split('.')[:2] | join('.') }}
+  template:
+    src: addons/{{ version }}/calico/{{ item }}.j2
+    dest: /usr/local/src/addons/calico/{{ item }}
+    owner: kube
+    group: root
+    mode: 0644
+  with_items: 
+    - kustomization.yaml
+    - cluster/roles.yaml
+    - config/configmap/rc.local
+    - config/configmap/cni_network_config
+    - crds/crds.yaml
+    - workloads/deployment.yaml
+    - workloads/daemonset.yaml
+  when: network_plugin == "calico"
+
+# coredns
+- name: 创建 k8s coredns 部署相关目录
+  vars:
+    component: coredns
+  file: path={{ item }} mode=0755 state=directory
+  with_items:
+    - /usr/local/src/addons/{{ component }}
+    - /usr/local/src/addons/{{ component }}/cluster
+    - /usr/local/src/addons/{{ component }}/cluster
+    - /usr/local/src/addons/{{ component }}/config/configmap
+    - /usr/local/src/addons/{{ component }}/service
+    - /usr/local/src/addons/{{ component }}/workloads
+- name: 创建 coredns 部署清单
+  vars:
+    component: coredns
+    version: v{{ k8s_version.split('.')[:2] | join('.') }}
+  template:
+    src: addons/{{ version }}/{{ component }}/{{ item }}.j2
+    dest: /usr/local/src/addons/{{ component }}/{{ item }}
+    owner: kube
+    group: root
+    mode: 0644
+  with_items: 
+    - kustomization.yaml
+    - cluster/roles.yaml
+    - config/configmap/Corefile
+    - service/services.yaml
+    - workloads/deployment.yaml
+
+# metrics-server
+- name: 创建 k8s metrics-server 部署相关目录
+  vars:
+    component: metrics-server
+  file: path={{ item }} mode=0755 state=directory
+  with_items:
+    - /usr/local/src/addons/{{ component }}
+    - /usr/local/src/addons/{{ component }}/crds
+    - /usr/local/src/addons/{{ component }}/cluster
+    - /usr/local/src/addons/{{ component }}/service
+    - /usr/local/src/addons/{{ component }}/workloads
+- name: 创建 metrics-server 部署清单
+  vars:
+    component: metrics-server
+    version: v{{ k8s_version.split('.')[:2] | join('.') }}
+  template:
+    src: addons/{{ version }}/{{ component }}/{{ item }}.j2
+    dest: /usr/local/src/addons/{{ component }}/{{ item }}
+    owner: kube
+    group: root
+    mode: 0644
+  with_items: 
+    - kustomization.yaml
+    - crds/apiservice.yaml
+    - cluster/roles.yaml
+    - service/services.yaml
+    - workloads/deployment.yaml
+
+# kube-proxy
+- name: 创建 k8s kube-proxy 部署相关目录
+  vars:
+    component: kube-proxy
+  file: path={{ item }} mode=0755 state=directory
+  with_items:
+    - /usr/local/src/addons/{{ component }}
+    - /usr/local/src/addons/{{ component }}/cluster
+    - /usr/local/src/addons/{{ component }}/workloads
+    - /usr/local/src/addons/{{ component }}/config
+    - /usr/local/src/addons/{{ component }}/config/configmap
+- name: 创建 kube-proxy 部署清单
+  vars:
+    component: kube-proxy
+    version: v{{ k8s_version.split('.')[:2] | join('.') }}
+  template:
+    src: addons/{{ version }}/{{ component }}/{{ item }}.j2
+    dest: /usr/local/src/addons/{{ component }}/{{ item }}
+    owner: kube
+    group: root
+    mode: 0644
+  with_items: 
+    - kustomization.yaml
+    - cluster/roles.yaml
+    - config/configmap/config.conf
+    - config/configmap/kubeconfig.conf
+    - workloads/daemonset.yaml

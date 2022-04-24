@@ -6,6 +6,11 @@
   with_items:
     - /root/.kube
     - /usr/local/src/addons
+    - /usr/local/src/addons/calico
+    - /usr/local/src/addons/coredns
+    - /usr/local/src/addons/kube-proxy
+    - /usr/local/src/addons/kube-system
+    - /usr/local/src/addons/metrics-server
 
 - import_tasks: certs.yaml
 - import_tasks: addons.yaml
