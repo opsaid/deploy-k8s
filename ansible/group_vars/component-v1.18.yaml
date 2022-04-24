@@ -6,7 +6,7 @@ containerd_version: 1.3.10
 
 # DANGER! 
 # 使用的k8s网络插件，支持: calico
-calico_version: 3.16.10
+calico_version: 3.18.6
 
 # 内部系统镜像地址，必须存在
 internal_images:
@@ -23,7 +23,7 @@ internal_images:
     kube_scheduler: "{{ k8s_version }}"
     kube_proxy: "{{ k8s_version }}"
 
-    # calico/node:v3.16.10
+    # calico/node:v3.18.6
     calico_cni: "{{ calico_version }}"
     calico_node: "{{ calico_version }}"
     calico_kube_controllers: "{{ calico_version }}"
