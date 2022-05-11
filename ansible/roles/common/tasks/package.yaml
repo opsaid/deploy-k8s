@@ -75,6 +75,7 @@
    - snapd.socket
    - multipathd.service
    - multipathd.socket
+  ignore_errors: yes
   when: ansible_distribution == 'Ubuntu'
 
 # socat 用于 worker 节点端口转发使用(helm)
