@@ -22,11 +22,16 @@
       src: "{{ temp_dir }}/release-v{{ calico_version }}.tgz"
       dest: "{{ temp_dir }}"
 
+  # calicoctl linux版本，存在两种名称：calicoctl 或 calicoctl-linux-amd64
   - name: 拷贝 calicoctl 二进制文件
     copy:
-      src: "{{ temp_dir }}/release-v{{ calico_version }}/bin/calicoctl/calicoctl-linux-amd64"
+      src: "{{ temp_dir }}/release-v{{ calico_version }}/bin/{{ item }}"
       dest: roles/binary/files/calico/bin/calicoctl-linux-amd64
       mode: 0755
+    with_items:
+      - calicoctl
+      - calicoctl-linux-amd64
+    ignore_errors: yes
 
   - name: 导入官方镜像
     command: docker load -i {{ item }}
