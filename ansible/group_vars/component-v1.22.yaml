@@ -40,7 +40,7 @@ internal_images:
 
 # etcd
 etcd_args:
-  advertise_client_urls: "https://{{ ansible_facts[listen_device_name]['ipv4']['address'] }}:2379"
+  advertise_client_urls: "https://{{ hostvars[inventory_hostname]['ip'] }}:2379"
   auto_tls: "false"
   cert_file: "{{ etc_dir }}/pki/etcd/server.crt"
   client_cert_auth: "true"
@@ -48,14 +48,14 @@ etcd_args:
   election_timeout: "5000"
   enable_v2: "true"
   heartbeat_interval: "250"
-  initial_advertise_peer_urls: "https://{{ ansible_facts[listen_device_name]['ipv4']['address'] }}:2380"
+  initial_advertise_peer_urls: "https://{{ hostvars[inventory_hostname]['ip'] }}:2380"
   initial_cluster: "{% for host in groups['etcd'] %}{{ host }}=https://{{ hostvars[host]['ip'] }}:2380{% if not loop.last %},{% endif %}{% endfor %}"
   initial_cluster_state: "new"
   initial_cluster_token: "{{ cluster_name }}"
   key_file: "{{ etc_dir }}/pki/etcd/server.key"
-  listen_client_urls: "https://127.0.0.1:2379,https://{{ ansible_facts[listen_device_name]['ipv4']['address'] }}:2379"
+  listen_client_urls: "https://127.0.0.1:2379,https://{{ hostvars[inventory_hostname]['ip'] }}:2379"
   listen_metrics_urls: "http://127.0.0.1:2381"
-  listen_peer_urls: "https://{{ ansible_facts[listen_device_name]['ipv4']['address'] }}:2380"
+  listen_peer_urls: "https://{{ hostvars[inventory_hostname]['ip'] }}:2380"
   max_request_bytes: "1048576"
   max_snapshots: "5"
   max_wals: "5"
@@ -71,7 +71,7 @@ etcd_args:
 
 # 对应k8s cli，变量由下划线转中划线
 api_server_args:
-  advertise_address: "{{ ansible_facts[listen_device_name]['ipv4']['address'] }}"
+  advertise_address: "{{ hostvars[inventory_hostname]['ip'] }}"
   allow_privileged: "true"
   alsologtostderr: "true"
   anonymous_auth: "true"
@@ -82,7 +82,7 @@ api_server_args:
   audit_log_path: "{{ log_dir }}/audit.log"
   audit_policy_file: "{{ etc_dir }}/audit-policy.yaml"
   authorization_mode: "Node,RBAC"
-  bind_address: "{{ ansible_facts[listen_device_name]['ipv4']['address'] }}"
+  bind_address: "{{ hostvars[inventory_hostname]['ip'] }}"
   client_ca_file: "{{ etc_dir }}/pki/ca.crt"
   default_not_ready_toleration_seconds: "60"
   default_unreachable_toleration_seconds: "60"
@@ -139,7 +139,7 @@ controller_manager_args:
   authentication_skip_lookup: "false"
   authorization_kubeconfig: "{{ etc_dir }}/controller-manager.conf"
   # 服务监听的IP地址，与secure-port配合使用，默认监听0.0.0.0
-  bind_address: "{{ ansible_facts[listen_device_name]['ipv4']['address'] }}"
+  bind_address: "{{ hostvars[inventory_hostname]['ip'] }}"
   cidr_allocator_type: "RangeAllocator"
   client_ca_file: "{{ etc_dir }}/pki/ca.crt"
   cluster_cidr: "{{ cluster_cidr }}"
@@ -196,7 +196,7 @@ scheduler_args:
   authentication_kubeconfig: "{{ etc_dir }}/scheduler.conf"
   authorization_kubeconfig: "{{ etc_dir }}/scheduler.conf"
   # 服务监听的IP地址，与secure-port配合使用，默认监听0.0.0.0
-  bind_address: "{{ ansible_facts[listen_device_name]['ipv4']['address'] }}"
+  bind_address: "{{ hostvars[inventory_hostname]['ip'] }}"
   config: "{{ etc_dir }}/scheduler-config.yaml"
   kubeconfig: "{{ etc_dir }}/scheduler.conf"
   log_dir: "{{ log_dir }}"
