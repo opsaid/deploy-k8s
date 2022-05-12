@@ -7,7 +7,7 @@ distinguished_name = dn
 [ dn ]
 C = CN
 O = system:nodes
-CN = system:node:{{ hostvars[item.item]['ansible_host'] }}
+CN = system:node:{{ hostvars[item.item]['ip'] }}
 
 [ v3_ext ]
 authorityKeyIdentifier=keyid

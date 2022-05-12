@@ -1,11 +1,11 @@
 apiVersion: kubeproxy.config.k8s.io/v1alpha1
 kind: KubeProxyConfiguration
-bindAddress: {{ ansible_facts[listen_device_name]['ipv4']['address'] }}
-healthzBindAddress: {{ ansible_facts[listen_device_name]['ipv4']['address'] }}:10256
+bindAddress: {{ hostvars[inventory_hostname]['ip'] }}
+healthzBindAddress: {{ hostvars[inventory_hostname]['ip'] }}:10256
 metricsBindAddress: 127.0.0.1:10249
 enableProfiling: false
 clusterCIDR: {{ cluster_cidr }}
-hostnameOverride: {{ ansible_facts[listen_device_name]['ipv4']['address'] }}
+hostnameOverride: {{ hostvars[inventory_hostname]['ip'] }}
 clientConnection:
   acceptContentTypes: ""
   burst: 10

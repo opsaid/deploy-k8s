@@ -30,7 +30,7 @@ spec:
     livenessProbe:
       failureThreshold: 8
       httpGet:
-        host: {{ ansible_facts[listen_device_name]['ipv4']['address'] }}
+        host: {{ hostvars[inventory_hostname].ip }}
         path: /healthz
         port: 10257
         scheme: HTTPS
@@ -44,7 +44,7 @@ spec:
     startupProbe:
       failureThreshold: 24
       httpGet:
-        host: {{ ansible_facts[listen_device_name]['ipv4']['address'] }}
+        host: {{ hostvars[inventory_hostname].ip }}
         path: /healthz
         port: 10257
         scheme: HTTPS

@@ -49,16 +49,16 @@
   - etcd/server.key
 
 # 拷贝 kubelet-client 证书文件
-- name: 拷贝 kubelet-client-{{ ansible_facts[listen_device_name]['ipv4']['address']  }}.crt 关联证书
+- name: 拷贝 kubelet-client-{{ hostvars[inventory_hostname]['ip'] }}.crt 关联证书
   copy: 
-    src: ../../pki/files/apiserver/kubelet-client-{{ ansible_facts[listen_device_name]['ipv4']['address'] }}.crt
+    src: ../../pki/files/apiserver/kubelet-client-{{ hostvars[inventory_hostname]['ip'] }}.crt
     dest: "{{ etc_dir }}/pki/kubelet-client-current.crt"
     owner: kube
     group: root 
     mode: 0644
-- name: 拷贝 kubelet-client-{{ ansible_facts[listen_device_name]['ipv4']['address']  }}.crt 关联证书
+- name: 拷贝 kubelet-client-{{ hostvars[inventory_hostname]['ip'] }}.crt 关联证书
   copy: 
-    src: ../../pki/files/apiserver/kubelet-client-{{ ansible_facts[listen_device_name]['ipv4']['address'] }}.key
+    src: ../../pki/files/apiserver/kubelet-client-{{ hostvars[inventory_hostname]['ip'] }}.key
     dest: "{{ etc_dir }}/pki/kubelet-client-current.key"
     owner:  kube
     group: root 

@@ -1,7 +1,7 @@
 kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1
 staticPodPath: {{ etc_dir }}/manifests
-address: {{ ansible_facts[listen_device_name]['ipv4']['address'] }}
+address: {{ hostvars[inventory_hostname]['ip'] }}
 port: 10250
 readOnlyPort: 0
 authentication:

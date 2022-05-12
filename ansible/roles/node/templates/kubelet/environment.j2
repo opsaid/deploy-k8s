@@ -8,7 +8,7 @@ KUBELET_CONFIG_ARGS="--config={{ data_dir }}/kubelet/config.yaml"
 
 KUBELET_EXTRA_ARGS="\
   --cert-dir={{ etc_dir }}/pki/ \
-  --node-ip={{ ansible_facts[listen_device_name]['ipv4']['address'] }} \
+  --node-ip={{ hostvars[inventory_hostname]['ip'] }} \
   --root-dir={{ data_dir }}/kubelet \
   --runtime-cgroups=/systemd/system.slice \
   --alsologtostderr=true \

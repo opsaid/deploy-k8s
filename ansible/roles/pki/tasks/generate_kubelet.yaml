@@ -1,7 +1,7 @@
 ---
 
 - stat:
-    path: roles/pki/files/apiserver/kubelet-client-{{ hostvars[item]['ansible_host'] }}.crt
+    path: roles/pki/files/apiserver/kubelet-client-{{ hostvars[item]['ip'] }}.crt
   with_items: "{{ groups['kube_control_plane'] }} "
   register: certs
 
@@ -15,29 +15,29 @@
   #    msg: "{{ item }}"
   #  with_items: "{{ certs.results }}"
 
-  - name: 拷贝 kubelet-client-{{ hostvars[item.item]['ansible_host'] }}-csr.conf 文件
+  - name: 拷贝 kubelet-client-{{ hostvars[item.item]['ip'] }}-csr.conf 文件
     template:
       src: "{{ cert_kind }}/kubelet-client-csr.conf.j2"
-      dest: "{{ work_dir }}/{{ cert_kind }}/kubelet-client-{{ hostvars[item.item]['ansible_host'] }}-csr.conf"
+      dest: "{{ work_dir }}/{{ cert_kind }}/kubelet-client-{{ hostvars[item.item]['ip'] }}-csr.conf"
     with_items: "{{ certs.results }}"
     when: item.stat.exists == False
 
-  - name: 生成 kubelet-client-{{ hostvars[item.item]['ansible_host'] }}.key 私钥
-    command: openssl genrsa -out kubelet-client-{{ hostvars[item.item]['ansible_host'] }}.key 2048
+  - name: 生成 kubelet-client-{{ hostvars[item.item]['ip'] }}.key 私钥
+    command: openssl genrsa -out kubelet-client-{{ hostvars[item.item]['ip'] }}.key 2048
     args:
       chdir: "{{ work_dir }}/{{ cert_kind }}"
     with_items: "{{ certs.results }}"
     when: item.stat.exists == False
 
-  - name: 生成 kubelet-client-{{ hostvars[item.item]['ansible_host'] }}.csr 证书
-    command: openssl req -new -key kubelet-client-{{ hostvars[item.item]['ansible_host'] }}.key -out kubelet-client-{{ hostvars[item.item]['ansible_host'] }}.csr -config kubelet-client-{{ hostvars[item.item]['ansible_host'] }}-csr.conf
+  - name: 生成 kubelet-client-{{ hostvars[item.item]['ip'] }}.csr 证书
+    command: openssl req -new -key kubelet-client-{{ hostvars[item.item]['ip'] }}.key -out kubelet-client-{{ hostvars[item.item]['ip'] }}.csr -config kubelet-client-{{ hostvars[item.item]['ip'] }}-csr.conf
     args:
       chdir: "{{ work_dir }}/{{ cert_kind }}"
     with_items: "{{ certs.results }}"
     when: item.stat.exists == False
 
-  - name: 签名 kubelet-client-{{ hostvars[item.item]['ansible_host'] }}.crt 证书
-    command: openssl x509 -req -in kubelet-client-{{ hostvars[item.item]['ansible_host'] }}.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out kubelet-client-{{ hostvars[item.item]['ansible_host'] }}.crt -days 3650 -extensions v3_ext -extfile kubelet-client-{{ hostvars[item.item]['ansible_host'] }}-csr.conf
+  - name: 签名 kubelet-client-{{ hostvars[item.item]['ip'] }}.crt 证书
+    command: openssl x509 -req -in kubelet-client-{{ hostvars[item.item]['ip'] }}.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out kubelet-client-{{ hostvars[item.item]['ip'] }}.crt -days 3650 -extensions v3_ext -extfile kubelet-client-{{ hostvars[item.item]['ip'] }}-csr.conf
     args:
       chdir: "{{ work_dir }}/{{ cert_kind }}"
     with_items: "{{ certs.results }}"
@@ -50,16 +50,16 @@
     with_items: "{{ certs.results }}"
     when: item.stat.exists == False
 
-  - name: 清理临时生成的 kubelet-client-{{ hostvars[item.item]['ansible_host'] }}.csr 文件
+  - name: 清理临时生成的 kubelet-client-{{ hostvars[item.item]['ip'] }}.csr 文件
     file:
-      path: "{{ work_dir }}/{{ cert_kind }}/kubelet-client-{{ hostvars[item.item]['ansible_host'] }}.csr"
+      path: "{{ work_dir }}/{{ cert_kind }}/kubelet-client-{{ hostvars[item.item]['ip'] }}.csr"
       state: absent
     with_items: "{{ certs.results }}"
     when: item.stat.exists == False
 
-  - name: 清理临时生成的 kubelet-client-{{ hostvars[item.item]['ansible_host'] }}-csr.conf 文件
+  - name: 清理临时生成的 kubelet-client-{{ hostvars[item.item]['ip'] }}-csr.conf 文件
     file:
-      path: "{{ work_dir }}/{{ cert_kind }}/kubelet-client-{{ hostvars[item.item]['ansible_host'] }}-csr.conf"
+      path: "{{ work_dir }}/{{ cert_kind }}/kubelet-client-{{ hostvars[item.item]['ip'] }}-csr.conf"
       state: absent
     with_items: "{{ certs.results }}"
     when: item.stat.exists == False

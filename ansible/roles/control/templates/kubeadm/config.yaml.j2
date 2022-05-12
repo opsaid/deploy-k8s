@@ -15,7 +15,7 @@ localAPIEndpoint:
 nodeRegistration:
   criSocket: /var/run/containerd/containerd.sock
   imagePullPolicy: IfNotPresent
-  name: {{ ansible_facts[listen_device_name]['ipv4']['address'] }}
+  name: {{ hostvars[inventory_hostname]['ip'] }}
   taints: null
 patches:
   directory: /usr/local/src/kubeadm/patches/
@@ -104,7 +104,7 @@ etcd:
     serverCertSANs:
     - 127.0.0.1
 {% for host in groups['etcd'] %}
-    - {{ hostvars[host]['ansible_host'] }}
+    - {{ hostvars[host]['ip'] }}
 {% endfor %}
 {% for host in groups['etcd'] %}
     - {{ host }}.{{ cluster_domain }}
@@ -112,7 +112,7 @@ etcd:
     peerCertSANs:
     - 127.0.0.1
 {% for host in groups['etcd'] %}
-    - {{ hostvars[host]['ansible_host'] }}
+    - {{ hostvars[host]['ip'] }}
 {% endfor %}
 {% for host in groups['etcd'] %}
     - {{ host }}.{{ cluster_domain }}
@@ -162,7 +162,7 @@ scheduler:
 kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1
 staticPodPath: {{ etc_dir }}/manifests
-address: {{ ansible_facts[listen_device_name]['ipv4']['address'] }}
+address: {{ hostvars[inventory_hostname]['ip'] }}
 port: 10250
 readOnlyPort: 0
 authentication:
