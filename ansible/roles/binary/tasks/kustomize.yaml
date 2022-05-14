@@ -1,0 +1,27 @@
+---
+
+- name: 创建 kustomize 二进制存放目录
+  file: path={{ item }} mode=0755 state=directory
+  with_items:
+    - "roles/binary/files/kustomize"
+
+- stat:
+    path: roles/binary/files/kustomize/kustomize
+  register: kustomize
+
+- name: 获取 kustomize 工具
+  block:
+  - name: 下载 kustomize_v4.5.4_linux_amd64.tar.gz
+    get_url:
+      url: https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v4.5.4/kustomize_v4.5.4_linux_amd64.tar.gz
+      dest: "{{ temp_dir }}/kustomize_v4.5.4_linux_amd64.tar.gz"
+  - name: 解压 {{ temp_dir }}/kustomize_v4.5.4_linux_amd64.tar.gz
+    unarchive:
+      src: "{{ temp_dir }}/kustomize_v4.5.4_linux_amd64.tar.gz"
+      dest: "{{ temp_dir }}"
+  - name: 拷贝 {{ temp_dir }}/kustomize
+    copy:
+      src: "{{ temp_dir }}/kustomize"
+      dest: roles/binary/files/kustomize/kustomize
+      mode: 0755
+  when: kustomize.stat.exists == False

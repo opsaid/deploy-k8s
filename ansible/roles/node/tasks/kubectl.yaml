@@ -1,9 +1,13 @@
 ---
 
-# 拷贝 kubectl 二进制文件
+# 拷贝 kubectl 与 kustomize  二进制文件
 - stat:
     path: /usr/bin/kubectl
   register: kubectl
+- stat:
+    path: /usr/bin/kustomize
+  register: kustomize
+
 - name: 拷贝 kubectl 二进制文件
   copy:
     src: ../../binary/files/kubernetes/server/bin/kubectl
@@ -12,3 +16,12 @@
     group: root
     mode: 0755
   when: kubectl.stat.exists == False
+
+- name: 拷贝 kustomize 二进制文件
+  copy:
+    src: ../../binary/files/kustomize/kustomize
+    dest: /usr/bin/kustomize
+    owner: root
+    group: root
+    mode: 0755
+  when: kustomize.stat.exists == False
