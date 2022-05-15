@@ -1,8 +1,4 @@
 ---
-- name: kubectl apply manifests
-  shell: "kubectl apply -k /usr/local/src/manifests"
-  run_once: true
-  ignore_errors: yes
 
 - name: kubectl label control
   shell: "kubectl label node {{ hostvars[item]['ip'] }} node-role.kubernetes.io/master="
