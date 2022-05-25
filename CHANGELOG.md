@@ -4,6 +4,13 @@
 
 ## Unreleased
 
+## v2.1.1 - [2022-05-25]
+
+### Added
+
+- containerd配置适配1.5版本优化
+- 添加kata-containers支持
+
 ## v2.1.0 - [2022-03-06]
 
 ### Added
