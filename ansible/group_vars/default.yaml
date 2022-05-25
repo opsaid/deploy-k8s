@@ -1,7 +1,7 @@
 ---
 
 # 部署脚本版本
-deploy_version: 2.1.0
+deploy_version: 2.1.1
 
 # apiserver的端口，一般不做变更
 apiserver_port: 6443

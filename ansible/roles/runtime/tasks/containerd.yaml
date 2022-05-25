@@ -8,6 +8,7 @@
     - /etc/containerd  
     - /opt/containerd
     - "{{ data_dir }}/containerd"
+    - /etc/containerd/certs.d
 
 # 安装部署containerd
 - stat:

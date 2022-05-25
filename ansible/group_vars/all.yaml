@@ -62,17 +62,26 @@ tls_bootstrap_token: 53fb9ee737936db263ebd937ab1829cd
 # 容器镜像中心，集群只允许以下登记的地址
 # 设置 insecure_skip_verify=true 跳过https的ca认证
 container_registry:
-- mirror: 'docker.io'
-  endpoints: [ "https://docker.mirrors.ustc.edu.cn" ]
-  tls:
-    insecure_skip_verify: true
-- mirror: 'registry.cn-hangzhou.aliyuncs.com/kube-image-repo'
-  endpoints: [ "https://registry.cn-hangzhou.aliyuncs.com/kube-image-repo" ]
-  #auth:
-  #  username: ""
-  #  password: ""
-  tls:
-    insecure_skip_verify: true
+- host: 'docker.io'
+  scheme: https
+  ca: []
+  skip_verify: true
+  client: []
+  # "pull", "resolve", "push"
+  capabilities: []
+  header:
+    user-agent: containerd/{{ containerd_version }} (deploy-k8s/{{ deploy_version }})
+    # Authorization: Basic base64(username:password)
+  mirrors:
+  - host: "docker.mirrors.ustc.edu.cn"
+    scheme: https
+    skip_verify: true
+  
+- host: 'registry.cn-hangzhou.aliyuncs.com'
+  scheme: https
+  capabilities: ["pull"]
+  header:
+    user-agent: containerd/{{ containerd_version }} (deploy-k8s/{{ deploy_version }})
 
 # 预留系统资源，防止节点内存不足导致离线
 # 由于swap被关闭，如果可用内存不足，节点会进入不可用状态

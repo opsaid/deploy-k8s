@@ -2,11 +2,15 @@
 
 # DANGER! 
 # 部署的containerd版本
-containerd_version: 1.3.10
+containerd_version: 1.5.11
 
 # DANGER! 
 # 使用的k8s网络插件，支持: calico
 calico_version: 3.18.6
+
+# 是否开启kata支持
+kata_containers_enabled: false
+kata_containers_version: 2.4.1
 
 # 内部系统镜像地址，必须存在
 internal_images:

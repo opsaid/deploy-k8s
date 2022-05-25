@@ -4,6 +4,7 @@ disabled_plugins = [
   "io.containerd.snapshotter.v1.aufs",
   "io.containerd.snapshotter.v1.btrfs",
   "io.containerd.snapshotter.v1.devmapper",
+  "io.containerd.snapshotter.v1.native",
   "io.containerd.snapshotter.v1.zfs"
 ]
 imports = []
@@ -25,7 +26,7 @@ version = 2
   uid = 0
 
 [grpc]
-  address = "/run/containerd/containerd.sock"
+  address = "/var/run/containerd/containerd.sock"
   gid = 0
   max_recv_message_size = 16777216
   max_send_message_size = 16777216
@@ -61,16 +62,15 @@ version = 2
     sandbox_image = "{{ internal_images.namespace }}/pause:{{ internal_images.system.pause }}-{{ server_arch }}"
     selinux_category_range = 1024
     stats_collect_period = 10
-    stream_idle_timeout = "4h0m0s"
+    stream_idle_timeout = "30m"
     stream_server_address = "127.0.0.1"
-    stream_server_port = "0"
+    stream_server_port = "1339"
     systemd_cgroup = false
     tolerate_missing_hugetlb_controller = true
     unset_seccomp_profile = ""
     [plugins."io.containerd.grpc.v1.cri".cni]
       bin_dir = "/opt/cni/bin"
       conf_dir = "/etc/cni/net.d"
-      conf_template = ""
       max_conf_num = 1
     [plugins."io.containerd.grpc.v1.cri".containerd]
       default_runtime_name = "runc"
@@ -78,23 +78,12 @@ version = 2
       discard_unpacked_layers = false
       no_pivot = false
       snapshotter = "overlayfs"
-      [plugins."io.containerd.grpc.v1.cri".containerd.default_runtime]
-        base_runtime_spec = ""
-        container_annotations = []
-        pod_annotations = []
-        privileged_without_host_devices = false
-        runtime_engine = ""
-        runtime_root = ""
-        runtime_type = ""
-        [plugins."io.containerd.grpc.v1.cri".containerd.default_runtime.options]
       [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
         [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
           base_runtime_spec = ""
           container_annotations = []
           pod_annotations = []
           privileged_without_host_devices = false
-          runtime_engine = ""
-          runtime_root = ""
           runtime_type = "io.containerd.runc.v2"
           [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
             BinaryName = ""
@@ -108,52 +97,14 @@ version = 2
             Root = ""
             ShimCgroup = ""
             SystemdCgroup = false
-      [plugins."io.containerd.grpc.v1.cri".containerd.untrusted_workload_runtime]
-        base_runtime_spec = ""
-        container_annotations = []
-        pod_annotations = []
-        privileged_without_host_devices = false
-        runtime_engine = ""
-        runtime_root = ""
-        runtime_type = ""
-        [plugins."io.containerd.grpc.v1.cri".containerd.untrusted_workload_runtime.options]
+{% if kata_containers_enabled %}
+        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.kata]
+          runtime_type = "io.containerd.kata.v2"
+{% endif %}
     [plugins."io.containerd.grpc.v1.cri".image_decryption]
       key_model = "node"
-
     [plugins."io.containerd.grpc.v1.cri".registry]
-      [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
-{% for registry in container_registry %}
-        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."{{ registry.mirror }}"]
-          endpoint = {{ registry.endpoints | to_json }}
-{% endfor %}
-      [plugins."io.containerd.grpc.v1.cri".registry.configs]
-{% for registry in container_registry %}
-        [plugins."io.containerd.grpc.v1.cri".registry.configs."{{ registry.mirror }}"]
-{% if registry.auth is defined %}
-          [plugins."io.containerd.grpc.v1.cri".registry.configs."{{ registry.mirror }}".auth]
-            username = "{{ registry.auth.username }}"
-            password = "{{ registry.auth.password }}"
-{% endif %}
-{% if registry.tls is defined %}
-          [plugins."io.containerd.grpc.v1.cri".registry.configs."{{ registry.mirror }}".tls]
-{% if registry.tls.insecure_skip_verify is defined %}
-            insecure_skip_verify = {{ registry.tls.insecure_skip_verify | to_json }}
-{% endif %}
-{% if registry.tls.ca_file is defined %}
-            ca_file = "{{ registry.tls.ca_file }}"
-{% endif %}
-{% if registry.tls.cert_file is defined %}
-            cert_file = "{{ registry.tls.cert_file }}"
-{% endif %}
-{% if registry.tls.key_file is defined %}
-            key_file = "{{ registry.tls.key_file }}"
-{% endif %}
-{% endif %}
-{% endfor %}
-
-    [plugins."io.containerd.grpc.v1.cri".x509_key_pair_streaming]
-      tls_cert_file = ""
-      tls_key_file = ""
+      config_path = "/etc/containerd/certs.d"
   [plugins."io.containerd.internal.v1.opt"]
     path = "/opt/containerd"
   [plugins."io.containerd.internal.v1.restart"]
@@ -172,20 +123,7 @@ version = 2
     platforms = ["linux/amd64"]
   [plugins."io.containerd.service.v1.diff-service"]
     default = ["walking"]
-  [plugins."io.containerd.snapshotter.v1.aufs"]
-    root_path = ""
-  [plugins."io.containerd.snapshotter.v1.btrfs"]
-    root_path = ""
-  [plugins."io.containerd.snapshotter.v1.devmapper"]
-    async_remove = false
-    base_image_size = ""
-    pool_name = ""
-    root_path = ""
-  [plugins."io.containerd.snapshotter.v1.native"]
-    root_path = ""
   [plugins."io.containerd.snapshotter.v1.overlayfs"]
-    root_path = ""
-  [plugins."io.containerd.snapshotter.v1.zfs"]
     root_path = ""
 
 [proxy_plugins]
