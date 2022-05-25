@@ -1,0 +1,33 @@
+{% if registry.scheme is defined %}
+[host."{{ registry.scheme }}://{{ registry.host }}"]
+{% else %}
+[host."https://{{ registry.host }}"]
+{% endif %}
+{% if registry.ca is defined %}
+  ca = {{ registry.ca }}
+{% endif %}
+{% if registry.skip_verify is defined %}
+  skip_verify = {{ registry.skip_verify | to_json }}
+{% endif %}
+{% if registry.client is defined %}
+  client = {{ registry.client }}
+{% endif %}
+{% if registry.capabilities is defined %}
+  capabilities = {{ registry.capabilities }}
+{% endif %}
+{% if registry.header is defined %}
+{% if registry.scheme is defined %}
+[host."{{ registry.scheme }}://{{ registry.host }}".header]
+{% for k,v in registry.header.items() %}
+  {{ k }} = {{ v }}  
+{% endfor %}
+{% else %}
+[host."https://{{ registry.host }}".header]
+{% endif %}
+{% endif %}
+
+{% if registry.mirrors is defined %}
+{% for registry in registry.mirrors %}
+{% include "templates/containerd/hosts.toml.j2" %}
+{% endfor %}
+{% endif %}

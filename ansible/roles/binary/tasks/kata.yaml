@@ -1,0 +1,16 @@
+---
+
+- name: 创建 kata-containers 二进制存放目录
+  file: path={{ item }} mode=0755 state=directory
+  with_items:
+    - "roles/binary/files/kata"
+
+- stat:
+    path: roles/binary/files/kata/kata-static-{{ kata_containers_version }}-x86_64.tar.xz
+  register: kata_static
+- name: 下载 cri-containerd-cni-{{ containerd_version }}-linux-amd64.tar.gz
+  get_url:
+    url: https://github.com/kata-containers/kata-containers/releases/download/{{ kata_containers_version }}/kata-static-{{ kata_containers_version }}-x86_64.tar.xz
+    dest: roles/binary/files/kata/kata-static-{{ kata_containers_version }}-x86_64.tar.xz
+    #checksum: sha256:https://github.com/containerd/containerd/releases/download/v{{ containerd_version }}/cri-containerd-cni-{{ containerd_version }}-linux-amd64.tar.gz.sha256sum
+  when: kata_static.stat.exists == False

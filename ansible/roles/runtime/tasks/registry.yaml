@@ -1,0 +1,15 @@
+---
+
+- name: 创建镜像中心相关目录
+  file:
+    path: "/etc/containerd/certs.d/{{ item.host }}"
+    state: directory
+  with_items: "{{ container_registry }}"
+
+- name: 生存镜像中心配置文件
+  vars:
+    registry: "{{ item }}" 
+  template:
+    src: containerd/hosts.toml.j2
+    dest: "/etc/containerd/certs.d/{{ item.host }}/hosts.toml"
+  with_items: "{{ container_registry }}"

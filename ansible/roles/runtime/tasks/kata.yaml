@@ -1,0 +1,24 @@
+---
+
+- stat:
+    path: /opt/kata/bin/containerd-shim-kata-v2
+  register: shim_kata_v2
+- name: 安装部署 kata-containers
+  block:
+  - name: 拷贝与解压 kata-static-{{ kata_containers_version }}-x86_64.tar.xz
+    unarchive:
+      src: ../../binary/files/kata/kata-static-{{ kata_containers_version }}-x86_64.tar.xz
+      dest: /
+  - name: 创建 /opt/kata/bin/ 二进制软链
+    file:
+      src: /opt/kata/bin/{{ item }}
+      dest: /usr/local/bin/{{ item }}
+      owner: root
+      group: root
+      state: link
+    with_items:
+      - containerd-shim-kata-v2
+      - kata-monitor
+      - kata-runtime
+      - qemu-system-x86_64
+  when: shim_kata_v2.stat.exists == False
