@@ -68,9 +68,8 @@ container_registry:
   skip_verify: true
   client: []
   # "pull", "resolve", "push"
-  capabilities: []
-  header:
-    user-agent: containerd/{{ containerd_version }} (deploy-k8s/{{ deploy_version }})
+  capabilities: ["pull","resolve"]
+  #header:
     # Authorization: Basic base64(username:password)
   mirrors:
   - host: "docker.mirrors.ustc.edu.cn"
@@ -79,9 +78,7 @@ container_registry:
   
 - host: 'registry.cn-hangzhou.aliyuncs.com'
   scheme: https
-  capabilities: ["pull"]
-  header:
-    user-agent: containerd/{{ containerd_version }} (deploy-k8s/{{ deploy_version }})
+  capabilities: ["pull","resolve"]
 
 # 预留系统资源，防止节点内存不足导致离线
 # 由于swap被关闭，如果可用内存不足，节点会进入不可用状态
