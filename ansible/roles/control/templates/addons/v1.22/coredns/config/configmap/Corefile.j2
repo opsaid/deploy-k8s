@@ -4,14 +4,21 @@
       lameduck 5s
     }
     ready
+
     kubernetes {{ cluster_domain }} in-addr.arpa ip6.arpa {
       pods insecure
+      ttl 30
       fallthrough in-addr.arpa ip6.arpa
     }
     prometheus :9153
+
+    forward . /etc/resolv.conf {
+      prefer_udp
+    }
+
     cache 30
-    loop
     log
+    loop
     reload
     loadbalance
 }
