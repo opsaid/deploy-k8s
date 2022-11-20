@@ -21,6 +21,7 @@
   with_items: 
     - kustomization.yaml
     - cluster/roles.yaml
+    - cluster/runtimeclass.yaml
 
 # calico
 - name: 创建 k8s calico 部署相关目录
