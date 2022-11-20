@@ -41,4 +41,7 @@
     - /etc/containerd/config.toml
     - /etc/systemd/system/containerd.service
     - /usr/local/bin/crictl
+    - /data/containerd
+    - /data/kubelet
+    - /data/etcd
   ignore_errors: true
