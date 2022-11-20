@@ -1,5 +1,7 @@
 temp/
 *-dev.*
 hosts-*.ini
+ansible/group_vars/all-*.yaml
 ansible/roles/pki/files/
 ansible/roles/binary/files/
+ansible/roles/binary/files-1.*/
