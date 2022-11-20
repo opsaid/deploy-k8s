@@ -5,11 +5,11 @@ default_md = sha256
 distinguished_name = dn
 
 [ dn ]
-C = CN
+O = system:masters
 CN = kube-apiserver-etcd-client
 
 [ v3_ext ]
-authorityKeyIdentifier=keyid,issuer:always
-basicConstraints=CA:FALSE
 keyUsage=critical,digitalSignature,keyEncipherment
 extendedKeyUsage=clientAuth
+basicConstraints=CA:FALSE
+authorityKeyIdentifier=keyid

@@ -6,7 +6,6 @@ req_extensions = req_ext
 distinguished_name = dn
 
 [ dn ]
-C = CN
 CN = kube-etcd
 
 [ req_ext ]
@@ -19,12 +18,12 @@ IP.{{ loop.index+1 }}  = {{ hostvars[host]['ip'] }}
 {% endfor %}
 DNS.1 = localhost
 {% for host in groups['etcd'] %}
-DNS.{{ loop.index+1 }} = {{ host }}.{{ cluster_domain }}
+DNS.{{ loop.index+1 }} = {{ host }}
 {% endfor %}
 
 [ v3_ext ]
-authorityKeyIdentifier=keyid,issuer:always
-basicConstraints=CA:FALSE
 keyUsage=critical,digitalSignature,keyEncipherment
-extendedKeyUsage=serverAuth
+extendedKeyUsage=serverAuth,clientAuth
+basicConstraints=CA:FALSE
+authorityKeyIdentifier=keyid
 subjectAltName=@alt_names
