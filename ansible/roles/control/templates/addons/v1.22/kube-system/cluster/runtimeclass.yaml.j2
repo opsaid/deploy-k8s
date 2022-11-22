@@ -1,5 +1,5 @@
 ---
-apiVersion: node.k8s.io/v1beta1
+apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
   name: runc
@@ -7,7 +7,7 @@ handler: runc
 
 {% if kata_containers_enabled %}
 ---
-apiVersion: node.k8s.io/v1beta1
+apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
   name: kata
