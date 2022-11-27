@@ -97,6 +97,7 @@ etcd:
 {% else %}
   local:
     dataDir: "{{ data_dir }}/etcd/"
+    imageTag: "{{ internal_images.system.etcd }}"
     extraArgs:
 {% for key, value in etcd_args.items() %}
       {{ key | replace('_','-') }}: "{{ value }}"
