@@ -8,30 +8,29 @@
 
 - name: 获取官方relases安装包
   block:
-  - name: 下载 etcd-v{{ internal_images.system.etcd }}-linux-amd64.tar.gz（不验证sha256值）
+  - name: 下载 etcd-{{ internal_images.system.etcd }}-linux-amd64.tar.gz（不验证sha256值）
     get_url:
-      url: https://github.com/etcd-io/etcd/releases/download/v{{ internal_images.system.etcd }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64.tar.gz
-      dest: "{{ temp_dir }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64.tar.gz"
-  - name: 解压 {{ temp_dir }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64.tar.gz 至 {{ temp_dir }}
+      url: https://github.com/etcd-io/etcd/releases/download/{{ internal_images.system.etcd }}/etcd-{{ internal_images.system.etcd }}-linux-amd64.tar.gz
+      dest: "{{ temp_dir }}/etcd-{{ internal_images.system.etcd }}-linux-amd64.tar.gz"
+  - name: 解压 {{ temp_dir }}/etcd-{{ internal_images.system.etcd }}-linux-amd64.tar.gz 至 {{ temp_dir }}
     unarchive:
-      src: "{{ temp_dir }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64.tar.gz"
+      src: "{{ temp_dir }}/etcd-{{ internal_images.system.etcd }}-linux-amd64.tar.gz"
       dest: "{{ temp_dir }}"
 
   - name: 生成 etcd Dockerfile
     template:
       src: etcd/Dockerfile.j2
-      dest: "{{ temp_dir }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64/Dockerfile"
-      group: root
+      dest: "{{ temp_dir }}/etcd-{{ internal_images.system.etcd }}-linux-amd64/Dockerfile"
       mode: 0644
   
-  - name: 制作 {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }}-{{ server_arch }} 镜像
-    command: docker build -f Dockerfile ./ -t {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }}-{{ server_arch }}
+  - name: 制作 {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }} 镜像
+    command: docker build -f Dockerfile ./ -t {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }}
     args:
-      chdir: "{{ temp_dir }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64/"
+      chdir: "{{ temp_dir }}/etcd-{{ internal_images.system.etcd }}-linux-amd64/"
 
   # TODO; 前提需要有docker repos的权限
-  - name: 上传 {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }}-{{ server_arch }} 镜像
-    command: docker push {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }}-{{ server_arch }}
+  - name: 上传 {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }} 镜像
+    command: docker push {{ internal_images.namespace }}/etcd:{{ internal_images.system.etcd }}
   when: (binary_kubelet.stat.exists == False) and (binary_kubectl.stat.exists == False) and (binary_kubeadm.stat.exists == False)
 
 - name: 清理缓存文件
@@ -39,7 +38,8 @@
     path: "{{ item }}"
     state: absent
   with_items:
-    - "{{ temp_dir }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64"
-    - "{{ temp_dir }}/etcd-v{{ internal_images.system.etcd }}-linux-amd64.tar.gz"
+    - "{{ temp_dir }}/etcd"
+    - "{{ temp_dir }}/etcd-{{ internal_images.system.etcd }}-linux-amd64"
+    - "{{ temp_dir }}/etcd-{{ internal_images.system.etcd }}-linux-amd64.tar.gz"
   # etcd etcdctl etcdutl是拷贝文件前检测，所以这里做不存在判断
   when: (binary_kubelet.stat.exists == False) and (binary_kubectl.stat.exists == False) and (binary_kubeadm.stat.exists == False)

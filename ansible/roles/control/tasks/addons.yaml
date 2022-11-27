@@ -11,7 +11,7 @@
 - name: 创建 system 部署清单
   vars:
     component: kube-system
-    version: v{{ k8s_version.split('.')[:2] | join('.') }}
+    version: "{{ k8s_version.split('.')[:2] | join('.') }}"
   template:
     src: addons/{{ version }}/{{ component }}/{{ item }}.j2
     dest: /usr/local/src/addons/{{ component }}/{{ item }}
@@ -35,7 +35,7 @@
     - /usr/local/src/addons/calico/workloads
 - name: 创建 calico 部署清单
   vars:
-    version: v{{ k8s_version.split('.')[:2] | join('.') }}
+    version: "{{ k8s_version.split('.')[:2] | join('.') }}"
   template:
     src: addons/{{ version }}/calico/{{ item }}.j2
     dest: /usr/local/src/addons/calico/{{ item }}
@@ -67,7 +67,7 @@
 - name: 创建 coredns 部署清单
   vars:
     component: coredns
-    version: v{{ k8s_version.split('.')[:2] | join('.') }}
+    version: "{{ k8s_version.split('.')[:2] | join('.') }}"
   template:
     src: addons/{{ version }}/{{ component }}/{{ item }}.j2
     dest: /usr/local/src/addons/{{ component }}/{{ item }}
@@ -95,7 +95,7 @@
 - name: 创建 metrics-server 部署清单
   vars:
     component: metrics-server
-    version: v{{ k8s_version.split('.')[:2] | join('.') }}
+    version: "{{ k8s_version.split('.')[:2] | join('.') }}"
   template:
     src: addons/{{ version }}/{{ component }}/{{ item }}.j2
     dest: /usr/local/src/addons/{{ component }}/{{ item }}
@@ -123,7 +123,7 @@
 - name: 创建 kube-proxy 部署清单
   vars:
     component: kube-proxy
-    version: v{{ k8s_version.split('.')[:2] | join('.') }}
+    version: "{{ k8s_version.split('.')[:2] | join('.') }}"
   template:
     src: addons/{{ version }}/{{ component }}/{{ item }}.j2
     dest: /usr/local/src/addons/{{ component }}/{{ item }}

@@ -19,7 +19,7 @@
   - binary
   vars_files:
   - group_vars/default.yaml
-  - group_vars/component-v{{ k8s_version.split('.')[:2] | join('.') }}.yaml
+  - group_vars/component-{{ k8s_version.split('.')[:2] | join('.') }}.yaml
 
 - name: 针对所有节点实现公共基础配置
   hosts: kube_control_plane,kube_node
@@ -42,7 +42,7 @@
   - node
   vars_files:
   - group_vars/default.yaml
-  - group_vars/component-v{{ k8s_version.split('.')[:2] | join('.') }}.yaml
+  - group_vars/component-{{ k8s_version.split('.')[:2] | join('.') }}.yaml
 
 - name: 部署K8S工作负载节点
   hosts: kube_node
@@ -54,7 +54,7 @@
   - node
   vars_files:
   - group_vars/default.yaml
-  - group_vars/component-v{{ k8s_version.split('.')[:2] | join('.') }}.yaml
+  - group_vars/component-{{ k8s_version.split('.')[:2] | join('.') }}.yaml
 
 - name: 卸载节点
   hosts: uninstall

@@ -26,8 +26,8 @@ resources:
 
 images:
 - name: {{ internal_images.namespace }}/calico-cni
-  newTag: {{ internal_images.system.calico_cni }}-{{ server_arch }}
+  newTag: {{ internal_images.system.calico_cni }}
 - name: {{ internal_images.namespace }}/calico-node
-  newTag: {{ internal_images.system.calico_node }}-{{ server_arch }}
+  newTag: {{ internal_images.system.calico_node }}
 - name: {{ internal_images.namespace }}/calico-kube-controllers
-  newTag: {{ internal_images.system.calico_kube_controllers }}-{{ server_arch }}
+  newTag: {{ internal_images.system.calico_kube_controllers }}

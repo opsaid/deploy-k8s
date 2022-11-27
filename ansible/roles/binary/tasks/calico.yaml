@@ -11,32 +11,55 @@
     with_items:
       - "roles/binary/files/calico/bin"
 
-  - name: 下载 calico release-v{{ calico_version }}.tgz
+  - name: 下载 calico release-{{ calico_version }}.tgz
     get_url:
-      url: https://github.com/projectcalico/calico/releases/download/v{{ calico_version }}/release-v{{ calico_version }}.tgz
-      dest: "{{ temp_dir }}/release-v{{ calico_version }}.tgz"
+      url: https://github.com/projectcalico/calico/releases/download/{{ calico_version }}/release-{{ calico_version }}.tgz
+      dest: "{{ temp_dir }}/release-{{ calico_version }}.tgz"
       #checksum: sha256:{{ calico_version_sha256 }}
+    #async: 1000
+    #poll: 0
+    #register: yum_sleeper
+    #environment: 
+    #  https_proxy: "http://127.0.0.1:1087"
 
-  - name: 解压 release-v{{ calico_version }}.tgz 至 {{ temp_dir }}
+  #- name: Check on an async task
+  #  async_status:
+  #    jid: "{{ yum_sleeper.ansible_job_id }}"
+  #  register: job_result
+  #  until: job_result.finished
+  #  retries: 100
+  #  delay: 10
+
+  - name: 解压 release-{{ calico_version }}.tgz 至 {{ temp_dir }}
     unarchive:
-      src: "{{ temp_dir }}/release-v{{ calico_version }}.tgz"
+      src: "{{ temp_dir }}/release-{{ calico_version }}.tgz"
       dest: "{{ temp_dir }}"
 
-  # calicoctl linux版本，存在两种名称：calicoctl 或 calicoctl-linux-amd64
   - name: 拷贝 calicoctl 二进制文件
-    copy:
-      src: "{{ temp_dir }}/release-v{{ calico_version }}/bin/{{ item }}"
-      dest: roles/binary/files/calico/bin/calicoctl-linux-amd64
-      mode: 0755
-    with_items:
-      - calicoctl
-      - calicoctl-linux-amd64
-    ignore_errors: yes
-
+    block:
+    - stat:
+        path: "{{ temp_dir }}/release-{{ calico_version }}/bin/calicoctl"
+      register: tmp_calicoctl
+    - stat:
+        path: "{{ temp_dir }}/release-{{ calico_version }}/bin/calicoctl/calicoctl-linux-amd64"
+      register: tmp_calicoctl_linux_amd64
+    - name: 拷贝 "{{ temp_dir }}/release-{{ calico_version }}/bin/calicoctl" 文件
+      copy:
+        src: "{{ temp_dir }}/release-{{ calico_version }}/bin/calicoctl"
+        dest: roles/binary/files/calico/bin/calicoctl-linux-amd64
+        mode: 0755
+      when: (tmp_calicoctl.stat.exists) and (tmp_calicoctl.stat.isreg)
+    - name: 拷贝 "{{ temp_dir }}/release-{{ calico_version }}/bin/calicoctl/calicoctl-linux-amd64" 文件
+      copy:
+        src: "{{ temp_dir }}/release-{{ calico_version }}/bin/calicoctl/calicoctl-linux-amd64"
+        dest: roles/binary/files/calico/bin/calicoctl-linux-amd64
+        mode: 0755
+      when: (tmp_calicoctl_linux_amd64.stat.exists) and (tmp_calicoctl_linux_amd64.stat.isreg)
+    
   - name: 导入官方镜像
     command: docker load -i {{ item }}
     args:
-      chdir: "{{ temp_dir }}/release-v{{ calico_version }}/images"
+      chdir: "{{ temp_dir }}/release-{{ calico_version }}/images"
     with_items:
       - calico-cni.tar
       - calico-node.tar
@@ -53,20 +76,19 @@
     register: imgid_calico_kube_controllers
 
   - name: 更改 calico/cni 镜像名
-    command: docker tag {{ imgid_calico_cni.stdout }} {{ internal_images.namespace }}/calico-cni:{{ internal_images.system.calico_cni }}-{{ server_arch }}
+    command: docker tag {{ imgid_calico_cni.stdout }} {{ internal_images.namespace }}/calico-cni:{{ internal_images.system.calico_cni }}
   - name: 更改 calico/node 镜像名
-    command: docker tag {{ imgid_calico_node.stdout }} {{ internal_images.namespace }}/calico-node:{{ internal_images.system.calico_node }}-{{ server_arch }}
+    command: docker tag {{ imgid_calico_node.stdout }} {{ internal_images.namespace }}/calico-node:{{ internal_images.system.calico_node }}
   - name: 更改 calico/kube-controllers 镜像名
-    command: docker tag {{ imgid_calico_kube_controllers.stdout }} {{ internal_images.namespace }}/calico-kube-controllers:{{ internal_images.system.calico_kube_controllers }}-{{ server_arch }}
+    command: docker tag {{ imgid_calico_kube_controllers.stdout }} {{ internal_images.namespace }}/calico-kube-controllers:{{ internal_images.system.calico_kube_controllers }}
 
   # TODO; 前提需要有docker repos的权限
-  - name: 上传镜像：{{ internal_images.namespace }}/calico-cni:{{ internal_images.system.calico_cni }}-{{ server_arch }}
-    command: docker push {{ internal_images.namespace }}/calico-cni:{{ internal_images.system.calico_cni }}-{{ server_arch }}
-  - name: 上传镜像：{{ internal_images.namespace }}/calico-node:{{ internal_images.system.calico_node }}-{{ server_arch }}
-    command: docker push {{ internal_images.namespace }}/calico-node:{{ internal_images.system.calico_node }}-{{ server_arch }}
-  - name: 上传镜像：{{ internal_images.namespace }}/calico-kube-controllers:{{ internal_images.system.calico_kube_controllers }}-{{ server_arch }}
-    command: docker push {{ internal_images.namespace }}/calico-kube-controllers:{{ internal_images.system.calico_kube_controllers }}-{{ server_arch }}
-
+  - name: 上传镜像：{{ internal_images.namespace }}/calico-cni:{{ internal_images.system.calico_cni }}
+    command: docker push {{ internal_images.namespace }}/calico-cni:{{ internal_images.system.calico_cni }}
+  - name: 上传镜像：{{ internal_images.namespace }}/calico-node:{{ internal_images.system.calico_node }}
+    command: docker push {{ internal_images.namespace }}/calico-node:{{ internal_images.system.calico_node }}
+  - name: 上传镜像：{{ internal_images.namespace }}/calico-kube-controllers:{{ internal_images.system.calico_kube_controllers }}
+    command: docker push {{ internal_images.namespace }}/calico-kube-controllers:{{ internal_images.system.calico_kube_controllers }}
   when: (network_plugin == "calico") and (binary_calicoctl.stat.exists == False)
 
 - name: 清理缓存文件
@@ -76,5 +98,4 @@
   with_items:
     - "{{ temp_dir }}/release-v{{ calico_version }}"
     - "{{ temp_dir }}/release-v{{ calico_version }}.tgz"
-
   when: (network_plugin == "calico") and (binary_calicoctl.stat.exists == False)

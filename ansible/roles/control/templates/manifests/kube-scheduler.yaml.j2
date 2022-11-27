@@ -27,7 +27,7 @@ spec:
 {% else %}
     - --leader-elect=false
 {% endif %}
-    image: {{ internal_images.namespace }}/kube-scheduler:{{ internal_images.system.kube_scheduler }}-{{ server_arch }}
+    image: {{ internal_images.namespace }}/kube-scheduler:{{ internal_images.system.kube_scheduler }}
     imagePullPolicy: IfNotPresent
     livenessProbe:
       failureThreshold: 8

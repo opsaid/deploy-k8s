@@ -27,7 +27,7 @@ spec:
 {% else %}
     - --leader-elect=false
 {% endif %}
-    image: {{ internal_images.namespace }}/kube-controller-manager:{{ internal_images.system.kube_controller_manager }}-{{ server_arch }}
+    image: {{ internal_images.namespace }}/kube-controller-manager:{{ internal_images.system.kube_controller_manager }}
     imagePullPolicy: IfNotPresent
     livenessProbe:
       failureThreshold: 8

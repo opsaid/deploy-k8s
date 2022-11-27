@@ -8,5 +8,6 @@
 - import_tasks: kata.yaml
   when: kata_containers_enabled
 - import_tasks: pause.yaml
+  when: ansible_system == "Linux"
 - import_tasks: etcd.yaml
 - import_tasks: coredns.yaml

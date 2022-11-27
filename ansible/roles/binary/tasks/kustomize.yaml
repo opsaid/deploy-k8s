@@ -25,3 +25,12 @@
       dest: roles/binary/files/kustomize/kustomize
       mode: 0755
   when: kustomize.stat.exists == False
+
+- name: 清理缓存文件
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ temp_dir }}/kustomize"
+    - "{{ temp_dir }}/kustomize_v4.5.4_linux_amd64.tar.gz"
+  when: kustomize.stat.exists == False

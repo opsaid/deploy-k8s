@@ -27,7 +27,7 @@ spec:
     - --oidc-username-claim={{ oidc_username_claim }}
     - --oidc-groups-claim={{ oidc_groups_claim }}
 {% endif %}
-    image: {{ internal_images.namespace }}/kube-apiserver:{{ internal_images.system.kube_apiserver }}-{{ server_arch }}
+    image: {{ internal_images.namespace }}/kube-apiserver:{{ internal_images.system.kube_apiserver }}
     imagePullPolicy: IfNotPresent
     livenessProbe:
       failureThreshold: 8
