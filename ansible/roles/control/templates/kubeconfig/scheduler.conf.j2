@@ -3,7 +3,7 @@ kind: Config
 current-context: system:kube-scheduler@{{ cluster_name }}
 clusters:
 - cluster:
-    certificate-authority: {{ etc_dir }}/pki/apiserver.crt
+    certificate-authority: {{ etc_dir }}/pki/ca.crt
     server: {{ apiserver_addr }}
   name: {{ cluster_name }}
 contexts:
