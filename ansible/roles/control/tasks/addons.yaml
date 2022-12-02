@@ -136,3 +136,35 @@
     - config/configmap/config.conf
     - config/configmap/kubeconfig.conf
     - workloads/daemonset.yaml
+
+# ingress-nginx
+- name: 创建 k8s ingress-nginx 部署相关目录
+  vars:
+    component: ingress-nginx
+  file: path={{ item }} mode=0755 state=directory
+  with_items:
+    - /usr/local/src/addons/{{ component }}
+    - /usr/local/src/addons/{{ component }}/cluster
+    - /usr/local/src/addons/{{ component }}/service
+    - /usr/local/src/addons/{{ component }}/workloads
+    - /usr/local/src/addons/{{ component }}/config
+    - /usr/local/src/addons/{{ component }}/config/configmap
+- name: 创建 ingress-nginx 部署清单
+  vars:
+    component: ingress-nginx
+    version: "{{ k8s_version.split('.')[:2] | join('.') }}"
+  template:
+    src: addons/{{ version }}/{{ component }}/{{ item }}.j2
+    dest: /usr/local/src/addons/{{ component }}/{{ item }}
+    owner: kube
+    group: root
+    mode: 0644
+  with_items:
+    - kustomization.yaml
+    - cluster/roles.yaml
+    - cluster/ingressclass.yaml
+    - cluster/validating-webhook.yaml
+    - config/configmap/nginx-configuration.yaml
+    - workloads/deployment.yaml
+    - workloads/job.yaml
+    - service/services.yaml

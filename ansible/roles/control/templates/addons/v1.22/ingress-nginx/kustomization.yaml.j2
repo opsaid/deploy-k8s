@@ -1,0 +1,30 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: kube-system
+
+commonLabels:
+  app.kubernetes.io/name: ingress-nginx
+  app.kubernetes.io/instance: ingress-nginx
+  app.kubernetes.io/part-of: ingress-nginx
+  app.kubernetes.io/managed-by: argocd
+  app.kubernetes.io/component: controller
+
+commonAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/path: "/metrics"
+  prometheus.io/port: "10902"
+
+resources:
+- cluster/roles.yaml
+- cluster/validating-webhook.yaml
+- cluster/ingressclass.yaml
+- service/services.yaml
+- workloads/deployment.yaml
+- workloads/job.yaml
+
+images:
+- name: registry.cn-hangzhou.aliyuncs.com/kube-image-repo/ingress-nginx-controller
+  newTag: v1.3.1
+- name: registry.cn-hangzhou.aliyuncs.com/kube-image-repo/kube-webhook-certgen
+  newTag: v1.3.0
