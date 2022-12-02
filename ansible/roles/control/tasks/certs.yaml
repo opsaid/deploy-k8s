@@ -10,16 +10,16 @@
   - apiserver/ca.key
   - apiserver/apiserver.crt
   - apiserver/apiserver.key
-  - apiserver/cluster-admin.crt
-  - apiserver/cluster-admin.key
-  - apiserver/scheduler-client.crt
-  - apiserver/scheduler-client.key
   - apiserver/apiserver-kubelet-client.crt
   - apiserver/apiserver-kubelet-client.key
-  - apiserver/controller-manager-client.crt
-  - apiserver/controller-manager-client.key
   - etcd/apiserver-etcd-client.crt
   - etcd/apiserver-etcd-client.key
+  #- apiserver/cluster-admin.crt
+  #- apiserver/cluster-admin.key
+  #- apiserver/scheduler-client.crt
+  #- apiserver/scheduler-client.key
+  #- apiserver/controller-manager-client.crt
+  #- apiserver/controller-manager-client.key
 
 # 拷贝front-proxy证书
 - name: 拷贝front-proxy相关证书

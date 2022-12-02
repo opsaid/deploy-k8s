@@ -3,7 +3,7 @@ kind: Config
 current-context: kubernetes-admin@{{ cluster_name }}
 clusters:
 - cluster:
-    certificate-authority: {{ etc_dir }}/pki/ca.crt
+    certificate-authority-data: {{ lookup('file', '../../pki/files/apiserver/ca.crt') | b64encode }}
     server: {{ apiserver_addr }}
   name: {{ cluster_name }}
 contexts:
@@ -14,5 +14,5 @@ contexts:
 users:
 - name: kubernetes-admin
   user:
-    client-certificate: {{ etc_dir }}/pki/cluster-admin.crt
-    client-key: {{ etc_dir }}/pki/cluster-admin.key
+    client-certificate-data: {{ lookup('file', '../../pki/files/apiserver/cluster-admin.crt') | b64encode }}
+    client-key-data: {{ lookup('file', '../../pki/files/apiserver/cluster-admin.key') | b64encode }}

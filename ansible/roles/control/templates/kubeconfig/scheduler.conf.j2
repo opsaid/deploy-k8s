@@ -3,7 +3,7 @@ kind: Config
 current-context: system:kube-scheduler@{{ cluster_name }}
 clusters:
 - cluster:
-    certificate-authority: {{ etc_dir }}/pki/ca.crt
+    certificate-authority-data: {{ lookup('file', '../../pki/files/apiserver/ca.crt') | b64encode }}
     server: {{ apiserver_addr }}
   name: {{ cluster_name }}
 contexts:
@@ -14,5 +14,5 @@ contexts:
 users:
 - name: system:kube-scheduler
   user:
-    client-certificate: {{ etc_dir }}/pki/scheduler-client.crt
-    client-key: {{ etc_dir }}/pki/scheduler-client.key
+    client-certificate-data: {{ lookup('file', '../../pki/files/apiserver/scheduler-client.crt') | b64encode }}
+    client-key-data: {{ lookup('file', '../../pki/files/apiserver/scheduler-client.key') | b64encode }}

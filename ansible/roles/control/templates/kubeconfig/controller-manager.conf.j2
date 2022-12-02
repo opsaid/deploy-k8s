@@ -4,7 +4,7 @@ preferences: {}
 current-context: system:kube-controller-manager@{{ cluster_name }}
 clusters:
 - cluster:
-    certificate-authority: {{ etc_dir }}/pki/ca.crt
+    certificate-authority-data: {{ lookup('file', '../../pki/files/apiserver/ca.crt') | b64encode }}
     server: {{ apiserver_addr }}
   name: {{ cluster_name }}
 contexts:
@@ -15,5 +15,5 @@ contexts:
 users:
 - name: system:kube-controller-manager
   user:
-    client-certificate: {{ etc_dir }}/pki/controller-manager-client.crt
-    client-key: {{ etc_dir }}/pki/controller-manager-client.key
+    client-certificate-data: {{ lookup('file', '../../pki/files/apiserver/controller-manager-client.crt') | b64encode }}
+    client-key-data: {{ lookup('file', '../../pki/files/apiserver/controller-manager-client.key') | b64encode }}

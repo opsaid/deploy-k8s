@@ -4,7 +4,7 @@ preferences: {}
 current-context: system:node:{{ hostvars[inventory_hostname]['ip'] }}@{{ cluster_name }}
 clusters:
 - cluster:
-    certificate-authority: /etc/kubernetes/pki/ca.crt
+    certificate-authority: {{ etc_dir }}/pki/ca.crt
     server: {{ apiserver_addr }}
   name: {{ cluster_name }}
 contexts:
