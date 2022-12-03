@@ -55,5 +55,11 @@ cluster_dns: "{{ service_cluster_ip_range.split('.')[0:3] | join('.') }}.10"
 # 服务端cpu架构，当前仅支持amd64
 server_arch: amd64
 
+# 签名ca多少天后过期，默认20年
+ca_expiry_days: 7300
+
+# 签名普通证书多少天后过期，默认10年
+cert_expiry_days: 3650
+
 # 帮助文档地址
 product_docs: https://opsaid.cn/docs

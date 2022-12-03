@@ -16,13 +16,13 @@
     chdir: "{{ work_dir }}/{{ cert_kind }}"
 
 - name: 签名 {{ cert_name }}.crt 证书
-  command: openssl x509 -req -in {{ cert_name }}.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out {{ cert_name }}.crt -days 3650 -extensions v3_ext -extfile {{ cert_name }}-csr.conf
+  command: openssl x509 -req -in {{ cert_name }}.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out {{ cert_name }}.crt -days {{ cert_expiry_days }} -extensions v3_ext -extfile {{ cert_name }}-csr.conf
   args:
     chdir: "{{ work_dir }}/{{ cert_kind }}"
   when: cert_name != "ca"
 
 - name: 签名 {{ cert_name }}.crt 证书
-  command: openssl x509 -req -in {{ cert_name }}.csr -signkey {{ cert_name }}.key -out {{ cert_name }}.crt -days 7300 -extensions v3_ext -extfile {{ cert_name }}-csr.conf
+  command: openssl x509 -req -in {{ cert_name }}.csr -signkey {{ cert_name }}.key -out {{ cert_name }}.crt -days {{ ca_expiry_days}} -extensions v3_ext -extfile {{ cert_name }}-csr.conf
   args:
     chdir: "{{ work_dir }}/{{ cert_kind }}"
   when: cert_name == "ca"
