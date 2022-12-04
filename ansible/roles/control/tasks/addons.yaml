@@ -165,6 +165,6 @@
     - cluster/ingressclass.yaml
     - cluster/validating-webhook.yaml
     - config/configmap/nginx-configuration.yaml
-    - workloads/deployment.yaml
+    - workloads/daemonset.yaml
     - workloads/job.yaml
-    - service/services.yaml
+    #- service/services.yaml

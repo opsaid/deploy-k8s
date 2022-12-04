@@ -15,17 +15,17 @@ spec:
   selector:
     app.kubernetes.io/component: admission-webhook
 
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: ingress-nginx-controller
-spec:
-  ports:
-  - name: http
-    port: 80
-    protocol: TCP
-    targetPort: http
-    appProtocol: http
-  selector:
-    app.kubernetes.io/component: controller
+#---
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: ingress-nginx-controller
+#spec:
+#  ports:
+#  - name: http
+#    port: 80
+#    protocol: TCP
+#    targetPort: http
+#    appProtocol: http
+#  selector:
+#    app.kubernetes.io/component: controller

@@ -13,15 +13,16 @@ commonLabels:
 commonAnnotations:
   prometheus.io/scrape: "true"
   prometheus.io/path: "/metrics"
-  prometheus.io/port: "10902"
+  prometheus.io/port: "10254"
 
 resources:
 - cluster/roles.yaml
-- cluster/validating-webhook.yaml
 - cluster/ingressclass.yaml
-- service/services.yaml
-- workloads/deployment.yaml
+- cluster/validating-webhook.yaml
 - workloads/job.yaml
+- workloads/daemonset.yaml
+- config/configmap/nginx-configuration.yaml
+- service/services.yaml
 
 images:
 - name: registry.cn-hangzhou.aliyuncs.com/kube-image-repo/ingress-nginx-controller
