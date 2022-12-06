@@ -2,7 +2,7 @@
 
 # DANGER! 
 # 部署的k8s版本，版本名称必须与官方github上对应，以"v"开头
-# 支持版本如下：v1.18.x v1.22.x
+# 支持大版本如下：v1.22.x, v1.18.x，二进制预先支持：v1.22.16 v1.18.20
 k8s_version: v1.22.16
 #k8s_version_sha256: ef5434b56c96c2f798c33b0a7bf5d9bc3d2d76817c00822c718bf52af6d0f728
 
