@@ -40,21 +40,25 @@
     - stat:
         path: "{{ temp_dir }}/release-{{ calico_version }}/bin/calicoctl"
       register: tmp_calicoctl
+      ignore_errors: True
     - stat:
         path: "{{ temp_dir }}/release-{{ calico_version }}/bin/calicoctl/calicoctl-linux-amd64"
       register: tmp_calicoctl_linux_amd64
+      ignore_errors: True
     - name: 拷贝 "{{ temp_dir }}/release-{{ calico_version }}/bin/calicoctl" 文件
       copy:
         src: "{{ temp_dir }}/release-{{ calico_version }}/bin/calicoctl"
         dest: roles/binary/files/calico/bin/calicoctl-linux-amd64
         mode: 0755
       when: (tmp_calicoctl.stat.exists) and (tmp_calicoctl.stat.isreg)
+      ignore_errors: True
     - name: 拷贝 "{{ temp_dir }}/release-{{ calico_version }}/bin/calicoctl/calicoctl-linux-amd64" 文件
       copy:
         src: "{{ temp_dir }}/release-{{ calico_version }}/bin/calicoctl/calicoctl-linux-amd64"
         dest: roles/binary/files/calico/bin/calicoctl-linux-amd64
         mode: 0755
       when: (tmp_calicoctl_linux_amd64.stat.exists) and (tmp_calicoctl_linux_amd64.stat.isreg)
+      ignore_errors: True
     
   - name: 导入官方镜像
     command: docker load -i {{ item }}
