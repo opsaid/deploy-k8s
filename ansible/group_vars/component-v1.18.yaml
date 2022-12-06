@@ -6,7 +6,7 @@ containerd_version: 1.5.11
 
 # DANGER! 
 # 使用的k8s网络插件，支持: calico
-calico_version: 3.18.6
+calico_version: v3.18.6
 
 # 是否开启kata支持
 kata_containers_enabled: false
@@ -19,7 +19,7 @@ internal_images:
     # key与镜像名一致,中划线以下划线代替,val为镜像版本末尾带具体系统架构
 
     # gcr.io/etcd-development/etcd:v3.5.1
-    etcd: 3.5.1
+    etcd: v3.5.1
 
     # k8s.gcr.io/kube-apiserver-amd64:v1.22.6
     kube_apiserver: "{{ k8s_version }}"
@@ -32,8 +32,8 @@ internal_images:
     calico_node: "{{ calico_version }}"
     calico_kube_controllers: "{{ calico_version }}"
 
-    # gcr.io/k8s-staging-metrics-server/metrics-server:master 
-    metrics_server: 0.5.2
+    # k8s.gcr.io/metrics-server/metrics-server:v0.5.2
+    metrics_server: v0.5.2
 
     # k8s.gcr.io/pause:3.2
     pause: 3.5

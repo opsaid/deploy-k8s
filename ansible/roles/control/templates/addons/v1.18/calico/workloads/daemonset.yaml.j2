@@ -36,7 +36,7 @@ spec:
       initContainers:
       # 为宿主安装cni插件
       - name: install-cni
-        image: {{ internal_images.namespace }}/calico-cni:{{ internal_images.system.calico_cni }}-{{ server_arch }}
+        image: {{ internal_images.namespace }}/calico-cni:{{ internal_images.system.calico_cni }}
         command: ["/opt/cni/bin/install"]
         envFrom:
         - configMapRef:
@@ -79,7 +79,7 @@ spec:
           privileged: true
       containers:
       - name: calico-node
-        image: {{ internal_images.namespace }}/calico-node:{{ internal_images.system.calico_node }}-{{ server_arch }}
+        image: {{ internal_images.namespace }}/calico-node:{{ internal_images.system.calico_node }}
         envFrom:
         - configMapRef:
             # Allow KUBERNETES_SERVICE_HOST and KUBERNETES_SERVICE_PORT to be overridden for eBPF mode.

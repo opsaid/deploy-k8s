@@ -19,7 +19,7 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: spec.nodeName
-        image: {{ internal_images.namespace }}/kube-proxy:{{ internal_images.system.kube_proxy }}-{{ server_arch }}
+        image: {{ internal_images.namespace }}/kube-proxy:{{ internal_images.system.kube_proxy }}
         imagePullPolicy: IfNotPresent
         name: kube-proxy
         resources: {}
