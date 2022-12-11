@@ -4,6 +4,27 @@
 
 ## Unreleased
 
+## v2.2.0 - [2022-12-11]
+
+### Added
+
+- kubeconfig 相关文件证书更改为内嵌
+
+1. 对文件admin.conf 更改证书路径为 base64 的内容
+2. 兼容 kubeadm certs check-expiration 查看证书过期时间
+
+- 自定义 ca 与成员证书的有效时间
+
+1. ansible/group_vars/default.yaml 新增 "ca_expiry_days" 表示ca过期天数
+
+- 添加 ingress-nginx 的 addons
+
+1. 支持 k8s 1.22 版本添加 ingress-nginx addons
+
+- 更改 k8s 1.18 镜像名称风格
+
+1. 由原先 {{ internal_images.system.kube_proxy }}-{{ server_arch }} 调整为 {{ internal_images.system.kube_proxy }} 不在使用系统架构为后缀，如：amd64
+
 ## v2.1.1 - [2022-05-25]
 
 ### Added
