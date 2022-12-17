@@ -8,3 +8,8 @@
         line: "{{ apiserver_haip }} {{ apiserver_host }}"
         regexp: "^{{ apiserver_haip }} {{ apiserver_host }}"
   when: resolv_use_hosts
+
+- name: 设置 /etc/resolv.conf 配置文件
+  template:
+    src: resolv.conf.j2
+    dest: "{{ host_resolv_conf.path }}"

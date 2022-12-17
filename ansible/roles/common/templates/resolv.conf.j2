@@ -1,0 +1,3 @@
+{% for value in host_resolv_conf.servers %}
+nameserver {{ value }}
+{% endfor %}
