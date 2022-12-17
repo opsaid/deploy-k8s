@@ -75,6 +75,7 @@
    - snapd.socket
    - multipathd.service
    - multipathd.socket
+   - systemd-resolved
   ignore_errors: yes
   when: ansible_distribution == 'Ubuntu'
 

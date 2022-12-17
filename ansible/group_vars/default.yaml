@@ -61,5 +61,12 @@ ca_expiry_days: 7300
 # 签名普通证书多少天后过期，默认10年
 cert_expiry_days: 3650
 
+# 宿主使用的 dns 配置
+host_resolv_conf:
+  path: "/etc/resolv.conf"
+  servers:
+    - 223.5.5.5
+    - 223.6.6.6
+
 # 帮助文档地址
 product_docs: https://opsaid.cn/docs
