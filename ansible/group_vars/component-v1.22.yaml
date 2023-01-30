@@ -158,7 +158,7 @@ controller_manager_args:
   concurrent_gc_syncs: "20"
   concurrent_namespace_syncs: "10"
   controller_start_interval: "1s"
-  controllers: "attachdetach,bootstrapsigner,clusterrole-aggregation,cronjob,csrapproving,csrcleaner,csrsigning,daemonset,deployment,disruption,endpoint,endpointslice,garbagecollector,horizontalpodautoscaling,job,namespace,nodeipam,nodelifecycle,persistentvolume-binder,persistentvolume-expander,podgc,pvc-protection,pv-protection,replicaset,replicationcontroller,resourcequota,root-ca-cert-publisher,route,service,serviceaccount,serviceaccount-token,statefulset,tokencleaner,ttl,ttl-after-finished"
+  controllers: "*"
   deployment_controller_sync_period: "30s"
   enable_garbage_collector: "true"
   horizontal_pod_autoscaler_cpu_initialization_period: "5m"
