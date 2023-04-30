@@ -4,7 +4,7 @@ kind: DaemonSet
 metadata:
   labels:
     app.kubernetes.io/component: controller
-  name: ingress-nginx-controller
+  name: default-ingress-nginx-controller
 spec:
   selector:
     matchLabels:
@@ -23,9 +23,9 @@ spec:
         - --ingress-class=nginx
         - --watch-ingress-without-class
         - --controller-class=k8s.io/ingress-nginx
-        - --configmap=$(POD_NAMESPACE)/nginx-configuration
-        - --tcp-services-configmap=$(POD_NAMESPACE)/tcp-services
-        - --udp-services-configmap=$(POD_NAMESPACE)/udp-services
+        - --configmap=$(POD_NAMESPACE)/default-ingress-nginx-controller
+        - --tcp-services-configmap=$(POD_NAMESPACE)/default-ingress-nginx-tcp
+        - --udp-services-configmap=$(POD_NAMESPACE)/default-ingress-nginx-udp
         - --annotations-prefix=nginx.ingress.kubernetes.io
         - --publish-status-address={{ apiserver_haip }}
         - --validating-webhook=:8443
@@ -65,9 +65,12 @@ spec:
         - name: http
           containerPort: 80
           protocol: TCP
-        #- name: https
-        #  containerPort: 443
-        #  protocol: TCP
+        - name: https
+          containerPort: 443
+          protocol: TCP
+        - name: metrics
+          containerPort: 10254
+          protocol: TCP
         - name: webhook
           containerPort: 8443
           protocol: TCP
@@ -152,12 +155,12 @@ spec:
 
       nodeSelector:
         kubernetes.io/os: linux
-      serviceAccountName: ingress-nginx
+      serviceAccountName: default-ingress-nginx
       terminationGracePeriodSeconds: 300
       volumes:
       - name: webhook-cert
         secret:
-          secretName: ingress-nginx-admission
+          secretName: default-ingress-nginx-admission
       - hostPath:
           path: /etc/localtime
           type: File

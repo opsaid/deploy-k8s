@@ -2,14 +2,16 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: ingress-nginx
+  labels:
+    app.kubernetes.io/component: controller
+  name: default-ingress-nginx
 automountServiceAccountToken: true
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: ingress-nginx
+  name: default-ingress-nginx
 rules:
 - apiGroups:
   - ""
@@ -78,21 +80,23 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: ingress-nginx
+  name: default-ingress-nginx
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: ingress-nginx
+  name: default-ingress-nginx
 subjects:
 - kind: ServiceAccount
-  name: ingress-nginx
+  name: default-ingress-nginx
   namespace: kube-system
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: ingress-nginx
+  labels:
+    app.kubernetes.io/component: controller
+  name: default-ingress-nginx
 rules:
 - apiGroups:
   - ""
@@ -188,31 +192,33 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: ingress-nginx
+  labels:
+    app.kubernetes.io/component: controller
+  name: default-ingress-nginx
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: ingress-nginx
+  name: default-ingress-nginx
 subjects:
 - kind: ServiceAccount
-  name: ingress-nginx
+  name: default-ingress-nginx
   namespace: kube-system
 
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: ingress-nginx-admission
   labels:
     app.kubernetes.io/component: admission-webhook
+  name: default-ingress-nginx-admission
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: ingress-nginx-admission
   labels:
     app.kubernetes.io/component: admission-webhook
+  name: default-ingress-nginx-admission
 rules:
 - apiGroups:
   - admissionregistration.k8s.io
@@ -226,25 +232,25 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name:  ingress-nginx-admission
   labels:
     app.kubernetes.io/component: admission-webhook
+  name: default-ingress-nginx-admission
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: ingress-nginx-admission
+  name: default-ingress-nginx-admission
 subjects:
 - kind: ServiceAccount
-  name: ingress-nginx-admission
+  name: default-ingress-nginx-admission
   namespace: kube-system
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name:  ingress-nginx-admission
   labels:
     app.kubernetes.io/component: admission-webhook
+  name:  default-ingress-nginx-admission
 rules:
 - apiGroups:
   - ""
@@ -258,14 +264,14 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: ingress-nginx-admission
   labels:
     app.kubernetes.io/component: admission-webhook
+  name: default-ingress-nginx-admission
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: ingress-nginx-admission
+  name: default-ingress-nginx-admission
 subjects:
 - kind: ServiceAccount
-  name: ingress-nginx-admission
+  name: default-ingress-nginx-admission
   namespace: kube-system

@@ -2,9 +2,9 @@
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
+  name: default-ingress-nginx-admission
   labels:
     app.kubernetes.io/component: admission-webhook
-  name: ingress-nginx-admission
 webhooks:
 - name: validate.nginx.ingress.kubernetes.io
   matchPolicy: Equivalent
@@ -24,6 +24,6 @@ webhooks:
   - v1
   clientConfig:
     service:
-      namespace: "default"
-      name: ingress-nginx-controller-admission
+      namespace: kube-system
+      name: default-ingress-nginx-controller-admission
       path: /networking/v1/ingresses

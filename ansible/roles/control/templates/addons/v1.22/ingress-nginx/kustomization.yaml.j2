@@ -5,10 +5,10 @@ namespace: kube-system
 
 commonLabels:
   app.kubernetes.io/name: ingress-nginx
-  app.kubernetes.io/instance: ingress-nginx
+  app.kubernetes.io/instance: default
   app.kubernetes.io/part-of: ingress-nginx
-  app.kubernetes.io/managed-by: argocd
-  app.kubernetes.io/component: controller
+  app.kubernetes.io/managed-by: kustomize
+  #app.kubernetes.io/component: controller, admission-webhook
 
 commonAnnotations:
   prometheus.io/scrape: "true"

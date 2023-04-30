@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: ingress-nginx-controller-admission
   labels:
     app.kubernetes.io/component: admission-webhook
+  name: default-ingress-nginx-controller-admission
 spec:
   type: ClusterIP
   ports:
@@ -19,7 +19,9 @@ spec:
 #apiVersion: v1
 #kind: Service
 #metadata:
-#  name: ingress-nginx-controller
+#  labels:
+#    app.kubernetes.io/component: controller
+#  name: default-ingress-nginx-controller
 #spec:
 #  ports:
 #  - name: http
