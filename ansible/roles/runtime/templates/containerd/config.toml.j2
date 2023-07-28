@@ -86,17 +86,7 @@ version = 2
           privileged_without_host_devices = false
           runtime_type = "io.containerd.runc.v2"
           [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
-            BinaryName = ""
-            CriuImagePath = ""
-            CriuPath = ""
-            CriuWorkPath = ""
-            IoGid = 0
-            IoUid = 0
-            NoNewKeyring = false
-            NoPivotRoot = false
-            Root = ""
-            ShimCgroup = ""
-            SystemdCgroup = false
+            SystemdCgroup = true
 {% if kata_containers_enabled %}
         [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.kata]
           runtime_type = "io.containerd.kata.v2"
