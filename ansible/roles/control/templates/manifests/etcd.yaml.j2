@@ -53,8 +53,10 @@ spec:
   hostNetwork: true
   priorityClassName: system-node-critical
   securityContext:
+{% if etcd_user.id > 0 %}
     runAsNonRoot: true
-    runAsUser: 996
+    runAsUser: {{ etcd_user.id }}
+{% endif %}
     seccompProfile:
       type: RuntimeDefault
   volumes:

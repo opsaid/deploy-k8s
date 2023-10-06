@@ -83,8 +83,10 @@ spec:
   hostNetwork: true
   priorityClassName: system-node-critical
   securityContext:
+{% if kube_user.id > 0 %}
     runAsNonRoot: true
-    runAsUser: 997
+    runAsUser: {{ kube_user.id }}
+{% endif %}
     seccompProfile:
       type: RuntimeDefault
   volumes:

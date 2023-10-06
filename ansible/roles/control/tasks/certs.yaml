@@ -2,50 +2,88 @@
 
 # 拷贝必须的几个证书文件
 - name: 拷贝 k8s-{{ cluster_name }}-apiserver-ca 关联证书
-  copy: src=../../pki/files/{{ item }} dest={{ etc_dir }}/pki/{{ item | basename }} owner=kube group=root mode=0644
+  copy: 
+    src: ../../pki/files/{{ item }}
+    dest: "{{ etc_dir }}/pki/{{ item | basename }}"
+    owner: "{{ kube_user.name }}"
+    group: root 
+    mode: 0644
   with_items:
   - sa.pub
-  - sa.key
   - apiserver/ca.crt
-  - apiserver/ca.key
   - apiserver/apiserver.crt
-  - apiserver/apiserver.key
   - apiserver/apiserver-kubelet-client.crt
-  - apiserver/apiserver-kubelet-client.key
   - etcd/apiserver-etcd-client.crt
+- name: 拷贝 k8s-{{ cluster_name }}-apiserver-ca 关联私钥
+  copy: 
+    src: ../../pki/files/{{ item }}
+    dest: "{{ etc_dir }}/pki/{{ item | basename }}" 
+    owner: "{{ kube_user.name }}"
+    group: root
+    mode: 0600
+  with_items:
+  - sa.key
+  - apiserver/ca.key
+  - apiserver/apiserver.key
+  - apiserver/apiserver-kubelet-client.key
   - etcd/apiserver-etcd-client.key
-  #- apiserver/cluster-admin.crt
-  #- apiserver/cluster-admin.key
-  #- apiserver/scheduler-client.crt
-  #- apiserver/scheduler-client.key
-  #- apiserver/controller-manager-client.crt
-  #- apiserver/controller-manager-client.key
 
 # 拷贝front-proxy证书
 - name: 拷贝front-proxy相关证书
-  copy: src=../../pki/files/front-proxy/{{ item }} dest={{ etc_dir }}/pki/front-proxy-{{ item }} owner=kube group=root mode=0644
+  copy: 
+    src: ../../pki/files/front-proxy/{{ item }}
+    dest: "{{ etc_dir }}/pki/front-proxy-{{ item }}"
+    owner: "{{ kube_user.name }}"
+    group: root
+    mode: 0644
   with_items:
   - ca.crt
-  - ca.key
   - client.crt
+- name: 拷贝front-proxy相关证书
+  copy: 
+    src: ../../pki/files/front-proxy/{{ item }}
+    dest: "{{ etc_dir }}/pki/front-proxy-{{ item }}"
+    owner: "{{ kube_user.name }}"
+    group: root
+    mode: 0600
+  with_items:
+  - ca.key
   - client.key
 
 # 拷贝oidc证书
 - name: 拷贝oidc ca证书
-  copy: src=../../pki/files/oidc/ca.crt dest={{ etc_dir }}/pki/oidc/ca.crt owner=kube group=root mode=0644
+  copy: 
+    src: ../../pki/files/oidc/ca.crt
+    dest: "{{ etc_dir }}/pki/oidc/ca.crt"
+    owner: "{{ kube_user.name }}"
+    group: root
+    mode: 0644
   when: oidc_ca_file is defined
 
 # 拷贝etcd证书, etcd ca.key在集群上使用不到
 - name: 拷贝外部etcd集群相关证书
-  copy: src=../../pki/files/{{ item }} dest={{ etc_dir }}/pki/{{ item }} owner=kube group=root mode=0644
+  copy: 
+    src: ../../pki/files/{{ item }}
+    dest: "{{ etc_dir }}/pki/{{ item }}"
+    owner: "{{ kube_user.name }}"
+    group: root
+    mode: 0644
   with_items:
   - etcd/ca.crt
-  - etcd/ca.key
   - etcd/peer.crt
-  - etcd/peer.key
   - etcd/healthcheck-client.crt
-  - etcd/healthcheck-client.key
   - etcd/server.crt
+- name: 拷贝外部etcd集群相关证书
+  copy: 
+    src: ../../pki/files/{{ item }}
+    dest: "{{ etc_dir }}/pki/{{ item }}"
+    owner: "{{ etcd_user.name }}"
+    group: root
+    mode: 0600
+  with_items:
+  - etcd/ca.key
+  - etcd/peer.key
+  - etcd/healthcheck-client.key
   - etcd/server.key
 
 # 拷贝 kubelet-client 证书文件
@@ -53,13 +91,13 @@
   copy: 
     src: ../../pki/files/apiserver/kubelet-client-{{ hostvars[inventory_hostname]['ip'] }}.crt
     dest: "{{ etc_dir }}/pki/kubelet-client-current.crt"
-    owner: kube
+    owner: "{{ kube_user.name }}"
     group: root 
     mode: 0644
 - name: 拷贝 kubelet-client-{{ hostvars[inventory_hostname]['ip'] }}.crt 关联证书
   copy: 
     src: ../../pki/files/apiserver/kubelet-client-{{ hostvars[inventory_hostname]['ip'] }}.key
     dest: "{{ etc_dir }}/pki/kubelet-client-current.key"
-    owner:  kube
+    owner: "{{ kube_user.name }}"
     group: root 
-    mode: 0644
+    mode: 0600

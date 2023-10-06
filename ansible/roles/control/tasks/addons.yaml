@@ -14,7 +14,7 @@
     template:
       src: addons/{{ version }}/{{ component }}/{{ item }}.j2
       dest: /usr/local/src/addons/{{ component }}/{{ item }}
-      owner: kube
+      owner: "{{ kube_user.name }}"
       group: root
       mode: 0644
     with_items: 
@@ -41,7 +41,7 @@
     template:
       src: addons/{{ version }}/calico/{{ item }}.j2
       dest: /usr/local/src/addons/calico/{{ item }}
-      owner: kube
+      owner: "{{ kube_user.name }}"
       group: root
       mode: 0644
     with_items: 
@@ -74,7 +74,7 @@
     template:
       src: addons/{{ version }}/{{ component }}/{{ item }}.j2
       dest: /usr/local/src/addons/{{ component }}/{{ item }}
-      owner: kube
+      owner: "{{ kube_user.name }}"
       group: root
       mode: 0644
     with_items: 
@@ -103,7 +103,7 @@
     template:
       src: addons/{{ version }}/{{ component }}/{{ item }}.j2
       dest: /usr/local/src/addons/{{ component }}/{{ item }}
-      owner: kube
+      owner: "{{ kube_user.name }}"
       group: root
       mode: 0644
     with_items: 
@@ -132,7 +132,7 @@
     template:
       src: addons/{{ version }}/{{ component }}/{{ item }}.j2
       dest: /usr/local/src/addons/{{ component }}/{{ item }}
-      owner: kube
+      owner: "{{ kube_user.name }}"
       group: root
       mode: 0644
     with_items: 
@@ -162,7 +162,7 @@
     template:
       src: addons/{{ version }}/{{ component }}/{{ item }}.j2
       dest: /usr/local/src/addons/{{ component }}/{{ item }}
-      owner: kube
+      owner: "{{ kube_user.name }}"
       group: root
       mode: 0644
     with_items:

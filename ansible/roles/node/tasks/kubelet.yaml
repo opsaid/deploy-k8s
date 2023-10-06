@@ -25,7 +25,7 @@
   template:
     src: kubelet/{{ item }}
     dest: "{{ etc_dir }}/bootstrap-kubelet.conf"
-    owner: kube
+    owner: "{{ kube_user.name }}"
     group: root
     mode: 0644
     backup: no

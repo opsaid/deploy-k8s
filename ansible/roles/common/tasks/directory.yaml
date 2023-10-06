@@ -4,7 +4,7 @@
 - name: 创建 kubernetes 安装目录
   file: 
     path: "{{ item }}" 
-    owner: kube 
+    owner: "{{ kube_user.name }}"
     group: root 
     mode: 0755 
     state: directory
@@ -22,18 +22,18 @@
 - name: 创建etcd相关目录
   file: 
     path: "{{ item }}" 
-    owner: etcd
-    group: etcd
+    owner: "{{ etcd_user.name }}"
+    group: "{{ etcd_user.name }}"
     mode: 0700
     state: directory
   with_items:
     - "{{ data_dir }}/etcd"
 
 # 创建cni相关目录
-- name: 创建cni相关目录
+- name: 创建 cni 相关目录
   file: 
     path: "{{ item }}" 
-    owner: kube
+    owner: "{{ kube_user.name }}"
     group: root 
     mode: 0755 
     state: directory
@@ -45,7 +45,7 @@
 - name: 创建 containerd 相关目录
   file:
     path: "{{ item }}"
-    owner: root
+    owner: "{{ kube_user.name }}"
     group: root 
     state: directory
   with_items:

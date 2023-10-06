@@ -11,7 +11,7 @@
   template:
     src: kubeadm/config.yaml.j2
     dest: /usr/local/src/kubeadm/config.yaml
-    owner: kube
+    owner: "{{ kube_user.name }}"
     group: root
     mode: 0644
 
@@ -19,7 +19,7 @@
   template:
     src: "kubeadm/patches/{{ item }}.j2"
     dest: /usr/local/src/kubeadm/patches/{{ item }}
-    owner: kube
+    owner: "{{ kube_user.name }}"
     group: root
     mode: 0644
   with_items:
@@ -30,7 +30,7 @@
   template:
     src: kube-scheduler/config-{{ k8s_version.split('.')[:2] | join('.') }}.yaml.j2
     dest: "{{ etc_dir }}/scheduler-config.yaml"
-    owner: kube
+    owner: "{{ kube_user.name }}"
     group: root
     mode: 0644
     backup: no
@@ -45,7 +45,7 @@
   template:
     src: kube-apiserver/audit-policy.yaml.j2
     dest: "{{ etc_dir }}/audit-policy.yaml"
-    owner: kube
+    owner: "{{ kube_user.name }}"
     group: root
     mode: 0644
     backup: no
@@ -55,7 +55,7 @@
   template:
     src: "manifests/{{ item }}.j2"
     dest: /etc/kubernetes/manifests/{{ item }}
-    owner: kube
+    owner: root
     group: root
     mode: 0644
   with_items:
@@ -64,15 +64,24 @@
     - kube-controller-manager.yaml
     - kube-scheduler.yaml
 
-- name: 创建kubeconfig文件
+- name: 创建 kubeconfig admin.conf 文件
   template:
     src: "kubeconfig/{{ item }}.j2"
     dest: /etc/kubernetes/{{ item }}
-    owner: kube
+    owner: root
     group: root
-    mode: 0644
+    mode: 0600
   with_items:
     - admin.conf
+
+- name: 创建 kubeconfig 其他文件
+  template:
+    src: "kubeconfig/{{ item }}.j2"
+    dest: /etc/kubernetes/{{ item }}
+    owner: "{{ kube_user.name }}"
+    group: root
+    mode: 0600
+  with_items:
     - kubelet.conf
     - scheduler.conf
     - controller-manager.conf

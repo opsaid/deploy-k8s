@@ -68,5 +68,17 @@ host_resolv_conf:
     - 223.5.5.5
     - 223.6.6.6
 
+# etcd 组件运行的用户
+etcd_user:
+  id: 996
+  name: etcd
+
+# 控制平面组件运行的用户
+kube_user: 
+  id: 0
+  name: root
+  #id: 997
+  #name: kube
+
 # 帮助文档地址
 product_docs: https://opsaid.cn/docs
