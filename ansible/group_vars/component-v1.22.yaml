@@ -80,7 +80,7 @@ api_server_args:
   advertise_address: "{{ hostvars[inventory_hostname]['ip'] }}"
   allow_privileged: "true"
   alsologtostderr: "true"
-  anonymous_auth: "true"
+  anonymous_auth: "false"
   apiserver_count: "{{ groups['kube_control_plane'] | length }}"
   audit_log_maxage: "20"
   audit_log_maxbackup: "10"
