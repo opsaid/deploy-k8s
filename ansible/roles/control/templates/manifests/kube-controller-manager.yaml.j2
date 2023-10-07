@@ -32,7 +32,8 @@ spec:
     livenessProbe:
       failureThreshold: 8
       httpGet:
-        host: {{ hostvars[inventory_hostname].ip }}
+        #host: {{ hostvars[inventory_hostname].ip }}
+        host: 127.0.0.1
         path: /healthz
         port: 10257
         scheme: HTTPS
@@ -46,7 +47,8 @@ spec:
     startupProbe:
       failureThreshold: 24
       httpGet:
-        host: {{ hostvars[inventory_hostname].ip }}
+        #host: {{ hostvars[inventory_hostname].ip }}
+        host: 127.0.0.1
         path: /healthz
         port: 10257
         scheme: HTTPS
