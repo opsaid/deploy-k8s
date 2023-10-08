@@ -200,7 +200,7 @@ controller_manager_args:
   secure_port: "10257"
   service_account_private_key_file: "{{ etc_dir }}/pki/sa.key"
   service_cluster_ip_range: "{{ service_cluster_ip_range }}"
-  terminated_pod_gc_threshold: "500"
+  terminated_pod_gc_threshold: "10"
   use_service_account_credentials: "true"
   v: "0"
 
