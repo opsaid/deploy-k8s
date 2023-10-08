@@ -107,8 +107,11 @@ api_server_args:
   etcd_servers: "{% for host in groups['etcd'] %}https://{{ hostvars[host]['ip'] }}:2379{% if not loop.last %},{% endif %}{% endfor %}"
   event_ttl: "1h"
   goaway_chance: "0.001"
+  # 数据流方向：kube-apiserver -> kubelet，请求 kubelet:10250 使用的客户端证书
   kubelet_client_certificate: "{{ etc_dir }}/pki/apiserver-kubelet-client.crt"
   kubelet_client_key: "{{ etc_dir }}/pki/apiserver-kubelet-client.key"
+  # 数据流方向：kubelet -> kube-apiserver，配置 kubelet 的 ca，用于验证 kubelet 请求客户端证书
+  #kubelet_certificate_authority: "{{ etc_dir }}/pki/kubelet.crt"
   # 优先使用InternalIP来访问kubelet，这样可以避免节点名称没有DNS解析记录时，通过节点名称调用节点kubeletAPI失败的情况
   kubelet_preferred_address_types: "InternalIP,Hostname"
   livez_grace_period: "5m"
