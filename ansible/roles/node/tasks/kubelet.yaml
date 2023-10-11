@@ -65,6 +65,15 @@
     when: install_dir != "/usr/bin"
   when: kubelet.stat.exists == False
 
+- name: 创建 10-kubeadm.conf 环境变量
+  template:
+    src: kubelet/10-kubeadm.conf.j2
+    dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    owner: root
+    group: root
+    mode: 0644
+    backup: no
+
 - name: 创建 kubelet systemd 文件
   template:
     src: kubelet/kubelet.service.j2

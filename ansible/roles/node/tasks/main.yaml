@@ -6,6 +6,7 @@
     - "{{ install_dir }}"
     - "{{ data_dir }}/kubelet"
     - "{{ etc_dir }}/manifests"
+    - "/etc/systemd/system/kubelet.service.d"
 
 - import_tasks: certs.yaml
 - import_tasks: kubelet.yaml
