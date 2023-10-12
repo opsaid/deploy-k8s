@@ -15,5 +15,5 @@ contexts:
 users:
 - name: system:node:{{ hostvars[inventory_hostname]['ip'] }}
   user:
-    client-certificate: /etc/kubernetes/pki/kubelet-client-current.crt
-    client-key: /etc/kubernetes/pki/kubelet-client-current.key
+    client-certificate: {{ data_dir }}/kubelet/pki/kubelet-client-current.crt
+    client-key: {{ data_dir }}/kubelet/pki/kubelet-client-current.key

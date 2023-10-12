@@ -11,6 +11,7 @@
     - /usr/local/src/addons/kube-proxy
     - /usr/local/src/addons/kube-system
     - /usr/local/src/addons/metrics-server
+    - "{{ data_dir }}/kubelet/pki"
 
 - import_tasks: certs.yaml
 - import_tasks: addons.yaml

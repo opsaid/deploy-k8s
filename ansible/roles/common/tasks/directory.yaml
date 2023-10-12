@@ -17,6 +17,7 @@
     - "{{ etc_dir }}/manifests"
     - "{{ log_dir }}"
     - "{{ install_dir }}"
+    - "{{ data_dir }}/kubelet/pki"
 
 # 创建etcd相关目录
 - name: 创建etcd相关目录
