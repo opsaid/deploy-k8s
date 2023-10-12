@@ -23,6 +23,7 @@ oomScoreAdj: -999
 clusterDomain: {{ cluster_domain }}
 clusterDNS:
   - {{ cluster_dns }}
+streamingConnectionIdleTimeout: 4h
 nodeStatusUpdateFrequency: 10s
 nodeStatusReportFrequency: 5m
 nodeLeaseDurationSeconds: 40
@@ -43,3 +44,7 @@ systemReserved:
 kubeReserved: 
   cpu: {{ resource_reserve.kube.cpu }}
   memory: {{ resource_reserve.kube.memory }}
+protectKernelDefaults: false
+makeIPTablesUtilChains: true
+tlsCertFile: /etc/kubernetes/pki/kubelet.crt
+tlsPrivateKeyFile: /etc/kubernetes/pki/kubelet.key
