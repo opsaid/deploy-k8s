@@ -6,7 +6,7 @@
     dest: "{{ data_dir }}/kubelet/{{ item }}"
     owner: root
     group: root
-    mode: 0644
+    mode: 0640
     backup: no
   with_items:
     - config.yaml
@@ -18,7 +18,7 @@
     dest: /etc/default/kubelet
     owner: root
     group: root
-    mode: 0644
+    mode: 0640
     backup: no
 
 - name: 创建 kubelet kubeconfig配置文件
@@ -27,7 +27,7 @@
     dest: "{{ etc_dir }}/bootstrap-kubelet.conf"
     owner: "{{ kube_user.name }}"
     group: root
-    mode: 0644
+    mode: 0640
     backup: no
   with_items:
     - bootstrap-kubelet.conf.j2
@@ -71,7 +71,7 @@
     dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
     owner: root
     group: root
-    mode: 0644
+    mode: 0640
     backup: no
 
 - name: 创建 kubelet systemd 文件
@@ -80,7 +80,7 @@
     dest: /etc/systemd/system/kubelet.service
     owner: root
     group: root
-    mode: 0644
+    mode: 0640
     backup: no
   notify:
     - enabled kubelet
