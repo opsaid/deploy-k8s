@@ -141,6 +141,8 @@ api_server_args:
   token_auth_file: "{{ etc_dir }}/known_tokens.csv"
   v: "0"
   watch_cache: "true"
+  # 在 k8s 1.22 特性 PodSecurity 默认是关闭的
+  feature_gates: "PodSecurity=true"
 
 # kube-controller-manager
 controller_manager_args:
