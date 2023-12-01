@@ -1,0 +1,61 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calico-kube-controllers
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: calico-kube-controllers
+spec:
+  # 控制器全局只能开启1个副本
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: calico-kube-controllers
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      name: calico-kube-controllers
+      namespace: kube-system
+      labels:
+        app.kubernetes.io/name: calico-kube-controllers
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+      tolerations:
+      - key: CriticalAddonsOnly
+        operator: Exists
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/control-plane
+        effect: NoSchedule
+      serviceAccountName: calico-kube-controllers
+      priorityClassName: system-cluster-critical
+      containers:
+      - name: calico-kube-controllers
+        image: {{ internal_images.namespace }}/calico-kube-controllers:{{ internal_images.system.calico_kube_controllers }}
+        env:
+        - name: DATASTORE_TYPE
+          value: kubernetes
+        # 在使用datastore为k8s下，只要开启node控制器
+        - name: ENABLED_CONTROLLERS
+          value: node
+        livenessProbe:
+          exec:
+            command:
+            - /usr/bin/check-status
+            - -l
+          periodSeconds: 10
+          initialDelaySeconds: 10
+          failureThreshold: 6
+          timeoutSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+            - /usr/bin/check-status
+            - -r
+          periodSeconds: 10
+{% if system_service_in_control_node %}
+        node-role.kubernetes.io/master: ""
+{% endif %}

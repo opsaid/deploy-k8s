@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: kube-system
+
+commonLabels:
+  app.kubernetes.io/managed-by: kustomize
+  kubernetes.io/name: CoreDNS
+  app.kubernetes.io/name: kube-dns
+  kubernetes.io/cluster-service: "true"
+
+configMapGenerator:
+- name: coredns
+  files:
+  - Corefile=config/configmap/Corefile
+  options:
+    disableNameSuffixHash: true
+
+resources:
+- cluster/roles.yaml
+- service/services.yaml
+- workloads/deployment.yaml
+
+images:
+- name: {{ internal_images.namespace }}/coredns
+  newTag: {{ internal_images.system.coredns }}

@@ -1,0 +1,231 @@
+---
+
+# DANGER! 
+# 部署的containerd版本
+containerd_version: 1.6.25
+
+# DANGER! 
+# 使用的k8s网络插件，支持: calico
+# docker.io/calico/cni:v3.22.2
+# docker.io/calico/node:v3.22.2
+# docker.io/calico/kube-controllers:v3.22.2
+calico_version: v3.26.4
+
+# 是否开启kata支持
+kata_containers_enabled: false
+kata_containers_version: 2.4.1
+
+# 内部系统镜像地址，必须存在
+internal_images:
+  namespace: registry.cn-hangzhou.aliyuncs.com/kube-image-repo
+  system:
+    # key与镜像名一致,中划线以下划线代替,val为镜像版本末尾带具体系统架构
+
+    # registry.k8s.io/etcd:3.5.9-0
+    etcd: v3.5.10
+
+    # k8s.gcr.io/kube-apiserver-amd64:v1.22.6
+    kube_apiserver: "{{ k8s_version }}"
+    kube_controller_manager: "{{ k8s_version }}"
+    kube_scheduler: "{{ k8s_version }}"
+    kube_proxy: "{{ k8s_version }}"
+
+    # calico/node:v3.16.10
+    calico_cni: "{{ calico_version }}"
+    calico_node: "{{ calico_version }}"
+    calico_kube_controllers: "{{ calico_version }}"
+
+    # k8s.gcr.io/metrics-server/metrics-server:v0.6.1
+    metrics_server: v0.6.1
+
+    # registry.k8s.io/pause:3.9
+    pause: 3.9
+
+    # registry.k8s.io/coredns/coredns:v1.9.3
+    coredns: v1.9.3
+
+# etcd
+etcd_args:
+  advertise_client_urls: "https://{{ hostvars[inventory_hostname]['ip'] }}:2379"
+  auto_tls: "false"
+  cert_file: "{{ etc_dir }}/pki/etcd/server.crt"
+  client_cert_auth: "true"
+  data_dir: "{{ data_dir }}/etcd/"
+  election_timeout: "5000"
+  enable_v2: "true"
+  heartbeat_interval: "250"
+  initial_advertise_peer_urls: "https://{{ hostvars[inventory_hostname]['ip'] }}:2380"
+  initial_cluster: "{% for host in groups['etcd'] %}{{ host }}=https://{{ hostvars[host]['ip'] }}:2380{% if not loop.last %},{% endif %}{% endfor %}"
+  initial_cluster_state: "new"
+  initial_cluster_token: "{{ cluster_name }}"
+  key_file: "{{ etc_dir }}/pki/etcd/server.key"
+  listen_client_urls: "https://127.0.0.1:2379,https://{{ hostvars[inventory_hostname]['ip'] }}:2379"
+  listen_metrics_urls: "http://127.0.0.1:2381"
+  listen_peer_urls: "https://{{ hostvars[inventory_hostname]['ip'] }}:2380"
+  max_request_bytes: "1048576"
+  max_snapshots: "5"
+  max_wals: "5"
+  name: "{{ inventory_hostname }}"
+  peer_auto_tls: "false"
+  peer_cert_file: "{{ etc_dir }}/pki/etcd/peer.crt"
+  peer_client_cert_auth: "true"
+  peer_key_file: "{{ etc_dir }}/pki/etcd/peer.key"
+  peer_trusted_ca_file: "{{ etc_dir }}/pki/etcd/ca.crt"
+  quota_backend_bytes: "4294967296"
+  snapshot_count: "10000"
+  trusted_ca_file: "{{ etc_dir }}/pki/etcd/ca.crt"
+
+# 对应k8s cli，变量由下划线转中划线
+api_server_args:
+  ## Generic flags ##
+  advertise_address: "{{ hostvars[inventory_hostname]['ip'] }}"
+  default_not_ready_toleration_seconds: "60"
+  default_unreachable_toleration_seconds: "60"
+  #enable_priority_and_fairness: "true"
+  goaway_chance: "0.001"
+  request_timeout: "60s"
+  ## Etcd flags ##
+  delete_collection_workers: "1"
+  enable_garbage_collector: "true"
+  # encryption_provider_config: ""
+  etcd_cafile: "{{ etc_dir }}/pki/etcd/ca.crt"
+  etcd_certfile: "{{ etc_dir }}/pki/apiserver-etcd-client.crt"
+  etcd_keyfile: "{{ etc_dir }}/pki/apiserver-etcd-client.key"
+  etcd_prefix: "/kubernetes/{{ cluster_domain }}/registry"
+  etcd_compaction_interval: "30m"
+  etcd_servers: "{% for host in groups['etcd'] %}https://{{ hostvars[host]['ip'] }}:2379{% if not loop.last %},{% endif %}{% endfor %}"
+  etcd_count_metric_poll_period: "60s"
+  etcd_db_metric_poll_interval: "30s"
+  etcd_healthcheck_timeout: "2s"
+  etcd_readycheck_timeout: "2s"
+  storage_backend: "etcd3"
+  # application/json application/yaml
+  storage_media_type: "application/vnd.kubernetes.protobuf"
+  watch_cache: "true"
+  ## Secure serving flags ##
+  bind_address: "{{ hostvars[inventory_hostname]['ip'] }}"
+  http2_max_streams_per_connection: "10000"
+  secure_port: "6443"
+  tls_cert_file: "{{ etc_dir }}/pki/apiserver.crt"
+  tls_private_key_file: "{{ etc_dir }}/pki/apiserver.key"
+  tls_min_version: "VersionTLS12"
+  # 数据流方向：kube-apiserver -> kubelet，请求 kubelet:10250 使用的客户端证书
+  kubelet_client_certificate: "{{ etc_dir }}/pki/apiserver-kubelet-client.crt"
+  kubelet_client_key: "{{ etc_dir }}/pki/apiserver-kubelet-client.key"
+  # 数据流方向：kubelet -> kube-apiserver，配置 kubelet 的 ca，用于验证 kubelet 请求客户端证书
+  #kubelet_certificate_authority: "{{ etc_dir }}/pki/kubelet.crt"
+  ## Auditing flags ##
+  audit_log_maxage: "30"
+  audit_log_maxbackup: "10"
+  audit_log_maxsize: "1024"
+  audit_log_path: "{{ log_dir }}/audit.log"
+  audit_log_compress: "true"
+  audit_policy_file: "{{ etc_dir }}/audit-policy.yaml"
+  ## Authentication Authorization flags ##
+  anonymous_auth: "false"
+  client_ca_file: "{{ etc_dir }}/pki/ca.crt"
+  enable_bootstrap_token_auth: "true"
+  requestheader_allowed_names: "front-proxy-client"
+  requestheader_client_ca_file: "{{ etc_dir }}/pki/front-proxy-ca.crt"
+  requestheader_extra_headers_prefix: "X-Remote-Extra-"
+  requestheader_group_headers: "X-Remote-Group"
+  requestheader_username_headers: "X-Remote-User"
+  proxy_client_cert_file: "{{ etc_dir }}/pki/front-proxy-client.crt"
+  proxy_client_key_file: "{{ etc_dir }}/pki/front-proxy-client.key"
+  service_account_issuer: "https://kubernetes.default.svc.{{ cluster_domain }}"
+  service_account_key_file: "{{ etc_dir }}/pki/sa.pub"
+  service_account_signing_key_file: "{{ etc_dir }}/pki/sa.key"
+  token_auth_file: "{{ etc_dir }}/known_tokens.csv"
+  authorization_mode: "Node,RBAC"
+  ## Admission flags ##
+  feature_gates: "WindowsHostNetwork=false"
+  enable_admission_plugins: "CertificateApproval,CertificateSigning,CertificateSubjectRestriction,DefaultIngressClass,DefaultStorageClass,DefaultTolerationSeconds,LimitRanger,MutatingAdmissionWebhook,NamespaceLifecycle,PersistentVolumeClaimResize,PodSecurity,Priority,ResourceQuota,RuntimeClass,ServiceAccount,StorageObjectInUseProtection,TaintNodesByCondition,ValidatingAdmissionPolicy,ValidatingAdmissionWebhook,NodeRestriction"
+  ## Misc flags ##
+  allow_privileged: "true"
+  enable_aggregator_routing: "false"
+  endpoint_reconciler_type: "lease"
+  event_ttl: "1h"
+  # 优先使用InternalIP来访问kubelet，这样可以避免节点名称没有DNS解析记录时，通过节点名称调用节点kubeletAPI失败的情况
+  kubelet_preferred_address_types: "InternalIP,Hostname"
+  livez_grace_period: "5m"
+  log_flush_frequency: "5s"
+  profiling: "false"
+  service_cluster_ip_range: "{{ service_cluster_ip_range }}"
+  service_node_port_range: "30000-32767"
+  v: "0"
+
+# kube-controller-manager
+controller_manager_args:
+  ## Generic flags ##
+  profiling: "false"
+  allocate_node_cidrs: "true"
+  cidr_allocator_type: "RangeAllocator"
+  cluster_cidr: "{{ cluster_cidr }}"
+  cluster_name: "{{ cluster_name }}"
+  controller_start_interval: "1s"
+  controllers: "*"
+  kube_api_burst: "100"
+  kube_api_qps: "100"
+  node_monitor_period: "5s"
+  use_service_account_credentials: "true"
+  ## Secure serving flags ##
+  # 服务监听的IP地址，与secure-port配合使用，默认监听0.0.0.0
+  #bind_address: "{{ hostvars[inventory_hostname]['ip'] }}"
+  bind_address: "127.0.0.1"
+  secure_port: "10257"
+  ## Authentication Authorization flags ##
+  authentication_kubeconfig: "{{ etc_dir }}/controller-manager.conf"
+  authentication_skip_lookup: "false"
+  authorization_kubeconfig: "{{ etc_dir }}/controller-manager.conf"
+  client_ca_file: "{{ etc_dir }}/pki/ca.crt"
+  requestheader_allowed_names: "front-proxy-client"
+  requestheader_client_ca_file: "{{ etc_dir }}/pki/front-proxy-ca.crt"
+  requestheader_extra_headers_prefix: "X-Remote-Extra-"
+  requestheader_group_headers: "X-Remote-Group"
+  requestheader_username_headers: "X-Remote-User"
+  ## Controller flags ##
+  cluster_signing_cert_file: "{{ etc_dir }}/pki/ca.crt"
+  cluster_signing_duration: "43800h0m0s"
+  cluster_signing_key_file: "{{ etc_dir }}/pki/ca.key"
+  concurrent_deployment_syncs: "5"
+  concurrent_endpoint_syncs: "5"
+  concurrent_gc_syncs: "20"
+  concurrent_namespace_syncs: "10"
+  enable_garbage_collector: "true"
+  horizontal_pod_autoscaler_cpu_initialization_period: "5m"
+  horizontal_pod_autoscaler_downscale_stabilization: "5m"
+  horizontal_pod_autoscaler_initial_readiness_delay: "30s"
+  horizontal_pod_autoscaler_sync_period: "30s"
+  horizontal_pod_autoscaler_tolerance: "0.1"
+  namespace_sync_period: "5m0s"
+  node_cidr_mask_size: "{{ node_cidr_mask }}"
+  node_eviction_rate: "0.1"
+  node_monitor_grace_period: "40s"
+  node_startup_grace_period: "1m0s"
+  pod_eviction_timeout: "5m0s"
+  resource_quota_sync_period: "5m0s"
+  root_ca_file: "{{ etc_dir }}/pki/ca.crt"
+  service_account_private_key_file: "{{ etc_dir }}/pki/sa.key"
+  service_cluster_ip_range: "{{ service_cluster_ip_range }}"
+  terminated_pod_gc_threshold: "10"
+  ## Misc flags ##
+  kubeconfig: "{{ etc_dir }}/controller-manager.conf"
+  log_flush_frequency: "5s"
+  min_resync_period: "12h0m0s"
+  v: "0"
+
+# kube-scheduler
+scheduler_args:
+  ## Secure serving flags ##
+  # 服务监听的IP地址，与secure-port配合使用，默认监听0.0.0.0
+  #bind_address: "{{ hostvars[inventory_hostname]['ip'] }}"
+  bind_address: "127.0.0.1"
+  secure_port: "10259"
+  ## Authentication Authorization flags ##
+  authentication_kubeconfig: "{{ etc_dir }}/scheduler.conf"
+  authorization_kubeconfig: "{{ etc_dir }}/scheduler.conf"
+  config: "{{ etc_dir }}/scheduler-config.yaml"
+  kubeconfig: "{{ etc_dir }}/scheduler.conf"
+  log_flush_frequency: "5s"
+  profiling: "false"
+  v: "0"

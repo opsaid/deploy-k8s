@@ -21,7 +21,7 @@
       - kustomization.yaml
       - cluster/roles.yaml
       - cluster/runtimeclass.yaml
-  when: (version == "v1.18") or (version == "v1.22")
+  when: (version == "v1.18") or (version == "v1.22") or (version == "v1.26")
 
 # calico
 - name: 生成 calico 配置
@@ -53,7 +53,7 @@
       - workloads/deployment.yaml
       - workloads/daemonset.yaml
     when: network_plugin == "calico"
-  when: (version == "v1.18") or (version == "v1.22")
+  when: (version == "v1.18") or (version == "v1.22") or (version == "v1.26")
 
 # coredns
 - name: 生成 coredns 配置
@@ -83,7 +83,7 @@
       - config/configmap/Corefile
       - service/services.yaml
       - workloads/deployment.yaml
-  when: (version == "v1.18") or (version == "v1.22")
+  when: (version == "v1.18") or (version == "v1.22") or (version == "v1.26")
 
 # metrics-server
 - name: 生成 metrics-server 配置
@@ -112,7 +112,7 @@
       - cluster/roles.yaml
       - service/services.yaml
       - workloads/deployment.yaml
-  when: (version == "v1.18") or (version == "v1.22")
+  when: (version == "v1.18") or (version == "v1.22") or (version == "v1.26")
 
 # kube-proxy
 - name: 生成 kube-proxy 配置
@@ -141,7 +141,7 @@
       - config/configmap/config.conf
       - config/configmap/kubeconfig.conf
       - workloads/daemonset.yaml
-  when: (version == "v1.18") or (version == "v1.22")
+  when: (version == "v1.18") or (version == "v1.22") or (version == "v1.26")
 
 # ingress-nginx
 - name: 生成 ingress-nginx 配置
@@ -174,4 +174,4 @@
       - workloads/daemonset.yaml
       - workloads/job.yaml
       - service/services.yaml
-  when: (version == "v1.22")
+  when: (version == "v1.22") or (version == "v1.26")

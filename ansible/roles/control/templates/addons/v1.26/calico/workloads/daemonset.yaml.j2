@@ -1,0 +1,275 @@
+---
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  labels:
+    app.kubernetes.io/name: calico-node
+  name: calico-node
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: calico-node
+  updateStrategy:
+    #type: OnDelete
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: calico-node
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+      hostNetwork: true
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      - key: CriticalAddonsOnly
+        operator: Exists
+      - effect: NoExecute
+        operator: Exists
+      serviceAccountName: calico-node
+      # Minimize downtime during a rolling upgrade or deletion; tell Kubernetes to do a "force
+      # deletion": https://kubernetes.io/docs/concepts/workloads/pods/pod/#termination-of-pods.
+      terminationGracePeriodSeconds: 0
+      priorityClassName: system-node-critical
+      initContainers:
+      # 为宿主安装cni插件
+      - name: install-cni
+        image: {{ internal_images.namespace }}/calico-cni:{{ internal_images.system.calico_cni }}
+        command: ["/opt/cni/bin/install"]
+        envFrom:
+        - configMapRef:
+            # Allow KUBERNETES_SERVICE_HOST and KUBERNETES_SERVICE_PORT to be overridden for eBPF mode.
+            name: kubernetes-services-endpoint
+            optional: true
+        env:
+        # Skip tls verify in /etc/cni/net.d/calico-kubeconfig
+        - name: SKIP_TLS_VERIFY
+          value: "true"
+        # 与containerd生成的保持一致
+        - name: CNI_CONF_NAME
+          value: "10-containerd-net.conflist"
+        # The CNI network config to install on each node.
+        - name: CNI_NETWORK_CONFIG
+          valueFrom:
+            configMapKeyRef:
+              name: calico-config
+              key: cni_network_config
+        # Set the hostname based on the k8s node name.
+        - name: KUBERNETES_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        # CNI MTU Config variable
+        - name: CNI_MTU
+          valueFrom:
+            configMapKeyRef:
+              name: calico-config
+              key: veth_mtu
+        # Prevents the container from sleeping forever.
+        - name: SLEEP
+          value: "false"
+        volumeMounts:
+        - mountPath: /host/opt/cni/bin
+          name: cni-bin-dir
+        - mountPath: /host/etc/cni/net.d
+          name: cni-net-dir
+        securityContext:
+          privileged: true
+      # This init container mounts the necessary filesystems needed by the BPF data plane
+      # i.e. bpf at /sys/fs/bpf and cgroup2 at /run/calico/cgroup. Calico-node initialisation is executed
+      # in best effort fashion, i.e. no failure for errors, to not disrupt pod creation in iptable mode.
+      - name: "mount-bpffs"
+        image: {{ internal_images.namespace }}/calico-node:{{ internal_images.system.calico_node }}
+        imagePullPolicy: IfNotPresent
+        command: ["calico-node", "-init", "-best-effort"]
+        volumeMounts:
+          - mountPath: /sys/fs
+            name: sys-fs
+            # Bidirectional is required to ensure that the new mount we make at /sys/fs/bpf propagates to the host
+            # so that it outlives the init container.
+            mountPropagation: Bidirectional
+          - mountPath: /var/run/calico
+            name: var-run-calico
+            # Bidirectional is required to ensure that the new mount we make at /run/calico/cgroup propagates to the host
+            # so that it outlives the init container.
+            mountPropagation: Bidirectional
+          # Mount /proc/ from host which usually is an init program at /nodeproc. It's needed by mountns binary,
+          # executed by calico-node, to mount root cgroup2 fs at /run/calico/cgroup to attach CTLB programs correctly.
+          - mountPath: /nodeproc
+            name: nodeproc
+            readOnly: true
+        securityContext:
+          privileged: true
+      containers:
+      - name: calico-node
+        image: {{ internal_images.namespace }}/calico-node:{{ internal_images.system.calico_node }}
+        imagePullPolicy: IfNotPresent
+        envFrom:
+        - configMapRef:
+            # Allow KUBERNETES_SERVICE_HOST and KUBERNETES_SERVICE_PORT to be overridden for eBPF mode.
+            name: kubernetes-services-endpoint
+            optional: true
+        env:
+        # Use Kubernetes API as the backing datastore.
+        - name: DATASTORE_TYPE
+          value: "kubernetes"
+        # 等待datastore可用后在继续
+        - name: WAIT_FOR_DATASTORE
+          value: "true"
+        # Set based on the k8s node name.
+        - name: NODENAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        # Choose the backend to use.
+        - name: CALICO_NETWORKING_BACKEND
+          valueFrom:
+            configMapKeyRef:
+              name: calico-config
+              key: calico_backend
+        # 在datastore使用k8s下会在末尾自动添加kdd
+        # 用于crd clusterinformations的数据验证
+        - name: CLUSTER_TYPE
+          value: "k8s,bgp"
+        # 作为主机上calico的下一跳IPv4地址，既bgp.ipv4Address值
+        # 每个节点不同，这里设置为选择指定网卡名（不能包含多IP）
+        - name: IP
+          value: "autodetect"
+        - name: IP_AUTODETECTION_METHOD
+          value: "cidr={{ hostvars[inventory_hostname]['ip'].split('.')[0:3] | join('.') }}.0/24"
+        # 禁用IPIP
+        - name: CALICO_IPV4POOL_IPIP
+          value: "Never"
+        # 禁用VXLAN
+        - name: CALICO_IPV4POOL_VXLAN
+          value: "Never"
+        # 默认创建的IPv4地址池，需等于集群参数--cluster-cidr
+        - name: CALICO_IPV4POOL_CIDR
+          value: "{{ cluster_cidr }}"
+        - name: CALICO_IPV4POOL_BLOCK_SIZE
+          value: "{{ node_cidr_mask }}"
+        # 禁用对ipv6的支持
+        - name: FELIX_IPV6SUPPORT
+          value: "false"
+        # 日志相关
+        - name: FELIX_LOGSEVERITYSCREEN
+          value: "info"
+        - name: CALICO_DISABLE_FILE_LOGGING
+          value: "true"
+        # 开启http健康检测服务，calico-node -felix-live探测依赖
+        # 使用hostNetwork并且容器在127.0.0.1监听，健康探测必须配置host
+        - name: FELIX_HEALTHENABLED
+          value: "true"
+        - name: FELIX_HEALTHHOST
+          value: "127.0.0.1"
+        - name: FELIX_HEALTHPORT
+          value: "9099"
+        - name: FELIX_PROMETHEUSMETRICSENABLED
+          value: "true"
+        - name: FELIX_PROMETHEUSMETRICSHOST
+          value: "127.0.0.1"
+        - name: FELIX_PROMETHEUSMETRICSPORT
+          value: "9091"
+        - name: FELIX_USAGEREPORTINGENABLED
+          value: "false"
+
+        # TODO; 无条件接受来自工作负载的数据包
+        - name: FELIX_DEFAULTENDPOINTTOHOSTACTION
+          value: "ACCEPT"
+
+        securityContext:
+          privileged: true
+        resources:
+          requests:
+            cpu: 250m
+        livenessProbe:
+          httpGet:
+            host: 127.0.0.1
+            path: /liveness
+            port: 9099
+            scheme: HTTP
+          periodSeconds: 10
+          initialDelaySeconds: 10
+          failureThreshold: 6
+        readinessProbe:
+          httpGet:
+            host: 127.0.0.1
+            path: /readiness
+            port: 9099
+            scheme: HTTP
+          periodSeconds: 10
+        volumeMounts:
+        - name: calico-config
+          mountPath: /etc/rc.local
+          subPath: rc.local
+        - mountPath: /lib/modules
+          name: lib-modules
+          readOnly: true
+        - mountPath: /run/xtables.lock
+          name: xtables-lock
+          readOnly: false
+        - mountPath: /var/run/calico
+          name: var-run-calico
+          readOnly: false
+        - mountPath: /var/lib/calico
+          name: var-lib-calico
+          readOnly: false
+        - name: policysync
+          mountPath: /var/run/nodeagent
+        # For eBPF mode, we need to be able to mount the BPF filesystem at /sys/fs/bpf so we mount in the
+        # parent directory.
+        - name: bpffs
+          mountPath: /sys/fs/bpf
+        #- name: cni-log-dir
+        #  mountPath: /var/log/calico/cni
+        #  readOnly: true
+      volumes:
+      # Used by calico-node.
+      - name: lib-modules
+        hostPath:
+          path: /lib/modules
+      - name: var-run-calico
+        hostPath:
+          path: /var/run/calico
+      - name: var-lib-calico
+        hostPath:
+          path: /var/lib/calico
+      - name: xtables-lock
+        hostPath:
+          path: /run/xtables.lock
+          type: FileOrCreate
+      - name: sys-fs
+        hostPath:
+          path: /sys/fs/
+          type: DirectoryOrCreate
+      - name: bpffs
+        hostPath:
+          path: /sys/fs/bpf
+          type: Directory
+      # mount /proc at /nodeproc to be used by mount-bpffs initContainer to mount root cgroup2 fs.
+      - name: nodeproc
+        hostPath:
+          path: /proc
+      # Used to install CNI.
+      - name: cni-bin-dir
+        hostPath:
+          path: /opt/cni/bin
+      - name: cni-net-dir
+        hostPath:
+          path: /etc/cni/net.d
+      - name: host-local-net-dir
+        hostPath:
+          path: /var/lib/cni/networks
+      # Used to create per-pod Unix Domain Sockets
+      - name: policysync
+        hostPath:
+          type: DirectoryOrCreate
+          path: /var/run/nodeagent
+      - name: calico-config
+        configMap:
+          name: calico-config
+          defaultMode: 493

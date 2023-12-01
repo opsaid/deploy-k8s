@@ -23,13 +23,15 @@
   block:
   - name: 下载 kubernetes.tar.gz（不验证sha256值）
     get_url:
-      url: https://github.com/kubernetes/kubernetes/releases/download/{{ k8s_version }}/kubernetes.tar.gz
+      #url: https://github.com/kubernetes/kubernetes/releases/download/{{ k8s_version }}/kubernetes.tar.gz
+      url: https://dl.k8s.io/{{ k8s_version }}/kubernetes.tar.gz
       dest: "{{ temp_dir }}/kubernetes.tar.gz"
     when: (k8s_version_sha256 is not defined) and (kubernetes_src.stat.exists == False)
 
   - name: 下载 kubernetes.tar.gz（需要验证sha256值）
     get_url:
-      url: https://github.com/kubernetes/kubernetes/releases/download/{{ k8s_version }}/kubernetes.tar.gz
+      #url: https://github.com/kubernetes/kubernetes/releases/download/{{ k8s_version }}/kubernetes.tar.gz
+      url: https://dl.k8s.io/{{ k8s_version }}/kubernetes.tar.gz
       dest: "{{ temp_dir }}/kubernetes.tar.gz"
       checksum: sha256:{{ k8s_version_sha256 }}
     when: (k8s_version_sha256 is defined) and (kubernetes_src.stat.exists == False)
@@ -47,6 +49,7 @@
       KUBERNETES_SKIP_CONFIRM: true
       KUBERNETES_CLIENT_OS: linux
       KUBERNETES_SERVER_ARCH: amd64
+      KUBERNETES_CLIENT_ARCH: amd64
 
   - name: 解压 kubernetes-server-linux-amd64.tar.gz
     unarchive:
@@ -83,16 +86,20 @@
       - kube-scheduler.tar
 
   - name: 获取 kube-apiserver 镜像ID
-    shell: docker images | grep k8s.gcr.io/kube-apiserver | grep {{ k8s_version }} | awk '{ print $3 }'
+    #shell: docker images | grep k8s.gcr.io/kube-apiserver | grep {{ k8s_version }} | awk '{ print $3 }'
+    shell: docker images | grep registry.k8s.io/kube-apiserver | grep {{ k8s_version }} | awk '{ print $3 }'
     register: imgid_apiserver
   - name: 获取 kube-controller-manager 镜像ID
-    shell: docker images | grep k8s.gcr.io/kube-controller-manager | grep {{ k8s_version }} | awk '{ print $3 }'
+    #shell: docker images | grep k8s.gcr.io/kube-controller-manager | grep {{ k8s_version }} | awk '{ print $3 }'
+    shell: docker images | grep registry.k8s.io/kube-controller-manager | grep {{ k8s_version }} | awk '{ print $3 }'
     register: imgid_controller
   - name: 获取 kube-proxy 镜像ID
-    shell: docker images | grep k8s.gcr.io/kube-proxy | grep {{ k8s_version }} | awk '{ print $3 }'
+    #shell: docker images | grep k8s.gcr.io/kube-proxy | grep {{ k8s_version }} | awk '{ print $3 }'
+    shell: docker images | grep registry.k8s.io/kube-proxy | grep {{ k8s_version }} | awk '{ print $3 }'
     register: imgid_proxy
   - name: 获取 kube-scheduler 镜像ID
-    shell: docker images | grep k8s.gcr.io/kube-scheduler | grep {{ k8s_version }} | awk '{ print $3 }'
+    #shell: docker images | grep k8s.gcr.io/kube-scheduler | grep {{ k8s_version }} | awk '{ print $3 }'
+    shell: docker images | grep registry.k8s.io/kube-scheduler | grep {{ k8s_version }} | awk '{ print $3 }'
     register: imgid_scheduler
 
   #- name: docker push test
