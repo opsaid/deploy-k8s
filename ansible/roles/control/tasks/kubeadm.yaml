@@ -39,7 +39,11 @@
 # 拥有token，既可使用user或group1、group2、group3的权限
 - name: 创建 known_tokens.csv 文件
   template:
-    src=kube-apiserver/known_tokens.csv.j2 dest={{ etc_dir }}/known_tokens.csv owner=kube group=root mode=0644
+    src: kube-apiserver/known_tokens.csv.j2
+    dest: "{{ etc_dir }}/known_tokens.csv"
+    owner: "{{ kube_user.name }}"
+    group: root
+    mode: 0644
 
 - name: 创建审计规则文件
   template:
