@@ -159,15 +159,16 @@ controller_manager_args:
   ## Generic flags ##
   profiling: "false"
   allocate_node_cidrs: "true"
-  cidr_allocator_type: "RangeAllocator"
+  #cidr_allocator_type: "RangeAllocator"
   cluster_cidr: "{{ cluster_cidr }}"
   cluster_name: "{{ cluster_name }}"
   controller_start_interval: "1s"
   controllers: "*"
+  #node_monitor_period: "5s"
+  # 所有使用的控制器使用单独的 sa
+  use_service_account_credentials: "true"
   kube_api_burst: "100"
   kube_api_qps: "100"
-  node_monitor_period: "5s"
-  use_service_account_credentials: "true"
   ## Secure serving flags ##
   # 服务监听的IP地址，与secure-port配合使用，默认监听0.0.0.0
   #bind_address: "{{ hostvars[inventory_hostname]['ip'] }}"
@@ -178,25 +179,27 @@ controller_manager_args:
   authentication_skip_lookup: "false"
   authorization_kubeconfig: "{{ etc_dir }}/controller-manager.conf"
   client_ca_file: "{{ etc_dir }}/pki/ca.crt"
-  requestheader_allowed_names: "front-proxy-client"
-  requestheader_client_ca_file: "{{ etc_dir }}/pki/front-proxy-ca.crt"
-  requestheader_extra_headers_prefix: "X-Remote-Extra-"
-  requestheader_group_headers: "X-Remote-Group"
-  requestheader_username_headers: "X-Remote-User"
+  #requestheader_allowed_names: "front-proxy-client"
+  #requestheader_client_ca_file: "{{ etc_dir }}/pki/front-proxy-ca.crt"
+  #requestheader_extra_headers_prefix: "X-Remote-Extra-"
+  #requestheader_group_headers: "X-Remote-Group"
+  #requestheader_username_headers: "X-Remote-User"
   ## Controller flags ##
+  # 用于签发 kubectl get csr 的 kubelet 证书 "kubelet-client-current.pem"
+  # 设置值为同 kube-apiserver client-ca-file
   cluster_signing_cert_file: "{{ etc_dir }}/pki/ca.crt"
-  cluster_signing_duration: "43800h0m0s"
   cluster_signing_key_file: "{{ etc_dir }}/pki/ca.key"
-  concurrent_deployment_syncs: "5"
-  concurrent_endpoint_syncs: "5"
-  concurrent_gc_syncs: "20"
-  concurrent_namespace_syncs: "10"
+  cluster_signing_duration: "43800h0m0s"
+  #concurrent_deployment_syncs: "5"
+  #concurrent_endpoint_syncs: "5"
+  #concurrent_gc_syncs: "20"
+  #concurrent_namespace_syncs: "10"
   enable_garbage_collector: "true"
-  horizontal_pod_autoscaler_cpu_initialization_period: "5m"
-  horizontal_pod_autoscaler_downscale_stabilization: "5m"
-  horizontal_pod_autoscaler_initial_readiness_delay: "30s"
-  horizontal_pod_autoscaler_sync_period: "30s"
-  horizontal_pod_autoscaler_tolerance: "0.1"
+  #horizontal_pod_autoscaler_cpu_initialization_period: "5m"
+  #horizontal_pod_autoscaler_downscale_stabilization: "5m"
+  #horizontal_pod_autoscaler_initial_readiness_delay: "30s"
+  #horizontal_pod_autoscaler_sync_period: "30s"
+  #horizontal_pod_autoscaler_tolerance: "0.1"
   namespace_sync_period: "5m0s"
   node_cidr_mask_size: "{{ node_cidr_mask }}"
   node_eviction_rate: "0.1"
@@ -205,8 +208,10 @@ controller_manager_args:
   pod_eviction_timeout: "5m0s"
   resource_quota_sync_period: "5m0s"
   root_ca_file: "{{ etc_dir }}/pki/ca.crt"
+  # 用来签名 sa 账户 "/var/run/secrets/kubernetes.io/serviceaccount/token" 的私钥
   service_account_private_key_file: "{{ etc_dir }}/pki/sa.key"
   service_cluster_ip_range: "{{ service_cluster_ip_range }}"
+  # 在 Pod GC 开始删除终止 Pod 之前，系统允许存在的 terminated 状态 Pod 数量
   terminated_pod_gc_threshold: "10"
   ## Misc flags ##
   kubeconfig: "{{ etc_dir }}/controller-manager.conf"
@@ -217,6 +222,7 @@ controller_manager_args:
 # kube-scheduler
 scheduler_args:
   ## Secure serving flags ##
+  profiling: "false"
   # 服务监听的IP地址，与secure-port配合使用，默认监听0.0.0.0
   #bind_address: "{{ hostvars[inventory_hostname]['ip'] }}"
   bind_address: "127.0.0.1"
@@ -227,5 +233,4 @@ scheduler_args:
   config: "{{ etc_dir }}/scheduler-config.yaml"
   kubeconfig: "{{ etc_dir }}/scheduler.conf"
   log_flush_frequency: "5s"
-  profiling: "false"
   v: "0"
