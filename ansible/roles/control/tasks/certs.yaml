@@ -7,7 +7,7 @@
     dest: "{{ etc_dir }}/pki/{{ item | basename }}"
     owner: "{{ kube_user.name }}"
     group: root 
-    mode: 0644
+    mode: 0600
   with_items:
   - sa.pub
   - apiserver/ca.crt
@@ -35,7 +35,7 @@
     dest: "{{ etc_dir }}/pki/front-proxy-{{ item }}"
     owner: "{{ kube_user.name }}"
     group: root
-    mode: 0644
+    mode: 0600
   with_items:
   - ca.crt
   - client.crt
@@ -57,7 +57,7 @@
     dest: "{{ etc_dir }}/pki/oidc/ca.crt"
     owner: "{{ kube_user.name }}"
     group: root
-    mode: 0644
+    mode: 0600
   when: oidc_ca_file is defined
 
 # 拷贝etcd证书, etcd ca.key在集群上使用不到
@@ -67,7 +67,7 @@
     dest: "{{ etc_dir }}/pki/{{ item }}"
     owner: "{{ kube_user.name }}"
     group: root
-    mode: 0644
+    mode: 0640
   with_items:
   - etcd/ca.crt
   - etcd/peer.crt
@@ -93,7 +93,7 @@
     dest: "{{ data_dir }}/kubelet/pki/kubelet-client-current.crt"
     owner: "{{ kube_user.name }}"
     group: root 
-    mode: 0644
+    mode: 0600
 - name: 拷贝 kubelet-client-{{ hostvars[inventory_hostname]['ip'] }}.crt 关联证书
   copy: 
     src: ../../pki/files/apiserver/kubelet-client-{{ hostvars[inventory_hostname]['ip'] }}.key

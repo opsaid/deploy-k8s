@@ -6,7 +6,7 @@
     dest: "{{ data_dir }}/kubelet/{{ item }}"
     owner: root
     group: root
-    mode: 0640
+    mode: 0600
     backup: no
   with_items:
     - config.yaml
@@ -71,7 +71,7 @@
     dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
     owner: root
     group: root
-    mode: 0640
+    mode: 0600
     backup: no
 
 - name: 创建 kubelet systemd 文件

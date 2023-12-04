@@ -61,7 +61,7 @@
     dest: /etc/kubernetes/manifests/{{ item }}
     owner: root
     group: root
-    mode: 0644
+    mode: 0600
   with_items:
     - etcd.yaml
     - kube-apiserver.yaml
@@ -106,5 +106,5 @@
     dest: "/root/.kube/config"
     owner: root
     group: root
-    mode: 0644
+    mode: 0600
     backup: no
