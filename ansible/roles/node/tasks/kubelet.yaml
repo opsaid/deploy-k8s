@@ -42,6 +42,15 @@
     state: link
   when: data_dir != "/var/lib"
 
+# 添加一个 seccomp 测试配置
+- name: 添加一个 seccomp 测试配置
+  copy:
+    src: seccomp/profiles/audit.json
+    dest: "{{ data_dir }}/kubelet/seccomp/profiles/audit.json"
+    owner: root
+    group: root
+    mode: 0644
+
 # 拷贝 kubelet 二进制文件
 - stat:
     path: "{{ install_dir }}/kubelet"
