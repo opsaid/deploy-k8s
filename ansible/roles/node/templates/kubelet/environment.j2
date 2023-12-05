@@ -6,4 +6,5 @@ KUBELET_EXTRA_ARGS="\
   --root-dir={{ data_dir }}/kubelet \
   --runtime-cgroups=/systemd/system.slice \
   --log-flush-frequency=5s \
+  --seccomp-default=true \
   --v=0"
