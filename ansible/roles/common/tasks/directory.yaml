@@ -15,6 +15,7 @@
     - "{{ etc_dir }}/pki/etcd"
     - "{{ etc_dir }}/pki/oidc"
     - "{{ etc_dir }}/manifests"
+    - "{{ etc_dir }}/policies"
     - "{{ log_dir }}"
     - "{{ install_dir }}"
     - "{{ data_dir }}/kubelet/pki"

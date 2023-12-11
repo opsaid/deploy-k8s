@@ -140,6 +140,7 @@ api_server_args:
   ## Admission flags ##
   feature_gates: "WindowsHostNetwork=false"
   enable_admission_plugins: "CertificateApproval,CertificateSigning,CertificateSubjectRestriction,DefaultIngressClass,DefaultStorageClass,DefaultTolerationSeconds,LimitRanger,MutatingAdmissionWebhook,NamespaceLifecycle,PersistentVolumeClaimResize,PodSecurity,Priority,ResourceQuota,RuntimeClass,ServiceAccount,StorageObjectInUseProtection,TaintNodesByCondition,ValidatingAdmissionPolicy,ValidatingAdmissionWebhook,NodeRestriction"
+  admission_control_config_file: "/etc/kubernetes/policies/admission-controls.yaml"
   ## Misc flags ##
   allow_privileged: "true"
   enable_aggregator_routing: "false"
