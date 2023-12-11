@@ -21,6 +21,7 @@
       - kustomization.yaml
       - cluster/roles.yaml
       - cluster/runtimeclass.yaml
+      - cluster/namespace.yaml
   when: (version == "v1.18") or (version == "v1.22") or (version == "v1.26")
 
 # calico
