@@ -68,6 +68,16 @@
     - kube-controller-manager.yaml
     - kube-scheduler.yaml
 
+- name: 同步 kube-apiserver 策略相关文件
+  template:
+    src: "policies/{{ item }}.j2"
+    dest: /etc/kubernetes/policies/{{ item }}
+    owner: root
+    group: root
+    mode: 0600
+  with_items:
+    - admission-controls.yaml
+
 - name: 创建 kubeconfig admin.conf 文件
   template:
     src: "kubeconfig/{{ item }}.j2"

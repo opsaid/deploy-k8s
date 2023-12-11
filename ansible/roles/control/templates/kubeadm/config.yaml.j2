@@ -13,7 +13,7 @@ localAPIEndpoint:
   advertiseAddress: {{ apiserver_haip }}
   bindPort: {{ apiserver_port }}
 nodeRegistration:
-  criSocket: /var/run/containerd/containerd.sock
+  criSocket: unix:///var/run/containerd/containerd.sock
   imagePullPolicy: IfNotPresent
   name: {{ hostvars[inventory_hostname]['ip'] }}
   taints: null
@@ -247,4 +247,3 @@ nodePortAddresses:
 - {{ cluster_cidr }}
 oomScoreAdj: -999
 portRange: ""
-udpIdleTimeout: 250ms
