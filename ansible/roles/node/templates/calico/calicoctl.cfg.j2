@@ -1,3 +1,11 @@
+# 这里仅是普通用户权限，获取管理员方式：
+#
+# export DATASTORE_TYPE=kubernetes
+# export KUBECONFIG=~/.kube/config
+# mv /etc/calico/calicoctl.cfg /etc/calico/calicoctl.cfg-bak
+# calicoctl get workloadendpoints
+#
+--- 
 apiVersion: projectcalico.org/v3
 kind: CalicoAPIConfig
 metadata:
