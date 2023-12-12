@@ -3,7 +3,7 @@
 - name: 生成 k8s-system 配置
   vars:
     component: kube-system
-    version: "{{ k8s_version.split('.')[:2] | join('.') }}"
+    #version: "{{ k8s_version.split('.')[:2] | join('.') }}"
   block:
   - name: 创建 k8s system 部署相关目录
     file: path={{ item }} mode=0755 state=directory
@@ -12,7 +12,7 @@
       - /usr/local/src/addons/{{ component }}/cluster
   - name: 创建 system 部署清单
     template:
-      src: addons/{{ version }}/{{ component }}/{{ item }}.j2
+      src: addons/{{ component }}/{{ item }}.j2
       dest: /usr/local/src/addons/{{ component }}/{{ item }}
       owner: "{{ kube_user.name }}"
       group: root
@@ -26,8 +26,8 @@
 
 # calico
 - name: 生成 calico 配置
-  vars:
-    version: "{{ k8s_version.split('.')[:2] | join('.') }}"
+  #vars:
+    #version: "{{ k8s_version.split('.')[:2] | join('.') }}"
   block:
   - name: 创建 k8s calico 部署相关目录
     file: path={{ item }} mode=0755 state=directory
@@ -40,7 +40,7 @@
       - /usr/local/src/addons/calico/workloads
   - name: 创建 calico 部署清单
     template:
-      src: addons/{{ version }}/calico/{{ item }}.j2
+      src: addons/calico/{{ item }}.j2
       dest: /usr/local/src/addons/calico/{{ item }}
       owner: "{{ kube_user.name }}"
       group: root
@@ -60,7 +60,7 @@
 - name: 生成 coredns 配置
   vars:
     component: coredns
-    version: "{{ k8s_version.split('.')[:2] | join('.') }}"
+    #version: "{{ k8s_version.split('.')[:2] | join('.') }}"
   block:
   - name: 创建 k8s coredns 部署相关目录
     file: path={{ item }} mode=0755 state=directory
@@ -73,7 +73,7 @@
       - /usr/local/src/addons/{{ component }}/workloads
   - name: 创建 coredns 部署清单
     template:
-      src: addons/{{ version }}/{{ component }}/{{ item }}.j2
+      src: addons/{{ component }}/{{ item }}.j2
       dest: /usr/local/src/addons/{{ component }}/{{ item }}
       owner: "{{ kube_user.name }}"
       group: root
@@ -90,7 +90,7 @@
 - name: 生成 metrics-server 配置
   vars:
     component: metrics-server
-    version: "{{ k8s_version.split('.')[:2] | join('.') }}"
+    #version: "{{ k8s_version.split('.')[:2] | join('.') }}"
   block:
   - name: 创建 k8s metrics-server 部署相关目录
     file: path={{ item }} mode=0755 state=directory
@@ -102,7 +102,7 @@
       - /usr/local/src/addons/{{ component }}/workloads
   - name: 创建 metrics-server 部署清单
     template:
-      src: addons/{{ version }}/{{ component }}/{{ item }}.j2
+      src: addons/{{ component }}/{{ item }}.j2
       dest: /usr/local/src/addons/{{ component }}/{{ item }}
       owner: "{{ kube_user.name }}"
       group: root
@@ -119,7 +119,7 @@
 - name: 生成 kube-proxy 配置
   vars:
     component: kube-proxy
-    version: "{{ k8s_version.split('.')[:2] | join('.') }}"
+    #version: "{{ k8s_version.split('.')[:2] | join('.') }}"
   block:
   - name: 创建 k8s kube-proxy 部署相关目录
     file: path={{ item }} mode=0755 state=directory
@@ -131,7 +131,7 @@
       - /usr/local/src/addons/{{ component }}/config/configmap
   - name: 创建 kube-proxy 部署清单
     template:
-      src: addons/{{ version }}/{{ component }}/{{ item }}.j2
+      src: addons/{{ component }}/{{ item }}.j2
       dest: /usr/local/src/addons/{{ component }}/{{ item }}
       owner: "{{ kube_user.name }}"
       group: root
@@ -148,7 +148,7 @@
 - name: 生成 ingress-nginx 配置
   vars:
     component: ingress-nginx
-    version: "{{ k8s_version.split('.')[:2] | join('.') }}"
+    #version: "{{ k8s_version.split('.')[:2] | join('.') }}"
   block:
   - name: 创建 k8s ingress-nginx 部署相关目录
     file: path={{ item }} mode=0755 state=directory
@@ -161,7 +161,7 @@
       - /usr/local/src/addons/{{ component }}/config/configmap
   - name: 创建 ingress-nginx 部署清单
     template:
-      src: addons/{{ version }}/{{ component }}/{{ item }}.j2
+      src: addons/{{ component }}/{{ item }}.j2
       dest: /usr/local/src/addons/{{ component }}/{{ item }}
       owner: "{{ kube_user.name }}"
       group: root
@@ -175,4 +175,4 @@
       - workloads/daemonset.yaml
       - workloads/job.yaml
       - service/services.yaml
-  when: (version == "v1.22") or (version == "v1.26")
+  #when: (version == "v1.22") or (version == "v1.26")
