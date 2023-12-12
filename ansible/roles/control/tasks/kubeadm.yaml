@@ -28,7 +28,7 @@
 # https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/
 - name: 创建 kube-scheduler 配置文件
   template:
-    src: kube-scheduler/config-{{ k8s_version.split('.')[:2] | join('.') }}.yaml.j2
+    src: kube-scheduler/config.yaml.j2
     dest: "{{ etc_dir }}/scheduler-config.yaml"
     owner: "{{ kube_user.name }}"
     group: root
