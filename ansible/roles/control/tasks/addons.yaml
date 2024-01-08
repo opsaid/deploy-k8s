@@ -56,6 +56,30 @@
     when: network_plugin == "calico"
   #when: (version == "v1.18") or (version == "v1.22") or (version == "v1.26")
 
+- name: 生成 cilium 配置
+  block:
+  - name: 创建 k8s cilium 部署相关目录
+    file: path={{ item }} mode=0755 state=directory
+    with_items:
+      - /usr/local/src/addons/cilium
+      - /usr/local/src/addons/cilium/cluster
+      - /usr/local/src/addons/cilium/config/configmap
+      - /usr/local/src/addons/cilium/workloads
+  - name: 创建 cilium 部署清单
+    template:
+      src: addons/cilium/{{ item }}.j2
+      dest: /usr/local/src/addons/cilium/{{ item }}
+      owner: "{{ kube_user.name }}"
+      group: root
+      mode: 0644
+    with_items: 
+      - kustomization.yaml
+      - cluster/roles.yaml
+      - config/configmap/cilium-config.yaml
+      - workloads/daemonset.yaml
+      - workloads/deployment.yaml
+    when: network_plugin == "cilium"
+
 # coredns
 - name: 生成 coredns 配置
   vars:
