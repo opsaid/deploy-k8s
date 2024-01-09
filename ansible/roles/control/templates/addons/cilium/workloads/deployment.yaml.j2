@@ -57,9 +57,9 @@ spec:
               name: cilium-config
               optional: true
         - name: KUBERNETES_SERVICE_HOST
-          value: "fake.dev.173ops.com"
+          value: "{{ cluster_domain }}"
         - name: KUBERNETES_SERVICE_PORT
-          value: "6443"
+          value: "{{ apiserver_port }}"
         livenessProbe:
           httpGet:
             host: "127.0.0.1"

@@ -85,9 +85,9 @@ spec:
         - name: CILIUM_CLUSTERMESH_CONFIG
           value: /var/lib/cilium/clustermesh/
         - name: KUBERNETES_SERVICE_HOST
-          value: "fake.dev.173ops.com"
+          value: "{{ cluster_domain }}"
         - name: KUBERNETES_SERVICE_PORT
-          value: "6443"
+          value: "{{ apiserver_port }}"
         lifecycle:
           postStart:
             exec:
@@ -193,9 +193,9 @@ spec:
               apiVersion: v1
               fieldPath: metadata.namespace
         - name: KUBERNETES_SERVICE_HOST
-          value: "fake.dev.173ops.com"
+          value: "{{ cluster_domain }}"
         - name: KUBERNETES_SERVICE_PORT
-          value: "6443"
+          value: "{{ apiserver_port }}"
         volumeMounts:
         - name: tmp
           mountPath: /tmp
@@ -312,9 +312,9 @@ spec:
               key: clean-cilium-bpf-state
               optional: true
         - name: KUBERNETES_SERVICE_HOST
-          value: "fake.dev.173ops.com"
+          value: "{{ cluster_domain }}"
         - name: KUBERNETES_SERVICE_PORT
-          value: "6443"
+          value: "{{ apiserver_port }}"
         terminationMessagePolicy: FallbackToLogsOnError
         securityContext:
           seLinuxOptions:

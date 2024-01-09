@@ -108,8 +108,10 @@ data:
   routing-mode: "native"
   tunnel-protocol: "vxlan"
   
-  ipv4-native-routing-cidr: "192.168.201.0/24"
-
+  # 宿主管理网段地址，当使用 routing-mode=native 时，容器路由同个这些地址实现路由
+  ipv4-native-routing-cidr: "{{ node_port_addresses[0] }}"
+  # List of devices used to attach bpf_host.o (implements BPF NodePort, host-firewall and BPF masquerading)
+  #devices: "eth0"
 
   # Enables L7 proxy for L7 policy enforcement and visibility
   enable-l7-proxy: "true"
