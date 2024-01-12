@@ -1,0 +1,11 @@
+cluster-name: default
+peer-service: "hubble-peer.kube-system.svc.{{ cluster_domain }}:80"
+listen-address: :4245
+gops: true
+gops-port: "9893"
+dial-timeout:
+retry-timeout:
+sort-buffer-len-max:
+sort-buffer-drain-timeout:
+disable-client-tls: true
+disable-server-tls: true

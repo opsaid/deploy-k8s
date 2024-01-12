@@ -9,8 +9,22 @@ commonLabels:
   app.kubernetes.io/part-of: cilium
   app.kubernetes.io/managed-by: kustomize
 
+configMapGenerator:
+- name: hubble-relay-config
+  files:
+  - config.yaml=config/configmap/hubble-relay-config.yaml
+  options:
+    disableNameSuffixHash: true
+- name: hubble-ui-nginx
+  files:
+  - nginx.conf=config/configmap/hubble-ui-nginx.config
+  options:
+    disableNameSuffixHash: true
+
 resources:
 - cluster/roles.yaml
+- cluster/hubble.yaml
 - config/configmap/cilium-config.yaml
+- service/hubble.yaml
 - workloads/daemonset.yaml
 - workloads/deployment.yaml

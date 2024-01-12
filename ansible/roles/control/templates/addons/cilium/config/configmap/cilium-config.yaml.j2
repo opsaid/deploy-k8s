@@ -105,12 +105,12 @@ data:
   #   - disabled
   #   - vxlan (default)
   #   - geneve
+  #routing-mode: "tunnel"
   routing-mode: "native"
-  tunnel-protocol: "vxlan"
-  
+  #tunnel-protocol: "disabled"
+
   # 宿主管理网段地址，当使用 routing-mode=native 时，容器路由同个这些地址实现路由
   ipv4-native-routing-cidr: "{{ node_port_addresses[0] }}"
-  # List of devices used to attach bpf_host.o (implements BPF NodePort, host-firewall and BPF masquerading)
   #devices: "eth0"
 
   # Enables L7 proxy for L7 policy enforcement and visibility
@@ -124,7 +124,8 @@ data:
   enable-xt-socket-fallback: "true"
   install-no-conntrack-iptables-rules: "false"
 
-  auto-direct-node-routes: "false"
+  # 当 routing-mode=native 且未使用外部 bgp 发布路由时，可开启宿主自动添加至对端 POD 路由
+  auto-direct-node-routes: "true"
   enable-local-redirect-policy: "false"
 
   kube-proxy-replacement: "strict"
@@ -153,17 +154,17 @@ data:
   hubble-socket-path: "/var/run/cilium/hubble.sock"
 
   # An additional address for Hubble server to listen to (e.g. ":4244").
-  #hubble-listen-address: ":4244"
-  #hubble-disable-tls: "false"
+  hubble-listen-address: ":4244"
+  hubble-disable-tls: "true"
   #hubble-tls-cert-file: /var/lib/cilium/tls/hubble/server.crt
   #hubble-tls-key-file: /var/lib/cilium/tls/hubble/server.key
   #hubble-tls-client-ca-files: /var/lib/cilium/tls/hubble/client-ca.crt
 
   ipam: "cluster-pool"
   ipam-cilium-node-update-rate: "15s"
-  cluster-pool-ipv4-cidr: "10.0.0.0/8"
-  cluster-pool-ipv4-mask-size: "24"
-  disable-cnp-status-updates: "true"
+  cluster-pool-ipv4-cidr: "{{ cluster_cidr }}"
+  cluster-pool-ipv4-mask-size: "{{ node_cidr_mask }}"
+  disable-cnp-status-updates: "false"
   cnp-node-status-gc-interval: "0s"
   egress-gateway-reconciliation-trigger-interval: "1s"
   enable-vtep: "false"
