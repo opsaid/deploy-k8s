@@ -20,10 +20,16 @@ configMapGenerator:
   - nginx.conf=config/configmap/hubble-ui-nginx.config
   options:
     disableNameSuffixHash: true
+- name: cilium-envoy-config
+  files:
+  - bootstrap-config.json=config/configmap/bootstrap-config.json
+  options:
+    disableNameSuffixHash: true
 
 resources:
 - cluster/roles.yaml
 - cluster/hubble.yaml
+- cluster/envoy.yaml
 - config/configmap/cilium-config.yaml
 - service/hubble.yaml
 - workloads/daemonset.yaml
