@@ -1,0 +1,57 @@
+---
+
+- stat:
+    path: /usr/local/bin/calicoctl
+  register: calicoctl
+- stat:
+    path: /usr/local/bin/cilium
+  register: cilium
+- stat:
+    path: /usr/local/bin/hubble
+  register: hubble
+
+- name: 拷贝 calico cli 工具
+  block:
+  - name: 创建 calico 相关目录
+    file: path={{ item }} mode=0755 state=directory
+    with_items:
+      - /etc/calico
+  - name: 创建 {{ role_name }} 相关配置
+    template:
+      src: calico/{{ item }}.j2
+      dest: /etc/calico/{{ item }}
+      owner: root
+      group: root
+      mode: 0644
+      backup: no
+    with_items:
+      - calicoctl.cfg
+  - name: 拷贝 calicoctl 二进制文件
+    copy:
+      src: ../../binary/files/calico/bin/calicoctl-linux-amd64
+      dest: /usr/local/bin/calicoctl
+      owner: root
+      group: root
+      mode: 0755
+    when: calicoctl.stat.exists == False
+  when: network_plugin == "calico"
+
+- name: 拷贝 calico cli 工具
+  block:
+  - name: 拷贝 cilium 二进制文件
+    copy:
+     src: ../../binary/files/cilium/bin/cilium
+     dest: /usr/local/bin/cilium
+     owner: root
+     group: root
+     mode: 0755
+    when: cilium.stat.exists == False
+  - name: 拷贝 hubble 二进制文件
+    copy:
+      src: ../../binary/files/cilium/bin/hubble
+      dest: /usr/local/bin/hubble
+      owner: root
+      group: root
+      mode: 0755
+    when: hubble.stat.exists == False
+  when: network_plugin == "cilium"

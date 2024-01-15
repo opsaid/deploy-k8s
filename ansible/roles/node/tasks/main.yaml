@@ -14,5 +14,4 @@
 - import_tasks: kubelet.yaml
 - import_tasks: kubectl.yaml
 - import_tasks: kubeadm.yaml
-- import_tasks: calicoctl.yaml
-  when: network_plugin == "calico"
+- import_tasks: network.yaml

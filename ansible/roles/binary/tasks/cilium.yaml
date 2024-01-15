@@ -1,0 +1,63 @@
+---
+
+- stat:
+    path: roles/binary/files/cilium/bin/cilium
+  register: binary_cilium
+
+- stat:
+    path: roles/binary/files/cilium/bin/hubble
+  register: binary_hubble
+
+- name: 获取官方 cilium relases 安装包
+  block:
+  - name: 创建 cilium 二进制存放目录
+    file: path={{ item }} mode=0755 state=directory
+    with_items:
+      - "roles/binary/files/cilium/bin"
+  - name: 下载 cilium-linux-{{ server_arch }}.tar.gz
+    get_url:
+      url: https://github.com/cilium/cilium-cli/releases/download/{{ network.cilium.cli }}/cilium-linux-{{ server_arch }}.tar.gz
+      dest: "{{ temp_dir }}/cilium-linux-{{ server_arch }}.tar.gz"
+  - name: 解压 cilium-linux-{{ server_arch }}.tar.gz 至 {{ temp_dir }}
+    unarchive:
+      src: "{{ temp_dir }}/cilium-linux-{{ server_arch }}.tar.gz"
+      dest: "{{ temp_dir }}"
+  - stat:
+      path: "{{ temp_dir }}/cilium"
+    register: tmp_cilium
+    ignore_errors: True
+  - name: 拷贝 "{{ temp_dir }}/cilium" 文件
+    copy:
+      src: "{{ temp_dir }}/cilium"
+      dest: roles/binary/files/cilium/bin/cilium
+      mode: 0755
+    when: (tmp_cilium.stat.exists) and (tmp_cilium.stat.isreg)
+    ignore_errors: True
+  when: not binary_cilium.stat.exists
+
+- name: 获取官方 hubble relases 安装包
+  block:
+  - name: 创建 hubble 二进制存放目录
+    file: path={{ item }} mode=0755 state=directory
+    with_items:
+      - "roles/binary/files/cilium/bin"
+  - name: 下载 hubble-linux-{{ server_arch }}.tar.gz
+    get_url:
+      url: https://github.com/cilium/hubble/releases/download/{{ network.hubble.cli }}/hubble-linux-{{ server_arch }}.tar.gz
+      dest: "{{ temp_dir }}/hubble-linux-{{ server_arch }}.tar.gz"
+  - name: 解压 hubble-linux-{{ server_arch }}.tar.gz 至 {{ temp_dir }}
+    unarchive:
+      src: "{{ temp_dir }}/hubble-linux-{{ server_arch }}.tar.gz"
+      dest: "{{ temp_dir }}"
+  - stat:
+      path: "{{ temp_dir }}/hubble"
+    register: tmp_hubble
+    ignore_errors: True
+  - name: 拷贝 "{{ temp_dir }}/hubble" 文件
+    copy:
+      src: "{{ temp_dir }}/hubble"
+      dest: roles/binary/files/cilium/bin/hubble
+      mode: 0755
+    when: (tmp_hubble.stat.exists) and (tmp_hubble.stat.isreg)
+    ignore_errors: True
+  when: not binary_hubble.stat.exists
