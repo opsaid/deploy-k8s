@@ -85,6 +85,7 @@ spec:
     - mountPath: {{ etc_dir }}/known_tokens.csv
       name: tokenconfig
       readOnly: true
+  dnsPolicy: ClusterFirstWithHostNet
   hostNetwork: true
   priorityClassName: system-node-critical
   securityContext:
