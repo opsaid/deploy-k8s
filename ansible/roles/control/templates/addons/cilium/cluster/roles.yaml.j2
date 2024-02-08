@@ -1,16 +1,45 @@
 ---
+# Source: cilium/templates/cilium-agent/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: cilium
+  name: "cilium"
+  namespace: kube-system
 
 ---
+# Source: cilium/templates/cilium-envoy/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: cilium-operator
+  name: "cilium-envoy"
+  namespace: kube-system
 
 ---
+# Source: cilium/templates/cilium-operator/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "cilium-operator"
+  namespace: kube-system
+
+---
+# Source: cilium/templates/hubble-relay/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "hubble-relay"
+  namespace: kube-system
+
+---
+# Source: cilium/templates/hubble-ui/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "hubble-ui"
+  namespace: kube-system
+
+---
+# Source: cilium/templates/cilium-agent/clusterrole.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -121,6 +150,7 @@ rules:
   - patch
 
 ---
+# Source: cilium/templates/cilium-operator/clusterrole.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -335,7 +365,6 @@ rules:
   - create
   - get
   - update
-# if .Values.ingressController.enabled
 - apiGroups:
   - networking.k8s.io
   resources:
@@ -353,6 +382,54 @@ rules:
   - update
 
 ---
+# Source: cilium/templates/hubble-ui/clusterrole.yaml
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: hubble-ui
+  labels:
+    app.kubernetes.io/part-of: cilium
+rules:
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - networkpolicies
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - componentstatuses
+  - endpoints
+  - namespaces
+  - nodes
+  - pods
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - cilium.io
+  resources:
+  - "*"
+  verbs:
+  - get
+  - list
+  - watch
+
+---
+# Source: cilium/templates/cilium-agent/clusterrolebinding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -369,6 +446,7 @@ subjects:
   namespace: kube-system
 
 ---
+# Source: cilium/templates/cilium-operator/clusterrolebinding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -382,6 +460,23 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: "cilium-operator"
+  namespace: kube-system
+
+---
+# Source: cilium/templates/hubble-ui/clusterrolebinding.yaml
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: hubble-ui
+  labels:
+    app.kubernetes.io/part-of: cilium
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: hubble-ui
+subjects:
+- kind: ServiceAccount
+  name: "hubble-ui"
   namespace: kube-system
 
 ---
@@ -404,6 +499,45 @@ rules:
   - watch
 
 ---
+# Source: cilium/templates/cilium-agent/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cilium-ingress-secrets
+  namespace: "cilium-secrets"
+  labels:
+    app.kubernetes.io/part-of: cilium
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
+
+---
+# Source: cilium/templates/cilium-operator/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cilium-operator-ingress-secrets
+  namespace: "cilium-secrets"
+  labels:
+    app.kubernetes.io/part-of: cilium
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+  - delete
+  - update
+  - patch
+
+---
 # Source: cilium/templates/cilium-agent/rolebinding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -419,4 +553,40 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: "cilium"
+    namespace: kube-system
+
+---
+# Source: cilium/templates/cilium-agent/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cilium-secrets
+  namespace: "cilium-secrets"
+  labels:
+    app.kubernetes.io/part-of: cilium
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cilium-ingress-secrets
+subjects:
+  - kind: ServiceAccount
+    name: "cilium"
+    namespace: kube-system
+
+---
+# Source: cilium/templates/cilium-operator/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cilium-operator-ingress-secrets
+  namespace: "cilium-secrets"
+  labels:
+    app.kubernetes.io/part-of: cilium
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cilium-operator-ingress-secrets
+subjects:
+  - kind: ServiceAccount
+    name: "cilium-operator"
     namespace: kube-system

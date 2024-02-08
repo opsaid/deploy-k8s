@@ -76,14 +76,15 @@
     with_items: 
       - kustomization.yaml
       - cluster/roles.yaml
-      - cluster/hubble.yaml
-      - cluster/envoy.yaml
+      #- cluster/hubble.yaml
+      #- cluster/envoy.yaml
       - cluster/namespace.yaml
       - config/configmap/cilium-config.yaml
       - config/configmap/hubble-relay-config.yaml
       - config/configmap/hubble-ui-nginx.config
       - config/configmap/bootstrap-config.json
-      - service/hubble.yaml
+      - service/services.yaml
+      - service/ingresses.yaml
       - workloads/daemonset.yaml
       - workloads/deployment.yaml
   when: network_plugin == "cilium"

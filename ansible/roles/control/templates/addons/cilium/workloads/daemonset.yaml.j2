@@ -3,10 +3,15 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   labels:
+    k8s-app: cilium
     app.kubernetes.io/instance: cilium
     app.kubernetes.io/name: cilium-agent
   name: cilium
+  namespace: kube-system
 spec:
+  selector:
+    matchLabels:
+      k8s-app: cilium
   updateStrategy:
     rollingUpdate:
       maxUnavailable: 2
@@ -24,6 +29,8 @@ spec:
       labels:
         # cilium status 依赖这个标签查询 pod 状态
         k8s-app: cilium
+        app.kubernetes.io/name: cilium-agent
+        app.kubernetes.io/part-of: cilium
     spec:
       containers:
       - name: cilium-agent
@@ -423,6 +430,11 @@ spec:
         hostPath:
           path: /run/xtables.lock
           type: FileOrCreate
+      # Sharing socket with Cilium Envoy on the same node by using a host path
+      - name: envoy-sockets
+        hostPath:
+          path: "/var/run/cilium/envoy/sockets"
+          type: DirectoryOrCreate
         # To read the clustermesh configuration
       - name: clustermesh-secrets
         projected:

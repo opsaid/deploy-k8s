@@ -1,4 +1,51 @@
 ---
+# Source: cilium/templates/cilium-envoy/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: cilium-envoy
+  namespace: kube-system
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9964"
+  labels:
+    k8s-app: cilium-envoy
+    app.kubernetes.io/name: cilium-envoy
+    app.kubernetes.io/part-of: cilium
+    io.cilium/app: proxy
+spec:
+  clusterIP: None
+  type: ClusterIP
+  selector:
+    k8s-app: cilium-envoy
+  ports:
+  - name: envoy-metrics
+    port: 9964
+    protocol: TCP
+    targetPort: envoy-metrics
+
+---
+# Source: cilium/templates/cilium-ingress-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: cilium-ingress
+  namespace: kube-system
+  labels:
+    cilium.io/ingress: "true"
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    nodePort: 30080
+  - name: https
+    port: 443
+    protocol: TCP
+    nodePort: 30443
+  type: NodePort
+
+---
 # Source: cilium/templates/hubble-relay/service.yaml
 kind: Service
 apiVersion: v1
@@ -19,6 +66,7 @@ spec:
     targetPort: 4245
 
 ---
+
 # Source: cilium/templates/hubble-ui/service.yaml
 kind: Service
 apiVersion: v1
@@ -30,7 +78,7 @@ metadata:
     app.kubernetes.io/name: hubble-ui
     app.kubernetes.io/part-of: cilium
 spec:
-  type: NodePort
+  type: "ClusterIP"
   selector:
     k8s-app: hubble-ui
   ports:
@@ -58,3 +106,4 @@ spec:
     protocol: TCP
     targetPort: 4244
   internalTrafficPolicy: Local
+
