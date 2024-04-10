@@ -4,13 +4,13 @@
 - name: 创建 kubeadm 相关目录
   file: path={{ item }} mode=0755 state=directory
   with_items:
-    - /usr/local/src/kubeadm
-    - /usr/local/src/kubeadm/patches
+    - "{{ etc_dir }}/kubeadm"
+    - "{{ etc_dir }}/kubeadm/patches"
 
 - name: 创建 kubeadm config.yaml
   template:
     src: kubeadm/config.yaml.j2
-    dest: /usr/local/src/kubeadm/config.yaml
+    dest: "{{ etc_dir }}/kubeadm/config.yaml"
     owner: "{{ kube_user.name }}"
     group: root
     mode: 0644
@@ -18,7 +18,7 @@
 - name: 创建 kubeadm control patches
   template:
     src: "kubeadm/patches/{{ item }}.j2"
-    dest: /usr/local/src/kubeadm/patches/{{ item }}
+    dest: "{{ etc_dir }}/kubeadm/patches/{{ item }}"
     owner: "{{ kube_user.name }}"
     group: root
     mode: 0644

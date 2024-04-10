@@ -18,7 +18,7 @@ nodeRegistration:
   name: {{ hostvars[inventory_hostname]['ip'] }}
   taints: null
 patches:
-  directory: /usr/local/src/kubeadm/patches/
+  directory: {{ etc_dir }}/kubeadm/patches/
 
 ---
 apiVersion: kubeadm.k8s.io/v1beta3
