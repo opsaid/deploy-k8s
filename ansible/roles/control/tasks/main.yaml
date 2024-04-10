@@ -5,12 +5,7 @@
   file: path={{ item }} mode=0755 state=directory
   with_items:
     - /root/.kube
-    - /usr/local/src/addons
-    - /usr/local/src/addons/calico
-    - /usr/local/src/addons/coredns
-    - /usr/local/src/addons/kube-proxy
-    - /usr/local/src/addons/kube-system
-    - /usr/local/src/addons/metrics-server
+    - "{{ etc_dir }}/addons"
     - "{{ data_dir }}/kubelet/pki"
 
 - import_tasks: certs.yaml

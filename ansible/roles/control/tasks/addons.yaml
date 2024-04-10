@@ -8,12 +8,12 @@
   - name: 创建 k8s system 部署相关目录
     file: path={{ item }} mode=0755 state=directory
     with_items:
-      - /usr/local/src/addons/{{ component }}
-      - /usr/local/src/addons/{{ component }}/cluster
+      - "{{ etc_dir }}/addons/{{ component }}"
+      - "{{ etc_dir }}/addons/{{ component }}/cluster"
   - name: 创建 system 部署清单
     template:
       src: addons/{{ component }}/{{ item }}.j2
-      dest: /usr/local/src/addons/{{ component }}/{{ item }}
+      dest: "{{ etc_dir }}/addons/{{ component }}/{{ item }}"
       owner: "{{ kube_user.name }}"
       group: root
       mode: 0644
@@ -32,16 +32,16 @@
   - name: 创建 k8s calico 部署相关目录
     file: path={{ item }} mode=0755 state=directory
     with_items:
-      - /usr/local/src/addons/calico
-      - /usr/local/src/addons/calico/cluster
-      - /usr/local/src/addons/calico/cluster
-      - /usr/local/src/addons/calico/config/configmap
-      - /usr/local/src/addons/calico/crds
-      - /usr/local/src/addons/calico/workloads
+      - "{{ etc_dir }}/addons/calico"
+      - "{{ etc_dir }}/addons/calico/cluster"
+      - "{{ etc_dir }}/addons/calico/cluster"
+      - "{{ etc_dir }}/addons/calico/config/configmap"
+      - "{{ etc_dir }}/addons/calico/crds"
+      - "{{ etc_dir }}/addons/calico/workloads"
   - name: 创建 calico 部署清单
     template:
       src: addons/calico/{{ item }}.j2
-      dest: /usr/local/src/addons/calico/{{ item }}
+      dest: "{{ etc_dir }}/calico/{{ item }}"
       owner: "{{ kube_user.name }}"
       group: root
       mode: 0644
@@ -61,23 +61,21 @@
   - name: 创建 k8s cilium 部署相关目录
     file: path={{ item }} mode=0755 state=directory
     with_items:
-      - /usr/local/src/addons/cilium
-      - /usr/local/src/addons/cilium/cluster
-      - /usr/local/src/addons/cilium/service
-      - /usr/local/src/addons/cilium/config/configmap
-      - /usr/local/src/addons/cilium/workloads
+      - "{{ etc_dir }}/addons/cilium"
+      - "{{ etc_dir }}/addons/cilium/cluster"
+      - "{{ etc_dir }}/addons/cilium/service"
+      - "{{ etc_dir }}/addons/cilium/config/configmap"
+      - "{{ etc_dir }}/addons/cilium/workloads"
   - name: 创建 cilium 部署清单
     template:
       src: addons/cilium/{{ item }}.j2
-      dest: /usr/local/src/addons/cilium/{{ item }}
+      dest: "{{ etc_dir }}/addons/cilium/{{ item }}"
       owner: "{{ kube_user.name }}"
       group: root
       mode: 0644
     with_items: 
       - kustomization.yaml
       - cluster/roles.yaml
-      #- cluster/hubble.yaml
-      #- cluster/envoy.yaml
       - cluster/namespace.yaml
       - config/configmap/cilium-config.yaml
       - config/configmap/hubble-relay-config.yaml
@@ -98,16 +96,16 @@
   - name: 创建 k8s coredns 部署相关目录
     file: path={{ item }} mode=0755 state=directory
     with_items:
-      - /usr/local/src/addons/{{ component }}
-      - /usr/local/src/addons/{{ component }}/cluster
-      - /usr/local/src/addons/{{ component }}/cluster
-      - /usr/local/src/addons/{{ component }}/config/configmap
-      - /usr/local/src/addons/{{ component }}/service
-      - /usr/local/src/addons/{{ component }}/workloads
+      - "{{ etc_dir }}/addons/{{ component }}"
+      - "{{ etc_dir }}/addons/{{ component }}/cluster"
+      - "{{ etc_dir }}/addons/{{ component }}/cluster"
+      - "{{ etc_dir }}/addons/{{ component }}/config/configmap"
+      - "{{ etc_dir }}/addons/{{ component }}/service"
+      - "{{ etc_dir }}/addons/{{ component }}/workloads"
   - name: 创建 coredns 部署清单
     template:
       src: addons/{{ component }}/{{ item }}.j2
-      dest: /usr/local/src/addons/{{ component }}/{{ item }}
+      dest: "{{ etc_dir }}/addons/{{ component }}/{{ item }}"
       owner: "{{ kube_user.name }}"
       group: root
       mode: 0644
@@ -128,15 +126,15 @@
   - name: 创建 k8s metrics-server 部署相关目录
     file: path={{ item }} mode=0755 state=directory
     with_items:
-      - /usr/local/src/addons/{{ component }}
-      - /usr/local/src/addons/{{ component }}/crds
-      - /usr/local/src/addons/{{ component }}/cluster
-      - /usr/local/src/addons/{{ component }}/service
-      - /usr/local/src/addons/{{ component }}/workloads
+      - "{{ etc_dir }}/addons/{{ component }}"
+      - "{{ etc_dir }}/addons/{{ component }}/crds"
+      - "{{ etc_dir }}/addons/{{ component }}/cluster"
+      - "{{ etc_dir }}/addons/{{ component }}/service"
+      - "{{ etc_dir }}/addons/{{ component }}/workloads"
   - name: 创建 metrics-server 部署清单
     template:
       src: addons/{{ component }}/{{ item }}.j2
-      dest: /usr/local/src/addons/{{ component }}/{{ item }}
+      dest: "{{ etc_dir }}/addons/{{ component }}/{{ item }}"
       owner: "{{ kube_user.name }}"
       group: root
       mode: 0644
@@ -157,15 +155,15 @@
   - name: 创建 k8s kube-proxy 部署相关目录
     file: path={{ item }} mode=0755 state=directory
     with_items:
-      - /usr/local/src/addons/{{ component }}
-      - /usr/local/src/addons/{{ component }}/cluster
-      - /usr/local/src/addons/{{ component }}/workloads
-      - /usr/local/src/addons/{{ component }}/config
-      - /usr/local/src/addons/{{ component }}/config/configmap
+      - "{{ etc_dir }}/addons/{{ component }}"
+      - "{{ etc_dir }}/addons/{{ component }}/cluster"
+      - "{{ etc_dir }}/addons/{{ component }}/workloads"
+      - "{{ etc_dir }}/addons/{{ component }}/config"
+      - "{{ etc_dir }}/addons/{{ component }}/config/configmap"
   - name: 创建 kube-proxy 部署清单
     template:
       src: addons/{{ component }}/{{ item }}.j2
-      dest: /usr/local/src/addons/{{ component }}/{{ item }}
+      dest: "{{ etc_dir }}/addons/{{ component }}/{{ item }}"
       owner: "{{ kube_user.name }}"
       group: root
       mode: 0644
@@ -186,16 +184,16 @@
   - name: 创建 k8s ingress-nginx 部署相关目录
     file: path={{ item }} mode=0755 state=directory
     with_items:
-      - /usr/local/src/addons/{{ component }}
-      - /usr/local/src/addons/{{ component }}/cluster
-      - /usr/local/src/addons/{{ component }}/service
-      - /usr/local/src/addons/{{ component }}/workloads
-      - /usr/local/src/addons/{{ component }}/config
-      - /usr/local/src/addons/{{ component }}/config/configmap
+      - "{{ etc_dir }}/addons/{{ component }}"
+      - "{{ etc_dir }}/addons/{{ component }}/cluster"
+      - "{{ etc_dir }}/addons/{{ component }}/service"
+      - "{{ etc_dir }}/addons/{{ component }}/workloads"
+      - "{{ etc_dir }}/addons/{{ component }}/config"
+      - "{{ etc_dir }}/addons/{{ component }}/config/configmap"
   - name: 创建 ingress-nginx 部署清单
     template:
       src: addons/{{ component }}/{{ item }}.j2
-      dest: /usr/local/src/addons/{{ component }}/{{ item }}
+      dest: "{{ etc_dir }}/addons/{{ component }}/{{ item }}"
       owner: "{{ kube_user.name }}"
       group: root
       mode: 0644
