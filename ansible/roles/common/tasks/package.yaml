@@ -32,17 +32,17 @@
   when: disable_swap == True
 
 # centos7默认使用firewalld管理iptable，卸载以防冲突
-- name: 卸载 firewalld 相关安装包
-  package: 
-    name: ['firewalld', 'python-firewall', 'firewalld-filesystem']
-    state: absent
-
-- name: 卸载基础软件包（centos/redhat）
-  package: 
-    name: ['postfix']
-    state: absent
-  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
-
+#- name: 卸载 firewalld 相关安装包
+#  package: 
+#    name: ['firewalld', 'python-firewall', 'firewalld-filesystem']
+#    state: absent
+#
+#- name: 卸载基础软件包（centos/redhat）
+#  package: 
+#    name: ['postfix']
+#    state: absent
+#  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+#
 # 关闭非必要服务
 #- name: stop unused service
 #  systemd:
@@ -51,18 +51,32 @@
 #    state: stopped
 #  with_items:
 #   - rpcbind.socket
-
+#
 # socat 在work节点端口转发时候会用到
 # debian不存在 libseccomp
-- name: 安装基础软件包（centos/redhat）
-  package: 
-    name: ['vim', 'net-tools', 'libseccomp', 'iproute', 'chrony', 'conntrack-tools', 'socat']
-    state: latest
-  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+#- name: 安装基础软件包（centos/redhat）
+#  package: 
+#    name: ['vim', 'net-tools', 'libseccomp', 'iproute', 'chrony', 'conntrack-tools', 'socat']
+#    state: latest
+#  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+# socat 用于 worker 节点端口转发使用(helm)
+# ipvsadm 用于 ProxyMode=lvs 下，管理查看条目方便
+#- name: 安装基础软件包
+#  package:
+#    name: ['socat', 'ipvsadm', 'iptables']
+#    state: latest
+
 - name: 安装基础软件包（debian/ubuntu）
   package: 
-    name: ['vim', 'net-tools', 'libseccomp-dev', 'iproute2', 'chrony', 'conntrack']
+    name: ['socat', 'ipvsadm', 'iptables', 'vim', 'net-tools', 'libseccomp-dev', 'iproute2', 'chrony', 'conntrack', 'avahi-daemon']
     state: latest
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: 卸载基础软件包（ubuntu/debian）
+  package: 
+    name: ['avahi-daemon', 'cups-browsed']
+    state: absent
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 # 关闭默认启动服务
@@ -78,13 +92,6 @@
    - systemd-resolved
   ignore_errors: yes
   when: ansible_distribution == 'Ubuntu'
-
-# socat 用于 worker 节点端口转发使用(helm)
-# ipvsadm 用于 ProxyMode=lvs 下，管理查看条目方便
-- name: 安装基础软件包
-  package:
-    name: ['socat', 'ipvsadm', 'iptables']
-    state: latest
 
 # 时间同步
 - name: chrony
