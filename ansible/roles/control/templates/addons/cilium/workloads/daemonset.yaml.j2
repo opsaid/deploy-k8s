@@ -34,7 +34,7 @@ spec:
     spec:
       containers:
       - name: cilium-agent
-        image: "registry.cn-hangzhou.aliyuncs.com/opsaid/cilium:v1.14.5"
+        image: "{{ internal_images.namespace }}/cilium:v1.14.5"
         imagePullPolicy: IfNotPresent
         command:
         - cilium-agent
@@ -183,7 +183,7 @@ spec:
           mountPath: /tmp
       initContainers:
       - name: config
-        image: "registry.cn-hangzhou.aliyuncs.com/opsaid/cilium:v1.14.5"
+        image: "{{ internal_images.namespace }}/cilium:v1.14.5"
         imagePullPolicy: IfNotPresent
         command:
         - cilium
@@ -210,7 +210,7 @@ spec:
       # Required to mount cgroup2 filesystem on the underlying Kubernetes node.
       # We use nsenter command with host's cgroup and mount namespaces enabled.
       - name: mount-cgroup
-        image: "registry.cn-hangzhou.aliyuncs.com/opsaid/cilium:v1.14.5"
+        image: "{{ internal_images.namespace }}/cilium:v1.14.5"
         imagePullPolicy: IfNotPresent
         env:
         - name: CGROUP_ROOT
@@ -247,7 +247,7 @@ spec:
             drop:
               - ALL
       - name: apply-sysctl-overwrites
-        image: "registry.cn-hangzhou.aliyuncs.com/opsaid/cilium:v1.14.5"
+        image: "{{ internal_images.namespace }}/cilium:v1.14.5"
         imagePullPolicy: IfNotPresent
         env:
         - name: BIN_PATH
@@ -285,7 +285,7 @@ spec:
       # from a privileged container because the mount propagation bidirectional
       # only works from privileged containers.
       - name: mount-bpf-fs
-        image: "registry.cn-hangzhou.aliyuncs.com/opsaid/cilium:v1.14.5"
+        image: "{{ internal_images.namespace }}/cilium:v1.14.5"
         imagePullPolicy: IfNotPresent
         args:
         - 'mount | grep "/sys/fs/bpf type bpf" || mount -t bpf bpf /sys/fs/bpf'
@@ -301,7 +301,7 @@ spec:
           mountPath: /sys/fs/bpf
           mountPropagation: Bidirectional
       - name: clean-cilium-state
-        image: "registry.cn-hangzhou.aliyuncs.com/opsaid/cilium:v1.14.5"
+        image: "{{ internal_images.namespace }}/cilium:v1.14.5"
         imagePullPolicy: IfNotPresent
         command:
         - /init-container.sh
@@ -350,7 +350,7 @@ spec:
             memory: 100Mi # wait-for-kube-proxy
       # Install the CNI binaries in an InitContainer so we don't have a writable host mount in the agent
       - name: install-cni-binaries
-        image: "registry.cn-hangzhou.aliyuncs.com/opsaid/cilium:v1.14.5"
+        image: "{{ internal_images.namespace }}/cilium:v1.14.5"
         imagePullPolicy: IfNotPresent
         command:
           - "/install-plugin.sh"
@@ -519,7 +519,7 @@ spec:
     spec:
       containers:
       - name: cilium-envoy
-        image: "registry.cn-hangzhou.aliyuncs.com/opsaid/cilium-envoy:v1.26.6"
+        image: "{{ internal_images.namespace }}/cilium-envoy:v1.26.6"
         imagePullPolicy: IfNotPresent
         command:
         - /usr/bin/cilium-envoy
