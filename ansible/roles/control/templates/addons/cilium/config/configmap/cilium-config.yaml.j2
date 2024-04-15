@@ -30,7 +30,7 @@ data:
 
   enable-envoy-config: "true"
 
-  bpf-lb-dev-ip-addr-inherit: "{{ hostvars[inventory_hostname]['ip'] }}"
+  # bpf-lb-dev-ip-addr-inherit: "{{ hostvars[inventory_hostname]['ip'] }}"
 
   enable-ingress-controller: "true"
   enforce-ingress-https: "true"
@@ -118,7 +118,8 @@ data:
   # enable-runtime-device-detection: "true"
 
   kube-proxy-replacement: "true"
-  kube-proxy-replacement-healthz-bind-address: "{{ hostvars[inventory_hostname]['ip'] }}:10256"
+  # kube-proxy-replacement-healthz-bind-address: "{{ hostvars[inventory_hostname]['ip'] }}:10256"
+  kube-proxy-replacement-healthz-bind-address: "127.0.0.1:10256"
 
   bpf-lb-sock: "false"
 
@@ -156,7 +157,8 @@ data:
 
   enable-hubble: "true"
   hubble-socket-path: "/var/run/cilium/hubble.sock"
-  hubble-listen-address: "{{ hostvars[inventory_hostname]['ip'] }}:4244"
+  # hubble-listen-address: "{{ hostvars[inventory_hostname]['ip'] }}:4244"
+  hubble-listen-address: "127.0.0.1:4244"
   hubble-disable-tls: "true"
   #hubble-tls-cert-file: /var/lib/cilium/tls/hubble/server.crt
   #hubble-tls-key-file: /var/lib/cilium/tls/hubble/server.key
