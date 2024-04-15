@@ -19,6 +19,7 @@
   - binary
   vars_files:
   - group_vars/default.yaml
+  - group_vars/cloud-provider/{{ cloud_provider }}.yaml
   - group_vars/component-{{ k8s_version.split('.')[:2] | join('.') }}.yaml
 
 - name: 针对所有节点实现公共基础配置
@@ -30,6 +31,7 @@
   - common
   vars_files:
   - group_vars/default.yaml
+  - group_vars/cloud-provider/{{ cloud_provider }}.yaml
 
 - name: 部署K8S控制平面节点
   hosts: kube_control_plane
@@ -42,6 +44,7 @@
   - node
   vars_files:
   - group_vars/default.yaml
+  - group_vars/cloud-provider/{{ cloud_provider }}.yaml
   - group_vars/component-{{ k8s_version.split('.')[:2] | join('.') }}.yaml
 
 - name: 部署K8S工作负载节点
@@ -54,6 +57,7 @@
   - node
   vars_files:
   - group_vars/default.yaml
+  - group_vars/cloud-provider/{{ cloud_provider }}.yaml
   - group_vars/component-{{ k8s_version.split('.')[:2] | join('.') }}.yaml
 
 - name: 卸载节点

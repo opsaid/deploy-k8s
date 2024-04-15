@@ -13,3 +13,4 @@
   template:
     src: resolv.conf.j2
     dest: "{{ host_resolv_conf.path }}"
+  when: host_resolv_conf is defined

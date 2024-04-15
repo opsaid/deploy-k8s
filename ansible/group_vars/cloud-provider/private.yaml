@@ -1,0 +1,7 @@
+
+# 宿主使用的 dns 配置
+host_resolv_conf:
+  path: "/etc/resolv.conf"
+  servers:
+    - 223.5.5.5
+    - 223.6.6.6
