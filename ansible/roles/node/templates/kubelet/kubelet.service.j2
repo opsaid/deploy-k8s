@@ -10,6 +10,7 @@ After=network-online.target
 WorkingDirectory={{ data_dir }}/kubelet
 EnvironmentFile=-/etc/default/kubelet
 EnvironmentFile=-{{ data_dir }}/kubelet/kubeadm-flags.env
+EnvironmentFile=-{{ data_dir }}/kubelet/cloud_provider.env
 ExecStart={{ install_dir }}/kubelet $KUBELET_KUBECONFIG_ARGS $KUBELET_CONFIG_ARGS $KUBELET_KUBEADM_ARGS $KUBELET_CLOUD_PROVIDER_ARGS $KUBELET_EXTRA_ARGS
 Type=simple
 RestartSec=10

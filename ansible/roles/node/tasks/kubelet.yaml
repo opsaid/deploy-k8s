@@ -31,10 +31,10 @@
       mode: 0600
       backup: no
     with_items:
-      - kubeadm-flags.env
+      - cloud_provider.env
     vars:
       PROVIDER_ID: "{{ var1.stdout }}.{{ var2.stdout }}"
-  when: cloud_private == "alibaba-cloud"
+  when: cloud_provider == "alibaba-cloud"
 
 - name: 创建 kubelet 环境变量
   template:
