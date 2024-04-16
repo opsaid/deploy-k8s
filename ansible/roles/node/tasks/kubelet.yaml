@@ -12,6 +12,30 @@
     - config.yaml
     - kubeadm-flags.env
 
+- name: 生成 provider-id 参数用于阿里云
+  block:
+  - name: 获取 region-id 变量
+    command: "curl -s http://100.100.100.200/latest/meta-data/region-id"
+    register: var1
+
+  - name: 获取 instance-id 变量
+    command: "curl -s http://100.100.100.200/latest/meta-data/instance-id"
+    register: var2
+
+  - name: 生成配置
+    template:
+      src: kubelet/{{ item }}.j2
+      dest: "{{ data_dir }}/kubelet/{{ item }}"
+      owner: root
+      group: root
+      mode: 0600
+      backup: no
+    with_items:
+      - kubeadm-flags.env
+    vars:
+      PROVIDER_ID: "{{ var1.stdout }}.{{ var2.stdout }}"
+  when: cloud_private == "alibaba-cloud"
+
 - name: 创建 kubelet 环境变量
   template:
     src: kubelet/environment.j2
