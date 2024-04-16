@@ -9,7 +9,7 @@
   - name: 更新 apt cache
     apt:
       update_cache: yes
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and ( cloud_provider != "private" )
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and ( cloud_provider == "private" )
 
 # selinux带来安全保障，同时也加大复杂度，目前没有能力控制好，所以先禁用
 - name: 禁用 selinux
