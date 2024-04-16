@@ -6,10 +6,11 @@
     template:
       src: "{{ ansible_facts['distribution'] }}/{{ ansible_distribution_major_version }}/sources.list"
       dest: /etc/apt/sources.list
-  - name: 更新 apt cache
-    apt:
-      update_cache: yes
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and ( cloud_provider == "private" )
+
+- name: 更新 apt cache
+  apt:
+    update_cache: yes
 
 # selinux带来安全保障，同时也加大复杂度，目前没有能力控制好，所以先禁用
 - name: 禁用 selinux
