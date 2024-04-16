@@ -1,0 +1,17 @@
+kind: Config
+contexts:
+- context:
+    cluster: {{ cluster_name }}
+    user: system:cloud-controller-manager
+  name: system:cloud-controller-manager@{{ cluster_name }}
+current-context: system:cloud-controller-manager@{{ cluster_name }}
+users:
+- name: system:cloud-controller-manager
+  user:
+    tokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: {{ lookup('file', '../../pki/files/apiserver/ca.crt') | b64encode }}
+    server: {{ apiserver_addr }}
+  name: {{ cluster_name }}

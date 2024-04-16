@@ -1,0 +1,12 @@
+---
+
+- name: 创建阿里云 cloud-controller-manager kubeconfig 文件
+  template:
+    src: "kubeconfig/{{ item }}.j2"
+    dest: /etc/kubernetes/{{ item }}
+    owner: "{{ kube_user.name }}"
+    group: root
+    mode: 0600
+  with_items:
+    - cloud-controller-manager.conf
+  when: cloud_provider == "alibaba-cloud"
