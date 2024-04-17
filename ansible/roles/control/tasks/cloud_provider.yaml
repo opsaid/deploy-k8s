@@ -5,7 +5,7 @@
   - name: 创建阿里云部署相关目录
     file: path={{ item }} mode=0755 state=directory
     with_items:
-      - "{{ etc_dir }}/addons/kube-system/cloud_provider/{{ cloud_provider }}"
+      - "{{ etc_dir }}/addons/kube-system/cloud-provider/{{ cloud_provider }}"
 
   - name: 创建 cloud-controller-manager kubeconfig 文件
     template:
@@ -19,8 +19,8 @@
 
   - name: 创建 cloud-controller-manager 部署清单
     template:
-      src: addons/kube-system/cloud_provider/{{ cloud_provider }}/{{ item }}.j2
-      dest: "{{ etc_dir }}/addons/kube-system/cloud_provider/{{ cloud_provider }}/{{ item }}"
+      src: addons/kube-system/cloud-provider/{{ cloud_provider }}/{{ item }}.j2
+      dest: "{{ etc_dir }}/addons/kube-system/cloud-provider/{{ cloud_provider }}/{{ item }}"
       owner: "{{ kube_user.name }}"
       group: root
       mode: 0644
