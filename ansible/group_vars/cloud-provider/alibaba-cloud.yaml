@@ -1,4 +1,8 @@
 
+# TODO; 对应云厂商 API 密钥
+access_key_id: ""
+access_key_secret: ""
+
 # 宿主使用的 dns 配置，这里为阿里云默认内部地址
 # 因会关闭 "systemd-resolved" 服务，所以该文件需自行更新
 host_resolv_conf:

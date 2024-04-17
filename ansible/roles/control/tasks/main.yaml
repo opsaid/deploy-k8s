@@ -12,3 +12,4 @@
 - import_tasks: addons.yaml
 - import_tasks: kubeadm.yaml
 - import_tasks: cloud_provider.yaml
+  when: cloud_provider != "private"

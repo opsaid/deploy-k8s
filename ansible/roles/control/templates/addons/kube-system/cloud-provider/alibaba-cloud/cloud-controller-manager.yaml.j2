@@ -1,0 +1,237 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: system:cloud-controller-manager
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumes
+      - services
+      - secrets
+      - endpoints
+      - configmaps
+      - serviceaccounts
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+      - list
+      - watch
+      - delete
+      - patch
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - services/status
+      - pods/status
+    verbs:
+      - update
+      - patch
+  - apiGroups:
+      - ""
+    resources:
+      - nodes/status
+    verbs:
+      - patch
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - events
+      - endpoints
+    verbs:
+      - create
+      - patch
+      - update
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - get
+      - update
+      - create
+      - delete
+  - apiGroups:
+      - apiextensions.k8s.io
+    resources:
+      - customresourcedefinitions
+    verbs:
+      - get
+      - update
+      - create
+      - delete
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - ingresses
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+      - create
+      - patch
+      - delete
+  - apiGroups:
+      - alibabacloud.com
+    resources:
+      - albconfigs
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+      - create
+      - patch
+      - delete
+  - apiGroups:
+      - alibabacloud.com
+    resources:
+      - albconfigs/status
+    verbs:
+      - update
+      - patch
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - ingresses/status
+    verbs:
+      - update
+      - patch
+  - apiGroups:
+      - discovery.k8s.io
+    resources:
+      - endpointslices
+    verbs:
+      - get
+      - list
+      - watch
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cloud-controller-manager
+  namespace: kube-system
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: system:cloud-controller-manager
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:cloud-controller-manager
+subjects:
+  - kind: ServiceAccount
+    name: cloud-controller-manager
+    namespace: kube-system
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloud-config
+  namespace: kube-system
+data:
+  cloud-config.conf: |-
+    {
+        "Global": {
+            "accessKeyID": "{{ access_key_id | b64encode }}",
+            "accessKeySecret": "{{ access_key_secret | b64encode }}"
+        }
+    }
+
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: cloud-controller-manager
+    tier: control-plane
+  name: cloud-controller-manager
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: cloud-controller-manager
+      tier: control-plane
+  template:
+    metadata:
+      labels:
+        app: cloud-controller-manager
+        tier: control-plane
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ''
+    spec:
+      serviceAccountName: cloud-controller-manager
+      tolerations:
+        - effect: NoSchedule
+          operator: Exists
+          key: node-role.kubernetes.io/master
+        - effect: NoSchedule
+          operator: Exists
+          key: node.cloudprovider.kubernetes.io/uninitialized
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      containers:
+        - command:
+          - /cloud-controller-manager
+          - --kubeconfig=/etc/kubernetes/cloud-controller-manager.conf
+          - --cloud-config=/etc/kubernetes/config/cloud-config.conf
+          #- --controllers=node,route,service,ingress
+          - --controllers=node,route
+          - --metrics-bind-addr=0
+          - --route-reconciliation-period=3m
+          - --configure-cloud-routes=true
+          - --cluster-cidr={{ cluster_cidr }}
+          image: registry.cn-hangzhou.aliyuncs.com/acs/cloud-controller-manager-amd64:v2.8.0
+          livenessProbe:
+            failureThreshold: 8
+            httpGet:
+              host: 127.0.0.1
+              path: /healthz
+              port: 10258
+              scheme: HTTP
+            initialDelaySeconds: 15
+            timeoutSeconds: 15
+          name: cloud-controller-manager
+          resources:
+            requests:
+              cpu: 100m
+              memory: 200Mi
+            limits:
+              cpu: 1000m
+              memory: 2Gi
+          volumeMounts:
+            - mountPath: /etc/kubernetes/
+              name: k8s
+            - mountPath: /etc/kubernetes/config
+              name: cloud-config
+      hostNetwork: true
+      volumes:
+        - hostPath:
+            path: /etc/kubernetes
+          name: k8s
+        - configMap:
+            defaultMode: 420
+            items:
+              - key: cloud-config.conf
+                path: cloud-config.conf
+            name: cloud-config
+          name: cloud-config
