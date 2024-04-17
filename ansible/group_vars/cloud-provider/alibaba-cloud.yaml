@@ -1,7 +1,8 @@
 
-# 宿主使用的 dns 配置
-#host_resolv_conf:
-#  path: "/etc/resolv.conf"
-#  servers:
-#    - 100.100.2.136
-#    - 100.100.2.138
+# 宿主使用的 dns 配置，这里为阿里云默认内部地址
+# 因会关闭 "systemd-resolved" 服务，所以该文件需自行更新
+host_resolv_conf:
+  path: "/etc/resolv.conf"
+  servers:
+    - 100.100.2.136
+    - 100.100.2.138
