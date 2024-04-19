@@ -164,7 +164,11 @@ data:
   #hubble-tls-key-file: /var/lib/cilium/tls/hubble/server.key
   #hubble-tls-client-ca-files: /var/lib/cilium/tls/hubble/client-ca.crt
 
+{% if cloud_provider == "private" %}
   ipam: "cluster-pool"
+{% else %}
+  ipam: "kubernetes"
+{% endif %}
   ipam-cilium-node-update-rate: "15s"
 
   cluster-pool-ipv4-cidr: "{{ cluster_cidr }}"
