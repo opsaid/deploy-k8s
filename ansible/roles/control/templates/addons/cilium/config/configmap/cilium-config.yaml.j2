@@ -113,7 +113,7 @@ data:
   enable-local-redirect-policy: "false"
 
   # 宿主管理网段地址，当使用 routing-mode=native 时，容器路由同个这些地址实现路由
-  ipv4-native-routing-cidr: "{{ node_port_addresses[0] }}"
+  ipv4-native-routing-cidr: "{{ cluster_cidr }}"
 
   # enable-runtime-device-detection: "true"
 
