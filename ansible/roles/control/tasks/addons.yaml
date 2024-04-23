@@ -173,6 +173,7 @@
       - config/configmap/config.conf
       - config/configmap/kubeconfig.conf
       - workloads/daemonset.yaml
+  when: network_plugin != "cilium"
   #when: (version == "v1.18") or (version == "v1.22") or (version == "v1.26")
 
 # ingress-nginx
