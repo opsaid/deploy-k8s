@@ -155,6 +155,9 @@ spec:
 
       nodeSelector:
         kubernetes.io/os: linux
+{% if system_service_in_control_node %}
+        node-role.kubernetes.io/master: ""
+{% endif %}
       serviceAccountName: default-ingress-nginx
       terminationGracePeriodSeconds: 300
       volumes:

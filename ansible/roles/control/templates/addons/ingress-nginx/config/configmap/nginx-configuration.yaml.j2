@@ -29,7 +29,7 @@ data:
   reuse-port: "true"
   server-tokens: "false"
   ssl-redirect: "false"
-  proxy-real-ip-cidr: ""
+  proxy-real-ip-cidr: "100.64.0.0/10,{{ cluster_cidr }}"
   use-proxy-protocol: "false"
   proxy-protocol-header-timeout: "60s"
   use-gzip: "true"
