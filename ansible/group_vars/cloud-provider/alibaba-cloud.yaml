@@ -1,5 +1,6 @@
 
 # TODO; 对应云厂商 API 密钥
+# 如存在环境变量：ACCESS_KEY_ID ACCESS_KEY_SECRET 则优先使用
 access_key_id: ""
 access_key_secret: ""
 

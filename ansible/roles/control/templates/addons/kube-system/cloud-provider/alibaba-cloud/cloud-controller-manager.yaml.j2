@@ -152,8 +152,16 @@ data:
   cloud-config.conf: |-
     {
         "Global": {
+{% if lookup('ansible.builtin.env', 'ACCESS_KEY_ID') != "" %}
+            "accessKeyID": "{{ lookup('ansible.builtin.env', 'ACCESS_KEY_ID') | b64encode }}",
+{% else %}
             "accessKeyID": "{{ access_key_id | b64encode }}",
+{% endif %}
+{% if lookup('ansible.builtin.env', 'ACCESS_KEY_SECRET') != "" %}
+            "accessKeySecret": "{{ lookup('ansible.builtin.env', 'ACCESS_KEY_SECRET') | b64encode }}",
+{% else %}
             "accessKeySecret": "{{ access_key_secret | b64encode }}"
+{% endif %}
         }
     }
 
@@ -176,8 +184,8 @@ spec:
       labels:
         app: cloud-controller-manager
         tier: control-plane
-      annotations:
-        scheduler.alpha.kubernetes.io/critical-pod: ''
+      #annotations:
+      #  scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
       serviceAccountName: cloud-controller-manager
       tolerations:
