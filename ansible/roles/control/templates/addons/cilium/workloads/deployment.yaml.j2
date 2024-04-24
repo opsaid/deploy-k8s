@@ -38,7 +38,7 @@ spec:
     spec:
       containers:
       - name: cilium-operator
-        image: "{{ internal_images.namespace }}/cilium-operator-generic:v1.14.5"
+        image: "{{ internal_images.namespace }}/cilium-operator-generic:latest"
         imagePullPolicy: IfNotPresent
         command:
         - cilium-operator-generic
@@ -154,7 +154,7 @@ spec:
             runAsGroup: 65532
             runAsNonRoot: true
             runAsUser: 65532
-          image: "{{ internal_images.namespace }}/hubble-relay:v1.14.5"
+          image: "{{ internal_images.namespace }}/hubble-relay:latest"
           imagePullPolicy: IfNotPresent
           command:
             - hubble-relay
@@ -231,7 +231,7 @@ spec:
       automountServiceAccountToken: true
       containers:
       - name: frontend
-        image: "{{ internal_images.namespace }}/hubble-ui:v0.12.1"
+        image: "{{ internal_images.namespace }}/hubble-ui:latest"
         imagePullPolicy: IfNotPresent
         ports:
         - name: http
@@ -244,7 +244,7 @@ spec:
           mountPath: /tmp
         terminationMessagePolicy: FallbackToLogsOnError
       - name: backend
-        image: "{{ internal_images.namespace }}/hubble-ui-backend:v0.12.1"
+        image: "{{ internal_images.namespace }}/hubble-ui-backend:latest"
         imagePullPolicy: IfNotPresent
         env:
         - name: EVENTS_SERVER_PORT

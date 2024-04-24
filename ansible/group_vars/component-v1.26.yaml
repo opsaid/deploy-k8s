@@ -11,11 +11,11 @@ containerd_version: 1.6.25
 # docker.io/calico/kube-controllers:v3.22.2
 calico_version: v3.26.4
 
-network:
-  cilium:
-    cli: v0.15.20
-  hubble:
-    cli: v0.12.3
+#network:
+#  cilium:
+#    cli: v0.15.20
+#  hubble:
+#    cli: v0.12.3
 
 # 是否开启kata支持
 kata_containers_enabled: false
@@ -27,6 +27,9 @@ internal_images:
   system:
     # key与镜像名一致,中划线以下划线代替,val为镜像版本末尾带具体系统架构
 
+    # registry.k8s.io/pause:3.9
+    pause: 3.9
+
     # registry.k8s.io/etcd:3.5.9-0
     etcd: v3.5.10
 
@@ -36,6 +39,7 @@ internal_images:
     kube_scheduler: "{{ k8s_version }}"
     kube_proxy: "{{ k8s_version }}"
 
+  addons:
     # calico/node:v3.16.10
     calico_cni: "{{ calico_version }}"
     calico_node: "{{ calico_version }}"
@@ -44,11 +48,26 @@ internal_images:
     # k8s.gcr.io/metrics-server/metrics-server:v0.6.1
     metrics_server: v0.6.1
 
-    # registry.k8s.io/pause:3.9
-    pause: 3.9
-
     # registry.k8s.io/coredns/coredns:v1.9.3
     coredns: v1.9.3
+
+    # https://github.com/cilium/cilium/releases
+    cilium_cli: v0.15.20
+    # quay.io/cilium/cilium:v1.14.5
+    cilium: v1.14.5
+    # quay.io/cilium/operator:v1.14.5
+    cilium_operator_generic: v1.14.5
+    # quay.io/cilium/cilium-envoy:v1.26.6
+    cilium_envoy: v1.26.6
+    # quay.io/cilium/hubble-relay:v1.14.5
+    hubble_relay: v1.14.5
+
+    # https://github.com/cilium/hubble/releases
+    hubble: v0.12.3
+    # quay.io/cilium/hubble-ui:v0.12.1
+    hubble_ui: v0.12.1
+    # quay.io/cilium/hubble-ui-backend:v0.12.1
+    hubble_ui_backend: v0.12.1
 
 # etcd
 etcd_args:

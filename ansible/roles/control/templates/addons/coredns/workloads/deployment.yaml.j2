@@ -30,7 +30,7 @@ spec:
           operator: "Exists"
       containers:
       - name: coredns
-        image: {{ internal_images.namespace }}/coredns:{{ internal_images.system.coredns }}
+        image: {{ internal_images.namespace }}/coredns:latest
         imagePullPolicy: IfNotPresent
         resources:
           limits:

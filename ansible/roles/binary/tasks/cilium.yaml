@@ -16,7 +16,7 @@
       - "roles/binary/files/cilium/bin"
   - name: 下载 cilium-linux-{{ server_arch }}.tar.gz
     get_url:
-      url: https://github.com/cilium/cilium-cli/releases/download/{{ network.cilium.cli }}/cilium-linux-{{ server_arch }}.tar.gz
+      url: https://github.com/cilium/cilium-cli/releases/download/{{ internal_images.addons.cilium_cli }}/cilium-linux-{{ server_arch }}.tar.gz
       dest: "{{ temp_dir }}/cilium-linux-{{ server_arch }}.tar.gz"
   - name: 解压 cilium-linux-{{ server_arch }}.tar.gz 至 {{ temp_dir }}
     unarchive:
@@ -43,7 +43,7 @@
       - "roles/binary/files/cilium/bin"
   - name: 下载 hubble-linux-{{ server_arch }}.tar.gz
     get_url:
-      url: https://github.com/cilium/hubble/releases/download/{{ network.hubble.cli }}/hubble-linux-{{ server_arch }}.tar.gz
+      url: https://github.com/cilium/hubble/releases/download/{{ internal_images.addons.hubble }}/hubble-linux-{{ server_arch }}.tar.gz
       dest: "{{ temp_dir }}/hubble-linux-{{ server_arch }}.tar.gz"
   - name: 解压 hubble-linux-{{ server_arch }}.tar.gz 至 {{ temp_dir }}
     unarchive:

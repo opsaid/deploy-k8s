@@ -34,7 +34,7 @@ spec:
       priorityClassName: system-cluster-critical
       containers:
       - name: calico-kube-controllers
-        image: {{ internal_images.namespace }}/calico-kube-controllers:{{ internal_images.system.calico_kube_controllers }}
+        image: {{ internal_images.namespace }}/calico-kube-controllers:latest
         env:
         - name: DATASTORE_TYPE
           value: kubernetes

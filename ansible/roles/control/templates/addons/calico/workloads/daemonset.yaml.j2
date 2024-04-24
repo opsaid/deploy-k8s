@@ -38,7 +38,7 @@ spec:
       initContainers:
       # 为宿主安装cni插件
       - name: install-cni
-        image: {{ internal_images.namespace }}/calico-cni:{{ internal_images.system.calico_cni }}
+        image: {{ internal_images.namespace }}/calico-cni:latest
         command: ["/opt/cni/bin/install"]
         envFrom:
         - configMapRef:
@@ -83,7 +83,7 @@ spec:
       # i.e. bpf at /sys/fs/bpf and cgroup2 at /run/calico/cgroup. Calico-node initialisation is executed
       # in best effort fashion, i.e. no failure for errors, to not disrupt pod creation in iptable mode.
       - name: "mount-bpffs"
-        image: {{ internal_images.namespace }}/calico-node:{{ internal_images.system.calico_node }}
+        image: {{ internal_images.namespace }}/calico-node:latest
         imagePullPolicy: IfNotPresent
         command: ["calico-node", "-init", "-best-effort"]
         volumeMounts:
@@ -106,7 +106,7 @@ spec:
           privileged: true
       containers:
       - name: calico-node
-        image: {{ internal_images.namespace }}/calico-node:{{ internal_images.system.calico_node }}
+        image: {{ internal_images.namespace }}/calico-node:latest
         imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:

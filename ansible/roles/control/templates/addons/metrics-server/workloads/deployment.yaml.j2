@@ -35,7 +35,7 @@ spec:
         #- --kubelet-preferred-address-types=InternalDNS,InternalIP,ExternalDNS,ExternalIP,Hostname
         - --kubelet-use-node-status-port
         - --metric-resolution=10s
-        image: {{ internal_images.namespace }}/metrics-server:{{ internal_images.system.metrics_server }}
+        image: {{ internal_images.namespace }}/metrics-server:latest
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3

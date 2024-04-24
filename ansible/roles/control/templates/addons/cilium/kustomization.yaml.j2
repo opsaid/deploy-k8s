@@ -33,3 +33,17 @@ resources:
 - service/ingresses.yaml
 - workloads/daemonset.yaml
 - workloads/deployment.yaml
+
+images:
+- name: {{ internal_images.namespace }}/cilium
+  newTag: {{ internal_images.addons.cilium }}
+- name: {{ internal_images.namespace }}/cilium-operator-generic
+  newTag: {{ internal_images.addons.cilium_operator_generic }}
+- name: {{ internal_images.namespace }}/cilium-envoy
+  newTag: {{ internal_images.addons.cilium_envoy }}
+- name: {{ internal_images.namespace }}/hubble-relay
+  newTag: {{ internal_images.addons.hubble_relay }}
+- name: {{ internal_images.namespace }}/hubble-ui
+  newTag: {{ internal_images.addons.hubble_ui }}
+- name: {{ internal_images.namespace }}/hubble-ui-backend
+  newTag: {{ internal_images.addons.hubble_ui_backend }}
