@@ -74,6 +74,7 @@
       group: root
       mode: 0644
     with_items: 
+      - README.md
       - kustomization.yaml
       - cluster/roles.yaml
       - cluster/namespace.yaml

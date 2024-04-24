@@ -1,0 +1,48 @@
+# cilium
+
+## install
+
+```shell
+cilium install \
+  --namespace kube-system \
+  --set routingMode=native \
+  --set ipv4NativeRoutingCIDR={{ cluster_cidr }} \
+  --set operator.replicas=1 \
+  --set hubble.tls.enabled=false \
+  --set image.repository={{ internal_images.namespace }}/cilium \
+  --set image.tag={{ internal_images.addons.cilium }} \
+  --set image.useDigest=false \
+  --set operator.image.repository={{ internal_images.namespace }}/cilium-operator-generic \
+  --set operator.image.tag={{ internal_images.addons.cilium_operator_generic }} \
+  --set operator.image.useDigest=false \
+  --set hubble.enabled=true \
+  --set hubble.relay.enabled=true \
+  --set hubble.relay.image.repository={{ internal_images.namespace }}/hubble-relay \
+  --set hubble.relay.image.tag={{ internal_images.addons.hubble_relay }} \
+  --set hubble.relay.image.useDigest=false \
+  --set hubble.ui.enabled=true \
+  --set hubble.ui.frontend.image.repository={{ internal_images.namespace }}/hubble-ui \
+  --set hubble.ui.frontend.image.tag={{ internal_images.addons.hubble_ui }} \
+  --set hubble.ui.frontend.image.useDigest=false \
+  --set hubble.ui.frontend.server.ipv6.enabled=false \
+  --set hubble.ui.backend.image.repository={{ internal_images.namespace }}/hubble-ui-backend \
+  --set hubble.ui.backend.image.tag={{ internal_images.addons.hubble_ui_backend }} \
+  --set hubble.ui.backend.image.useDigest=false \
+  --set bpf.masquerade=true \
+  --set envoy.enabled=true \
+  --set envoy.image.repository={{ internal_images.namespace }}/cilium-envoy \
+  --set envoy.image.tag={{ internal_images.addons.cilium_envoy }} \
+  --set envoy.image.useDigest=false \
+  --set kubeProxyReplacement=true \
+  --set k8sServiceHost={{ apiserver_addr }} \
+  --set k8sServicePort={{ apiserver_port }} \
+  --set ingressController.enabled=true \
+  --set ingressController.service.type=NodePort \
+  --set ingressController.loadbalancerMode=shared \
+  --set ingressController.service.insecureNodePort=30080 \
+  --set ingressController.service.secureNodePort=30443 \
+  --set ipam.operator.clusterPoolIPv4PodCIDRList={{ cluster_cidr }} \
+  --set ipam.operator.clusterPoolIPv4MaskSize={{ node_cidr_mask }} \
+  --set autoDirectNodeRoutes=true \
+  --set loadBalancer.mode=hybrid
+```
