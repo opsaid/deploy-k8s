@@ -148,6 +148,9 @@ spec:
               - ALL
         terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
+        - name: envoy-sockets
+          mountPath: /var/run/cilium/envoy/sockets
+          readOnly: false
         # Unprivileged containers need to mount /proc/sys/net from the host
         # to have write access
         - mountPath: /host/proc/sys/net
@@ -568,6 +571,10 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: metadata.namespace
+        - name: KUBERNETES_SERVICE_HOST
+          value: "{{ cluster_domain }}"
+        - name: KUBERNETES_SERVICE_PORT
+          value: "{{ apiserver_port }}"
         ports:
         - name: envoy-metrics
           containerPort: 9964

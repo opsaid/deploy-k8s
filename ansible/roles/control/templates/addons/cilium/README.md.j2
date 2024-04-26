@@ -1,6 +1,6 @@
 # cilium
 
-## install
+## 通过 cli 安装
 
 ```shell
 cilium install \
@@ -12,10 +12,11 @@ cilium install \
   --set image.repository={{ internal_images.namespace }}/cilium \
   --set image.tag={{ internal_images.addons.cilium }} \
   --set image.useDigest=false \
-  --set operator.image.repository={{ internal_images.namespace }}/cilium-operator-generic \
+  --set operator.image.repository={{ internal_images.namespace }}/cilium-operator \
   --set operator.image.tag={{ internal_images.addons.cilium_operator_generic }} \
   --set operator.image.useDigest=false \
   --set hubble.enabled=true \
+  --set hubble.listenAddress=127.0.0.1:4244 \
   --set hubble.relay.enabled=true \
   --set hubble.relay.image.repository={{ internal_images.namespace }}/hubble-relay \
   --set hubble.relay.image.tag={{ internal_images.addons.hubble_relay }} \
@@ -41,8 +42,39 @@ cilium install \
   --set ingressController.loadbalancerMode=shared \
   --set ingressController.service.insecureNodePort=30080 \
   --set ingressController.service.secureNodePort=30443 \
+  --set ingressController.enforceHttps=false \
+  --set autoDirectNodeRoutes=true \
+  --set loadBalancer.mode=hybrid \
+  --set healthPort=9879 \
+  --set cluster.id=1 \
+  --set cluster.name={{ cluster_name }} \
+{% if cloud_provider == "private" %}
+  --set ipam.mode=cluster-pool \
   --set ipam.operator.clusterPoolIPv4PodCIDRList={{ cluster_cidr }} \
   --set ipam.operator.clusterPoolIPv4MaskSize={{ node_cidr_mask }} \
-  --set autoDirectNodeRoutes=true \
-  --set loadBalancer.mode=hybrid
+{% else %}
+  --set ipam.mode=kubernetes \
+{% endif %}
+  --set prometheus.port=127.0.0.1:9962 \
+  --set tunnelProtocol="" \
+  --set loadBalancer.dsrDispatch=opt \
+  --set clusterHealthPort=4240 \
+  --set nodePort.enabled=true \
+  --set nodePort.range="30000\,32767"
 ```
+
+## 模版生成
+
+以下是 "kustomization" 模版的生成方式：
+
+```shell
+git clone -b v1.15.4 https://github.com/cilium/cilium.git
+cd cilium/install/kubernetes/
+
+helm template cilium cilium/ \
+  --namespace kube-system \
+  ......
+  参数同上
+  ......
+```
+
