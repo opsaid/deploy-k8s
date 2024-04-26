@@ -7,7 +7,7 @@ cilium install \
   --namespace kube-system \
   --set routingMode=native \
   --set ipv4NativeRoutingCIDR={{ cluster_cidr }} \
-  --set operator.replicas=1 \
+  --set operator.replicas={{ groups['kube_control_plane'] | length }} \
   --set hubble.tls.enabled=false \
   --set image.repository={{ internal_images.namespace }}/cilium \
   --set image.tag={{ internal_images.addons.cilium }} \
@@ -30,6 +30,9 @@ cilium install \
   --set hubble.ui.backend.image.tag={{ internal_images.addons.hubble_ui_backend }} \
   --set hubble.ui.backend.image.useDigest=false \
   --set bpf.masquerade=true \
+{% if node_port_devices is defined and node_port_devices != "" %}
+  --set devices={{ node_port_devices }} \
+{% endif %}
   --set envoy.enabled=true \
   --set envoy.image.repository={{ internal_images.namespace }}/cilium-envoy \
   --set envoy.image.tag={{ internal_images.addons.cilium_envoy }} \
