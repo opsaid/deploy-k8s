@@ -31,7 +31,7 @@ cilium install \
   --set hubble.ui.backend.image.useDigest=false \
   --set bpf.masquerade=true \
 {% if node_port_devices is defined and node_port_devices != "" %}
-  --set devices={{ node_port_devices }} \
+  --set devices='{% raw %}{{% endraw %}{{ node_port_devices }}{% raw %}}{% endraw %}'\
 {% endif %}
   --set envoy.enabled=true \
   --set envoy.image.repository={{ internal_images.namespace }}/cilium-envoy \

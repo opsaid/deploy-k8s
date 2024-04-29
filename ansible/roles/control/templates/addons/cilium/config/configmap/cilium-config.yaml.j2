@@ -143,7 +143,7 @@ data:
 {% if node_port_devices is defined and node_port_devices != "" %}
   # List of devices used to attach bpf_host.o (implements BPF NodePort,
   # host-firewall and BPF masquerading)
-  devices: "{{ node_port_devices }}"
+  devices: "{{ node_port_devices | replace(',', ' ')}}"
 {% endif %}
   # enable-runtime-device-detection: "true"
 
