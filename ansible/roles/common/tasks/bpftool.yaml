@@ -1,0 +1,14 @@
+---
+
+- name: 获取目标主机的内核版本
+  command: uname -r
+  register: kernel_version
+
+- name: 安装基础软件包（debian/ubuntu）
+  package:
+    name:
+    - linux-tools-common
+    - linux-tools-generic
+    - linux-tools-{{ kernel_version.stdout }}
+    state: latest
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'

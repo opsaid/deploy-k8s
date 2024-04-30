@@ -8,3 +8,5 @@
 - import_tasks: adduser.yaml
 - import_tasks: package.yaml
 - import_tasks: directory.yaml
+- import_tasks: bpftool.yaml
+  when: network_plugin == "cilium"
