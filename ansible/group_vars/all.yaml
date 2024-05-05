@@ -22,8 +22,8 @@ resolv_use_hosts: true
 external_etcd: false
 
 # DANGER! 
-# 使用的k8s网络插件，支持: calico
-network_plugin: calico
+# 使用的k8s网络插件，支持: calico, cilium
+network_plugin: cilium
 
 # 集群南北流量高可用的ip地址
 # 一般为vip，没有则设置为控制平面任意一个实际的ip地址
@@ -31,8 +31,12 @@ apiserver_haip: 192.168.31.200
 
 # 集群对外的业务网段，用于监听端口对外提供服务
 # 管理网段与业务网段分开时配置业务网段，如没有则按需设置为管理网段
-node_port_addresses:
-- 192.168.31.0/24
+#node_port_addresses:
+#- 172.16.91.0/24
+
+# 指定网卡运行 eBPF datapath
+# 仅 cni = cilium 有效
+#node_port_devices: "lxc+,eth0"
 
 # worker 节点使用的子网掩码
 node_cidr_mask: 28
@@ -61,19 +65,19 @@ tls_bootstrap_token: 53fb9ee737936db263ebd937ab1829cd
 # 容器镜像中心，集群只允许以下登记的地址
 # 设置 insecure_skip_verify=true 跳过https的ca认证
 container_registry:
-- host: 'docker.io'
-  scheme: https
-  ca: []
-  skip_verify: true
-  client: []
-  # "pull", "resolve", "push"
-  capabilities: ["pull","resolve"]
-  #header:
-    # Authorization: Basic base64(username:password)
-  mirrors:
-  - host: "docker.mirrors.ustc.edu.cn"
-    scheme: https
-    skip_verify: true
+#- host: 'docker.io'
+#  scheme: https
+#  ca: []
+#  skip_verify: true
+#  client: []
+#  # "pull", "resolve", "push"
+#  capabilities: ["pull","resolve"]
+#  #header:
+#    # Authorization: Basic base64(username:password)
+#  mirrors:
+#  - host: "docker.mirrors.ustc.edu.cn"
+#    scheme: https
+#    skip_verify: true
   
 - host: 'registry.cn-hangzhou.aliyuncs.com'
   scheme: https
@@ -88,3 +92,6 @@ resource_reserve:
   system:
     cpu: 50m
     memory: 50Mi
+
+# 云提供商标志
+cloud_provider: "private"

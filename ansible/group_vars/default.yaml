@@ -35,7 +35,7 @@ data_dir: /data
 temp_dir: /tmp
 
 # 系统服务是否必须在控制节点
-system_service_in_control_node: false
+system_service_in_control_node: true
 
 # 是否允许开启swap
 disable_swap: true
@@ -72,9 +72,6 @@ kube_user:
   name: root
   #id: 997
   #name: kube
-
-# 云提供商标志
-cloud_provider: "private"
 
 # 帮助文档地址
 product_docs: https://opsaid.cn/docs
