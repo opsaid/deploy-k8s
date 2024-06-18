@@ -1,0 +1,61 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: argocd
+
+replicas:
+- name: argocd-server
+  count: 1
+
+resources:
+- cluster/crds.yaml
+- cluster/roles.yaml
+- cluster/namespace.yaml
+- config/configmap/argocd-cm.yaml
+- config/configmap/argocd-notifications-cm.yaml
+- config/configmap/argocd-tls-certs-cm.yaml
+- config/configmap/argocd-cmd-params-cm.yaml
+- config/configmap/argocd-rbac-cm.yaml
+- config/configmap/argocd-gpg-keys-cm.yaml
+- config/configmap/argocd-ssh-known-hosts-cm.yaml
+- config/secret/argocd-notifications-secret.yaml
+- config/secret/argocd-secret.yaml
+- service/services.yaml
+- service/ingresses.yaml
+- workloads/deployments/argocd-redis.yaml
+- workloads/deployments/argocd-server.yaml
+- workloads/deployments/argocd-applicationset-controller.yaml
+- workloads/deployments/argocd-repo-server.yaml
+- workloads/deployments/argocd-notifications-controller.yaml
+- workloads/statefulsets/argocd-application-controller.yaml
+- cluster/argocd-server-applications
+
+patches:
+- patch: |-
+    - op: replace
+      path: /spec/ingressClassName
+{% if network_plugin == "cilium" %}
+      value: cilium
+{% else %}
+      value: nginx
+{% endif %}
+  target:
+    group: networking.k8s.io
+    version: v1
+    kind: Ingress
+- patch: |-
+    - op: replace
+      path: /spec/rules/0/host
+      value: cd.{{ cluster_domain }}
+  target:
+    group: networking.k8s.io
+    version: v1
+    kind: Ingress
+
+images:
+- name: redis:7.0.14-alpine
+  newName: registry.cn-hangzhou.aliyuncs.com/kube-image-repo/redis
+  newTag: 7.0.5-alpine
+- name: quay.io/argoproj/argocd:v2.11.3
+  newName: registry.cn-hangzhou.aliyuncs.com/kube-image-repo/argocd
+  newTag: v2.11.3

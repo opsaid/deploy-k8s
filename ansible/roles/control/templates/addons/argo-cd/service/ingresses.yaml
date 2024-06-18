@@ -1,0 +1,18 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  rules:
+  - host: cd.cluster.local
+    http:
+      paths:
+      - path: /
+        backend:
+          service:
+            name: argocd-server
+            port:
+              number: 80
+        pathType: Prefix

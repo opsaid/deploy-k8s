@@ -73,5 +73,9 @@ kube_user:
   #id: 997
   #name: kube
 
+# 集群角色
+# control edge
+cluster_role: control
+
 # 帮助文档地址
 product_docs: https://opsaid.cn/docs
