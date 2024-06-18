@@ -54,8 +54,8 @@ patches:
 
 images:
 - name: redis:7.0.14-alpine
-  newName: registry.cn-hangzhou.aliyuncs.com/kube-image-repo/redis
+  newName: {{ internal_images.namespace }}/redis
   newTag: 7.0.5-alpine
 - name: quay.io/argoproj/argocd:v2.11.3
-  newName: registry.cn-hangzhou.aliyuncs.com/kube-image-repo/argocd
+  newName: {{ internal_images.namespace }}/argocd
   newTag: v2.11.3
