@@ -1,0 +1,56 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: argo
+
+configMapGenerator:
+- name: workflow-controller-configmap
+#  files:
+#  - controller-config.yaml=config/configmap/controller-config.yaml
+  options:
+    disableNameSuffixHash: true
+
+replicas:
+- name: argo-server
+  count: 1
+- name: workflow-controller
+  count: 1
+
+resources:
+- cluster/crds.yaml
+- cluster/roles.yaml
+- cluster/namespace.yaml
+- service/services.yaml
+- service/ingresses.yaml
+- workloads/deployments/argo-server.yaml
+- workloads/deployments/workflow-controller.yaml
+
+patches:
+- patch: |-
+    - op: replace
+      path: /spec/ingressClassName
+{% if network_plugin == "cilium" %}
+      value: cilium
+{% else %}
+      value: nginx
+{% endif %}
+  target:
+    group: networking.k8s.io
+    version: v1
+    kind: Ingress
+- patch: |-
+    - op: replace
+      path: /spec/rules/0/host
+      value: workflows.{{ cluster_domain }}
+  target:
+    group: networking.k8s.io
+    version: v1
+    kind: Ingress
+
+images:
+- name: quay.io/argoproj/argocli
+  newName: {{ internal_images.namespace }}/argocli
+  newTag: v3.5.7
+- name: quay.io/argoproj/workflow-controller
+  newName: {{ internal_images.namespace }}/argo-workflow-controller
+  newTag: v3.5.7
