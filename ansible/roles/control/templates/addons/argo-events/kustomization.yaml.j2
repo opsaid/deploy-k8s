@@ -1,0 +1,43 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: argo-events
+
+configMapGenerator:
+- name: argo-events-controller-config
+  files:
+  - controller-config.yaml=config/configmap/controller-config.yaml
+  options:
+    disableNameSuffixHash: true
+
+replicas:
+- name: controller-manager
+  count: 1
+- name: events-webhook
+  count: 1
+
+resources:
+- cluster/crds.yaml
+- cluster/roles.yaml
+- cluster/namespace.yaml
+- cluster/events-webhook.yaml
+- service/services.yaml
+- workloads/deployments/controller-manager.yaml
+- workloads/deployments/events-webhook.yaml
+
+replacements:
+- source:
+    kind: Deployment
+    name: controller-manager
+    fieldPath: spec.template.spec.containers.[name=controller-manager].image
+  targets:
+  - select:
+      kind: Deployment
+      name: controller-manager
+    fieldPaths:
+    - spec.template.spec.containers.[name=controller-manager].env.[name=ARGO_EVENTS_IMAGE].value
+
+images:
+- name: quay.io/argoproj/argo-events
+  newName: {{ internal_images.namespace }}/argo-events
+  newTag: v1.9.2

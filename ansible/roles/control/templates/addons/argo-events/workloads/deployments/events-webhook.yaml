@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: events-webhook
+  namespace: argo-events
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: events-webhook
+  template:
+    metadata:
+      labels:
+        app: events-webhook
+    spec:
+      containers:
+      - args:
+        - webhook-service
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: PORT
+          value: "8443"
+        image: quay.io/argoproj/argo-events:latest
+        imagePullPolicy: Always
+        name: webhook
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          allowPrivilegeEscalation: false
+          seccompProfile:
+            type: RuntimeDefault
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 9731
+      serviceAccountName: argo-events-webhook-sa

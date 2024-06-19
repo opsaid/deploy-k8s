@@ -314,3 +314,46 @@
       - workloads/deployments/argo-server.yaml
       - workloads/deployments/workflow-controller.yaml
   when: cluster_role == "control"
+
+- name: 生成 argo-events 配置
+  vars:
+    component: argo-events
+  block:
+  - name: 创建 argo-events 部署相关目录
+    file: path={{ item }} mode=0755 state=directory
+    with_items:
+      - "{{ etc_dir }}/addons/{{ component }}"
+      - "{{ etc_dir }}/addons/{{ component }}/cluster"
+      - "{{ etc_dir }}/addons/{{ component }}/workloads"
+      - "{{ etc_dir }}/addons/{{ component }}/workloads/deployments"
+      - "{{ etc_dir }}/addons/{{ component }}/workloads/statefulsets"
+      - "{{ etc_dir }}/addons/{{ component }}/config"
+      - "{{ etc_dir }}/addons/{{ component }}/config/configmap"
+      - "{{ etc_dir }}/addons/{{ component }}/config/secret"
+      - "{{ etc_dir }}/addons/{{ component }}/service"
+  - name: 生成 argo-events 模版清单
+    template:
+      src: addons/{{ component }}/{{ item }}.j2
+      dest: "{{ etc_dir }}/addons/{{ component }}/{{ item }}"
+      owner: "{{ kube_user.name }}"
+      group: root
+      mode: 0644
+    with_items:
+      - kustomization.yaml
+      - config/configmap/controller-config.yaml
+  - name: 拷贝 argo-events 部署清单
+    template:
+      src: addons/{{ component }}/{{ item }}
+      dest: "{{ etc_dir }}/addons/{{ component }}/{{ item }}"
+      owner: "{{ kube_user.name }}"
+      group: root
+      mode: 0644
+    with_items:
+      - cluster/crds.yaml
+      - cluster/namespace.yaml
+      - cluster/roles.yaml
+      - cluster/events-webhook.yaml
+      - service/services.yaml
+      - workloads/deployments/controller-manager.yaml
+      - workloads/deployments/events-webhook.yaml
+  when: cluster_role == "control"
