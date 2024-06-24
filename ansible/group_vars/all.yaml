@@ -2,7 +2,7 @@
 
 # DANGER! 
 # 部署的k8s版本，版本名称必须与官方github上对应，以"v"开头
-# 当前支持大版本如下：v1.26.x
+# 支持大版本如下：v1.22.x, v1.18.x，二进制预先支持：v1.22.16 v1.18.20
 k8s_version: v1.26.11
 #k8s_version_sha256: ef5434b56c96c2f798c33b0a7bf5d9bc3d2d76817c00822c718bf52af6d0f728
 
@@ -12,7 +12,7 @@ cluster_name: fake
 
 # DANGER! 
 # 集群域名后缀
-cluster_domain: "{{ cluster_name }}.k8s.a-demo-web.site"
+cluster_domain: "{{ cluster_name }}.dev.173ops.com"
 
 # 如果kube apiserver接口域名未通过dns解析，则通过本地hosts绑定
 resolv_use_hosts: true
@@ -27,22 +27,24 @@ network_plugin: cilium
 
 # 集群南北流量高可用的ip地址
 # 一般为vip，没有则设置为控制平面任意一个实际的ip地址
-apiserver_haip: 192.168.31.200
+apiserver_haip: 192.168.0.2
 
 # 集群对外的业务网段，用于监听端口对外提供服务
 # 管理网段与业务网段分开时配置业务网段，如没有则按需设置为管理网段
-#node_port_addresses:
-#- 172.16.91.0/24
+# 仅 cni = calico 有效
+node_port_addresses:
+- 192.168.0.0/24
 
 # 指定网卡运行 eBPF datapath
+# 如指定了则必须包含 "lxc+" 开头的网卡
 # 仅 cni = cilium 有效
-#node_port_devices: "lxc+,eth0"
+#node_port_devices: "lxc+,enx0826ae396977"
 
 # worker 节点使用的子网掩码
-node_cidr_mask: 28
+node_cidr_mask: 24
 
 # 集群pod使用的网络地址范围
-cluster_cidr: 192.168.201.0/24
+cluster_cidr: 192.168.201.0/21
 
 # 集群service使用的网络地址范围
 # 可取范围：10.0.0.0/16-24，172.16-31.0.0/16-24，192.168.0.0/16-24
@@ -90,8 +92,8 @@ resource_reserve:
     cpu: 100m
     memory: 100Mi
   system:
-    cpu: 50m
-    memory: 50Mi
+    cpu: 100m
+    memory: 100Mi
 
 # 云提供商标志
 cloud_provider: "private"

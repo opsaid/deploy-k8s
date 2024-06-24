@@ -6,4 +6,16 @@ metadata:
     app.kubernetes.io/name: argocd-cmd-params-cm
     app.kubernetes.io/part-of: argocd
 data:
-  application.namespaces: default, deploy-k8s-*
+  application.namespaces: deploy-k8s-*
+
+  server.insecure: "true"
+
+  server.basehref: "/"
+  #server.rootpath: "/"
+  server.staticassets: "/shared/app"
+  server.k8sclient.retry.max: "0"
+  server.k8sclient.retry.base.backoff: "100"
+  server.api.content.types: "application/json"
+
+  server.log.format: "text"
+  server.log.level: "info"

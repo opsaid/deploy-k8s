@@ -1,0 +1,84 @@
+---
+# Source: dex/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dexidp
+  labels:
+    helm.sh/chart: dex-0.18.0
+    app.kubernetes.io/name: dex
+    app.kubernetes.io/instance: dexidp
+    app.kubernetes.io/version: "2.40.0"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: dex/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: dexidp
+  labels:
+    helm.sh/chart: dex-0.18.0
+    app.kubernetes.io/name: dex
+    app.kubernetes.io/instance: dexidp
+    app.kubernetes.io/version: "2.40.0"
+    app.kubernetes.io/managed-by: Helm
+rules:
+  - apiGroups: ["apiextensions.k8s.io"]
+    resources: ["customresourcedefinitions"]
+    verbs: ["list", "create"]
+---
+# Source: dex/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: dexidp-cluster
+  labels:
+    helm.sh/chart: dex-0.18.0
+    app.kubernetes.io/name: dex
+    app.kubernetes.io/instance: dexidp
+    app.kubernetes.io/version: "2.40.0"
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  kind: ClusterRole
+  apiGroup: rbac.authorization.k8s.io
+  name: dexidp
+subjects:
+- kind: ServiceAccount
+  namespace: kube-system
+  name: dexidp
+---
+# Source: dex/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: dexidp
+  labels:
+    helm.sh/chart: dex-0.18.0
+    app.kubernetes.io/name: dex
+    app.kubernetes.io/instance: dexidp
+    app.kubernetes.io/version: "2.40.0"
+    app.kubernetes.io/managed-by: Helm
+rules:
+  - apiGroups: ["dex.coreos.com"]
+    resources: ["*"]
+    verbs: ["*"]
+---
+# Source: dex/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: dexidp
+  labels:
+    helm.sh/chart: dex-0.18.0
+    app.kubernetes.io/name: dex
+    app.kubernetes.io/instance: dexidp
+    app.kubernetes.io/version: "2.40.0"
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  kind: Role
+  apiGroup: rbac.authorization.k8s.io
+  name: dexidp  
+subjects:
+- kind: ServiceAccount
+  namespace: kube-system
+  name: dexidp

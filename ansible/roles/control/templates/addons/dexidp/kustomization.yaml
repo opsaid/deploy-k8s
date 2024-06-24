@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: kube-system
+
+configMapGenerator:
+- name: dexidp
+  files:
+  - config.yaml=config/configmap/config.yaml
+  options:
+    disableNameSuffixHash: true
+
+replicas:
+- name: dexidp
+  count: 1
+
+resources:
+- cluster/roles.yaml
+- service/services.yaml
+- service/ingresses.yaml
+- workloads/deployments/dexidp.yaml
+
+images:
+- name: ghcr.io/dexidp/dex
+  newName: registry.cn-guangzhou.aliyuncs.com/kube-image-repo/dex
+  newTag: v2.40.0

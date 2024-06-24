@@ -6,17 +6,17 @@ metadata:
     app.kubernetes.io/name: argocd-cm
     app.kubernetes.io/part-of: argocd
 data:
-  url: http://cd.cluster.local/
+  url: http://{{ cluster_role.control.gitops_domain }}
 
   exec.enabled: "true"
 
   oidc.config: |
     name: OPSaid
-    issuer: http://id.cluster.local/oauth2
+    issuer: http://{{ cluster_role.control.oauth2_domain }}/oauth2
     clientID: argo
-    clientSecret: testkey
+    clientSecret: {{ tls_bootstrap_token }}
     requestedScopes: ["openid", "profile", "email", "groups"]
-    logoutURL: http://cd.cluster.local/
+    logoutURL: http://{{ cluster_role.control.gitops_domain }}
 
   resource.customizations: |
     networking.k8s.io/Ingress:

@@ -1,0 +1,23 @@
+issuer: http://id.cluster.local/oauth2
+
+storage:
+  type: kubernetes
+  config:
+    inCluster: true
+
+staticClients:
+- id: argo
+  redirectURIs:
+  - 'http://cd.cluster.local/auth/callback'
+  - 'http://flow.cluster.local/oauth2/callback'
+  name: 'Argo'
+  secret: testkey
+
+enablePasswordDB: true
+
+staticPasswords:
+- email: "admin@example.com"
+  # echo password | htpasswd -BinC 10 admin | cut -d: -f2
+  hash: "$2y$10$j5xc0T9qj8k7DY1hmmEZme/fXNZ.NDQrfFRJ/aws2ZK0cgPotmM3y"
+  username: "admin"
+  userID: "10000"

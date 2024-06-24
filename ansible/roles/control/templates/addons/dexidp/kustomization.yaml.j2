@@ -1,0 +1,48 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: kube-system
+
+configMapGenerator:
+- name: dexidp
+  files:
+  - config.yaml=config/configmap/config.yaml
+  options:
+    disableNameSuffixHash: true
+
+replicas:
+- name: dexidp
+  count: 1
+
+resources:
+- cluster/roles.yaml
+- service/services.yaml
+- service/ingresses.yaml
+- workloads/deployments/dexidp.yaml
+
+patches:
+- patch: |-
+    - op: replace
+      path: /spec/ingressClassName
+{% if network_plugin == "cilium" %}
+      value: cilium
+{% else %}
+      value: nginx
+{% endif %}
+  target:
+    group: networking.k8s.io
+    version: v1
+    kind: Ingress
+- patch: |-
+    - op: replace
+      path: /spec/rules/0/host
+      value: {{ cluster_role.control.oauth2_domain }}
+  target:
+    group: networking.k8s.io
+    version: v1
+    kind: Ingress
+
+images:
+- name: ghcr.io/dexidp/dex
+  newName: {{ internal_images.namespace }}/dex
+  newTag: v2.40.0

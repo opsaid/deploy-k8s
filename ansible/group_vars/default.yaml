@@ -73,9 +73,15 @@ kube_user:
   #id: 997
   #name: kube
 
-# 集群角色
-# control edge
-cluster_role: control
+# 集群角色个性化配置
+cluster_role:
+  # control edge
+  deployment: control
+  control:
+    oauth2_domain: "id.{{ cluster_domain }}"
+    gitops_domain: "cd.{{ cluster_domain }}"
+    workflow_domain: "flow.{{ cluster_domain }}"
+  edge:
 
 # 帮助文档地址
 product_docs: https://opsaid.cn/docs

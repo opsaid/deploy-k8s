@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: workflow-controller-configmap
+data:
+  sso: |
+    issuer: http://id.cluster.local/oauth2
+    sessionExpiry: 240h
+    clientId:
+      name: oauth2-client
+      key: client-id
+    clientSecret:
+      name: oauth2-client
+      key: client-secret
+    redirectUrl: http://flow.cluster.local/oauth2/callback
+    scopes:
+    - groups
+    - email
+    - profile

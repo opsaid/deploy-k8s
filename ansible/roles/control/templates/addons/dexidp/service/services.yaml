@@ -1,0 +1,33 @@
+---
+# Source: dex/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: dexidp
+  labels:
+    helm.sh/chart: dex-0.18.0
+    app.kubernetes.io/name: dex
+    app.kubernetes.io/instance: dexidp
+    app.kubernetes.io/version: "2.40.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 5556
+      targetPort: http
+      protocol: TCP
+      appProtocol: http
+    - name: grpc
+      port: 5557
+      targetPort: grpc
+      protocol: TCP
+      appProtocol: http
+    - name: telemetry
+      port: 5558
+      targetPort: telemetry
+      protocol: TCP
+      appProtocol: http
+  selector:
+    app.kubernetes.io/name: dex
+    app.kubernetes.io/instance: dexidp

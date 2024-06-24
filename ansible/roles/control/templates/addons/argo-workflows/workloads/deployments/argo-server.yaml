@@ -23,7 +23,7 @@ spec:
       containers:
       - args:
         - server
-        - "--auth-mode=server"
+        - "--auth-mode=sso"
         - "--secure=false"
         env: []
         image: quay.io/argoproj/argocli:latest

@@ -3,12 +3,12 @@ kind: Kustomization
 
 namespace: argo
 
-configMapGenerator:
-- name: workflow-controller-configmap
+#configMapGenerator:
+#- name: workflow-controller-configmap
 #  files:
 #  - controller-config.yaml=config/configmap/controller-config.yaml
-  options:
-    disableNameSuffixHash: true
+#  options:
+#    disableNameSuffixHash: true
 
 replicas:
 - name: argo-server
@@ -22,6 +22,8 @@ resources:
 - cluster/namespace.yaml
 - service/services.yaml
 - service/ingresses.yaml
+- config/configmap/workflow-controller-configmap.yaml
+- config/secret/oauth2-client.yaml
 - workloads/deployments/argo-server.yaml
 - workloads/deployments/workflow-controller.yaml
 
@@ -41,7 +43,7 @@ patches:
 - patch: |-
     - op: replace
       path: /spec/rules/0/host
-      value: workflows.{{ cluster_domain }}
+      value: {{ cluster_role.control.workflow_domain }}
   target:
     group: networking.k8s.io
     version: v1

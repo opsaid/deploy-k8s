@@ -46,7 +46,7 @@ patches:
 - patch: |-
     - op: replace
       path: /spec/rules/0/host
-      value: cd.{{ cluster_domain }}
+      value: {{ cluster_role.control.gitops_domain }}
   target:
     group: networking.k8s.io
     version: v1

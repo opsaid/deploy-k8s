@@ -5,6 +5,11 @@
     }
     ready
 
+    hosts {
+      {{ apiserver_haip }} id.{{ cluster_domain }}
+      fallthrough
+    }
+
     kubernetes {{ cluster_domain }} in-addr.arpa ip6.arpa {
       pods insecure
       ttl 30

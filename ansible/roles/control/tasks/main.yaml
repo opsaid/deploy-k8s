@@ -9,7 +9,9 @@
     - "{{ data_dir }}/kubelet/pki"
 
 - import_tasks: certs.yaml
-- import_tasks: addons.yaml
+- import_tasks: addons_base.yaml
+- import_tasks: addons_control.yaml
+  when: cluster_role.deployment == "control"
 - import_tasks: kubeadm.yaml
 - import_tasks: cloud_provider.yaml
   when: cloud_provider != "private"

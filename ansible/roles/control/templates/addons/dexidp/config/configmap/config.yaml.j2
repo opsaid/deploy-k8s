@@ -1,0 +1,23 @@
+issuer: http://{{ cluster_role.control.oauth2_domain }}/oauth2
+
+storage:
+  type: kubernetes
+  config:
+    inCluster: true
+
+staticClients:
+- id: argo
+  redirectURIs:
+  - 'http://{{ cluster_role.control.gitops_domain }}/auth/callback'
+  - 'http://{{ cluster_role.control.workflow_domain }}/oauth2/callback'
+  name: 'Argo'
+  secret: {{ tls_bootstrap_token }}
+
+enablePasswordDB: true
+
+staticPasswords:
+- email: "admin@example.com"
+  # echo password | htpasswd -BinC 10 admin | cut -d: -f2
+  hash: "$2y$10$j5xc0T9qj8k7DY1hmmEZme/fXNZ.NDQrfFRJ/aws2ZK0cgPotmM3y"
+  username: "admin"
+  userID: "10000"
