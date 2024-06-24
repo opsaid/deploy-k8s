@@ -5,3 +5,8 @@ metadata:
   labels:
     app.kubernetes.io/name: argocd-rbac-cm
     app.kubernetes.io/part-of: argocd
+data:
+  policy.default: role:read-only
+  scopes: '[email, groups]'
+  policy.csv: |
+    g, admin@example.com, role:admin
