@@ -13,13 +13,13 @@
   client = {{ registry.client }}
 {% endif %}
 {% if registry.capabilities is defined %}
-  capabilities = {{ registry.capabilities }}
+  capabilities = {{ registry.capabilities | to_json }}
 {% endif %}
 {% if registry.header is defined %}
 {% if registry.scheme is defined %}
 [host."{{ registry.scheme }}://{{ registry.host }}".header]
 {% for k,v in registry.header.items() %}
-  {{ k }} = {{ v }}  
+  {{ k }} = {{ v | to_json }}
 {% endfor %}
 {% else %}
 [host."https://{{ registry.host }}".header]
