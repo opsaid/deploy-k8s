@@ -135,6 +135,7 @@
       - cluster/crds.yaml
       - cluster/namespace.yaml
       - cluster/roles.yaml
+      - cluster/executor.yaml
       - service/ingresses.yaml
       - service/services.yaml
       - workloads/deployments/argo-server.yaml

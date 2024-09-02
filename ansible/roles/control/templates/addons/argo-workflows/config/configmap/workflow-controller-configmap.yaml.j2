@@ -45,6 +45,14 @@ data:
       limits:
         cpu: 0.5
         memory: 512Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 1000
 
   workflowDefaults: |
     spec:
