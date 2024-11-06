@@ -37,6 +37,7 @@ data:
       runAsUser: 1000
 
   executor: |
+    image: {{ internal_images.namespace }}/argoexec:v3.5.7
     imagePullPolicy: IfNotPresent
     resources:
       requests:

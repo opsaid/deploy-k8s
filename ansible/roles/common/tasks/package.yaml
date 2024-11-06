@@ -10,6 +10,7 @@
 
 - name: 更新 apt cache
   apt:
+    upgrade: dist
     update_cache: yes
 
 # selinux带来安全保障，同时也加大复杂度，目前没有能力控制好，所以先禁用
