@@ -1,4 +1,104 @@
 apiVersion: audit.k8s.io/v1
 kind: Policy
+omitStages:
+- "RequestReceived"
 rules:
-  - level: Metadata
+# 以下请求被手动确定为高容量和低风险，因此请取消这些请求。
+- level: None
+  users: ["system:kube-proxy"]
+  verbs: ["watch"]
+  resources:
+    - group: "" # core
+      resources: ["endpoints", "services"]
+- level: None
+  users: ["system:unsecured"]
+  namespaces: ["kube-system"]
+  verbs: ["get"]
+  resources:
+    - group: "" # core
+      resources: ["configmaps"]
+- level: None
+  users: ["kubelet"] # legacy kubelet identity
+  verbs: ["get"]
+  resources:
+    - group: "" # core
+      resources: ["nodes"]
+- level: None
+  userGroups: ["system:nodes"]
+  verbs: ["get"]
+  resources:
+    - group: "" # core
+      resources: ["nodes"]
+- level: None
+  users:
+    - system:kube-controller-manager
+    - system:kube-scheduler
+    - system:serviceaccount:kube-system:endpoint-controller
+  verbs: ["get", "update"]
+  namespaces: ["kube-system"]
+  resources:
+    - group: "" # core
+      resources: ["endpoints"]
+- level: None
+  users: ["system:apiserver"]
+  verbs: ["get"]
+  resources:
+    - group: "" # core
+      resources: ["namespaces"]
+#不要记录这些只读URL。
+- level: None
+  nonResourceURLs:
+    - /healthz*
+    - /version
+    - /swagger*
+#不要记录事件请求。
+- level: None
+  resources:
+    - group: "" # core
+      resources: ["events"]
+# 机密、配置映射和令牌审查可以包含敏感和二进制数据，
+# 因此，只能在元数据级别进行日志记录。
+- level: Metadata
+  resources:
+    - group: "" # core
+      resources: ["secrets", "configmaps"]
+    - group: authentication.k8s.io
+      resources: ["tokenreviews"]
+
+- level: Request
+  verbs: ["get", "list", "watch"]
+  resources:
+    - group: "" # core
+    - group: "admissionregistration.k8s.io"
+    - group: "apps"
+    - group: "authentication.k8s.io"
+    - group: "authorization.k8s.io"
+    - group: "autoscaling"
+    - group: "batch"
+    - group: "certificates.k8s.io"
+    - group: "extensions"
+    - group: "networking.k8s.io"
+    - group: "policy"
+    - group: "rbac.authorization.k8s.io"
+    - group: "settings.k8s.io"
+    - group: "storage.k8s.io"
+# 已知API的默认级别。
+- level: RequestResponse
+  resources:
+    - group: "" # core
+    - group: "admissionregistration.k8s.io"
+    - group: "apps"
+    - group: "authentication.k8s.io"
+    - group: "authorization.k8s.io"
+    - group: "autoscaling"
+    - group: "batch"
+    - group: "certificates.k8s.io"
+    - group: "extensions"
+    - group: "networking.k8s.io"
+    - group: "policy"
+    - group: "rbac.authorization.k8s.io"
+    - group: "settings.k8s.io"
+    - group: "storage.k8s.io"
+    - group: "autoscaling.alibabacloud.com"
+# 所有其他请求的默认级别。
+- level: Metadata
