@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: kube-system
+
+#commonLabels:
+#  app.kubernetes.io/managed-by: kustomize
+#  kubernetes.io/name: metrics-server
+#  app.kubernetes.io/name: metrics-server
+#  kubernetes.io/cluster-service: "true"
+
+resources:
+- cluster/roles.yaml
+- service/services.yaml
+- workloads/deployment.yaml
+
+images:
+- name: registry.k8s.io/kube-state-metrics/kube-state-metrics
+  newName: {{ internal_images.namespace }}/kube-state-metrics
+  newTag: {{ internal_images.addons.kube_state_metrics }}
