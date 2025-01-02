@@ -3,12 +3,6 @@ kind: Kustomization
 
 namespace: kube-system
 
-#commonLabels:
-#  app.kubernetes.io/managed-by: kustomize
-#  kubernetes.io/name: metrics-server
-#  app.kubernetes.io/name: metrics-server
-#  kubernetes.io/cluster-service: "true"
-
 resources:
 - cluster/roles.yaml
 - service/services.yaml

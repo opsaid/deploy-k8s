@@ -22,7 +22,10 @@ spec:
     spec:
       automountServiceAccountToken: true
       containers:
-      - image: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.9.2
+      - args:
+        - --metric-labels-allowlist=pods=[*],deployments=[*],nodes=[*]
+        - --resources=certificatesigningrequests,configmaps,cronjobs,daemonsets,deployments,endpoints,horizontalpodautoscalers,ingresses,jobs,leases,limitranges,mutatingwebhookconfigurations,namespaces,networkpolicies,nodes,persistentvolumeclaims,persistentvolumes,poddisruptionbudgets,pods,replicasets,replicationcontrollers,resourcequotas,services,statefulsets,storageclasses,validatingwebhookconfigurations,volumeattachments
+        image: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.9.2
         livenessProbe:
           httpGet:
             path: /healthz
@@ -41,6 +44,13 @@ spec:
             port: 8081
           initialDelaySeconds: 5
           timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: 500m
+            memory: 2048Mi
+          requests:
+            cpu: 10m
+            memory: 32Mi
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
