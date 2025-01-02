@@ -209,3 +209,30 @@
       - workloads/job.yaml
       - service/services.yaml
   #when: (version == "v1.22") or (version == "v1.26")
+
+# kube-state-metrics
+- name: 生成 kube-state-metrics 配置
+  vars:
+    component: kube-state-metrics
+  block:
+  - name: 创建 k8s ingress-nginx 部署相关目录
+    file: path={{ item }} mode=0755 state=directory
+    with_items:
+      - "{{ etc_dir }}/addons/{{ component }}"
+      - "{{ etc_dir }}/addons/{{ component }}/cluster"
+      - "{{ etc_dir }}/addons/{{ component }}/service"
+      - "{{ etc_dir }}/addons/{{ component }}/workloads"
+      - "{{ etc_dir }}/addons/{{ component }}/config"
+      - "{{ etc_dir }}/addons/{{ component }}/config/configmap"
+  - name: 创建 kube-state-metrics 部署清单
+    template:
+      src: addons/{{ component }}/{{ item }}.j2
+      dest: "{{ etc_dir }}/addons/{{ component }}/{{ item }}"
+      owner: "{{ kube_user.name }}"
+      group: root
+      mode: 0644
+    with_items:
+      - kustomization.yaml
+      - cluster/roles.yaml
+      - workloads/deployment.yaml
+      - service/services.yaml
