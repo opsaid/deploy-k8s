@@ -16,6 +16,9 @@ subjectAltName = @alt_names
 IP.1 = 127.0.0.1
 IP.2 = {{ master_cluster_ip }}
 IP.3 = {{ apiserver_haip }}
+{% for host in groups['kube_control_plane'] %}
+IP.{{ loop.index+4 }}  = {{ hostvars[host]['ip'] }}
+{% endfor %}
 DNS.1 = localhost
 DNS.2 = {{ cluster_domain }}
 DNS.3 = *.{{ cluster_domain }}
