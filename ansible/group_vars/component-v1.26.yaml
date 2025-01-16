@@ -187,7 +187,8 @@ api_server_args:
 controller_manager_args:
   ## Generic flags ##
   profiling: "false"
-  allocate_node_cidrs: "true"
+  # 节点 PodCIDR 默认均由 CNI 分配
+  allocate_node_cidrs: "false"
   #cidr_allocator_type: "RangeAllocator"
   cluster_cidr: "{{ cluster_cidr }}"
   cluster_name: "{{ cluster_name }}"
