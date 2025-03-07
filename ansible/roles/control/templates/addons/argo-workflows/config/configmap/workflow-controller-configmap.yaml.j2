@@ -3,6 +3,8 @@ kind: ConfigMap
 metadata:
   name: workflow-controller-configmap
 data:
+  instanceID: default
+
   sso: |
     issuer: http://{{ cluster_role.control.oauth2_domain }}/oauth2
     sessionExpiry: 240h
